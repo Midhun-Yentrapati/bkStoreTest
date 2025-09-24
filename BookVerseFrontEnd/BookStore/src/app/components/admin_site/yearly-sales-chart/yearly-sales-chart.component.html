@@ -1,0 +1,88 @@
+<!-- Yearly Sales Progress Chart -->
+<div class="yearly-sales-container">
+  <div class="chart-header">
+    <div class="header-content">
+      <h3 class="chart-title">Yearly Sales Progress</h3>
+      <p class="chart-subtitle">Track your annual revenue performance</p>
+    </div>
+    <div class="chart-filters">
+      <select 
+        [(ngModel)]="selectedYearRange" 
+        (change)="onYearRangeChange()"
+        class="year-range-selector"
+      >
+        <option value="last-3-years">Last 3 Years</option>
+        <option value="last-5-years">Last 5 Years</option>
+        <option value="last-7-years">Last 7 Years</option>
+        <option value="last-10-years">Last 10 Years</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="chart-content">
+    <div class="chart-wrapper" [class.loading]="isLoading">
+      <div *ngIf="isLoading" class="loading-indicator">
+        <div class="loading-spinner"></div>
+        <p>Loading yearly sales data...</p>
+      </div>
+      <canvas 
+        *ngIf="!isLoading" 
+        #yearlySalesChart 
+        class="yearly-sales-canvas"
+        width="800" 
+        height="300">
+      </canvas>
+    </div>
+    
+    <!-- Chart Legend -->
+    <div class="chart-legend">
+      <div class="legend-item">
+        <div class="legend-color actual-sales"></div>
+        <span class="legend-label">Sales Revenue</span>
+      </div>
+    </div>
+    
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Sales (Period)</span>
+          <span class="stat-value">₹{{ formatRevenue(totalSalesInPeriod) }}</span>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Avg. Yearly Growth</span>
+          <span class="stat-value" [class.positive]="averageYearlyGrowth > 0" [class.negative]="averageYearlyGrowth < 0">
+            {{ averageYearlyGrowth > 0 ? '+' : '' }}{{ averageYearlyGrowth.toFixed(1) }}%
+          </span>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Best Year</span>
+          <span class="stat-value">{{ bestPerformingYear }}</span>
+        </div>
+      </div>
+      
+
+    </div>
+  </div>
+</div>

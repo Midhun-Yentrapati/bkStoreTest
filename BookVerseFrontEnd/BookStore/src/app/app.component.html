@@ -1,0 +1,10 @@
+<app-header *ngIf="!isAdminRoute"></app-header>
+<main class="main-content-container" [class.admin-mode]="isAdminRoute">
+<router-outlet></router-outlet>
+</main>
+<app-footer *ngIf="!isAdminRoute"></app-footer>
+
+<app-login-prompt *ngIf="showLoginPrompt && !isAdminRoute" (close)="closeLoginPrompt()"></app-login-prompt>
+
+<!-- Global Notifications -->
+<app-notification></app-notification>

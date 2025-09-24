@@ -1,0 +1,137 @@
+<div class="payment-details bg-white border border-gray-200 rounded-lg p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- No Payments -->
+  <div *ngIf="!loading && payments.length === 0" class="text-center py-8">
+    <p class="text-gray-600">No payment information available.</p>
+  </div>
+
+  <!-- Payment Summary -->
+  <div *ngIf="!loading && payments.length > 0" class="mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+      <div class="text-center">
+        <p class="text-2xl font-bold text-green-600">₹{{ getTotalPaid() }}</p>
+        <p class="text-sm text-gray-600">Total Paid</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold text-blue-600">₹{{ getTotalRefunded() }}</p>
+        <p class="text-sm text-gray-600">Total Refunded</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold text-gray-900">₹{{ getTotalPaid() - getTotalRefunded() }}</p>
+        <p class="text-sm text-gray-600">Net Amount</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment List -->
+  <div *ngIf="!loading && payments.length > 0" class="space-y-4">
+    <div *ngFor="let payment of payments" 
+         class="payment-item border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+      
+      <!-- Payment Header -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl">{{ getStatusIcon(payment.paymentStatus) }}</span>
+          <div>
+            <p class="font-medium text-gray-900">Payment #{{ payment.id.slice(-8) }}</p>
+            <p class="text-sm text-gray-600">{{ payment.createdAt | date:'MMM d, yyyy h:mm a' }}</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium" 
+              [ngClass]="getStatusColor(payment.paymentStatus)">
+          {{ payment.paymentStatus | titlecase }}
+        </span>
+      </div>
+
+      <!-- Payment Details -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <div>
+          <p class="text-sm text-gray-600">Amount</p>
+          <p class="font-semibold">₹{{ payment.amount }} {{ payment.currency }}</p>
+        </div>
+        <div *ngIf="payment.paymentGatewayId">
+          <p class="text-sm text-gray-600">Transaction ID</p>
+          <p class="font-mono text-sm">{{ payment.paymentGatewayId }}</p>
+        </div>
+        <div *ngIf="payment.refundedAmount && payment.refundedAmount > 0">
+          <p class="text-sm text-gray-600">Refunded Amount</p>
+          <p class="font-semibold text-blue-600">₹{{ payment.refundedAmount }}</p>
+        </div>
+        <div *ngIf="payment.failureReason">
+          <p class="text-sm text-gray-600">Failure Reason</p>
+          <p class="text-sm text-red-600">{{ payment.failureReason }}</p>
+        </div>
+      </div>
+
+      <!-- Refund Section -->
+      <div *ngIf="showRefundOption && canRefund(payment)" class="mt-4 pt-3 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-700">Refundable Amount</p>
+            <p class="text-lg font-semibold text-green-600">₹{{ getRefundableAmount(payment) }}</p>
+          </div>
+          <button (click)="requestRefund(payment.id)"
+                  [disabled]="refundLoading"
+                  class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <span *ngIf="!refundLoading">Request Refund</span>
+            <span *ngIf="refundLoading">Processing...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Additional Info for Failed Payments -->
+      <div *ngIf="payment.paymentStatus === 'failed'" 
+           class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div class="flex items-start space-x-2">
+          <span class="text-red-500 mt-0.5">⚠️</span>
+          <div>
+            <p class="text-sm font-medium text-red-800">Payment Failed</p>
+            <p class="text-sm text-red-700">
+              {{ payment.failureReason || 'Payment could not be processed. Please try again or use a different payment method.' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refund History -->
+      <div *ngIf="payment.refundedAmount && payment.refundedAmount > 0" 
+           class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="flex items-center space-x-2">
+          <span class="text-blue-600">🔄</span>
+          <div>
+            <p class="text-sm font-medium text-blue-800">
+              Refund Processed: ₹{{ payment.refundedAmount }}
+            </p>
+            <p class="text-sm text-blue-700">
+              Refund will be credited to your original payment method within 5-7 business days.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Support -->
+  <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+    <h4 class="font-medium text-gray-900 mb-2">Need Help?</h4>
+    <p class="text-sm text-gray-600 mb-3">
+      If you have questions about your payment or need assistance with refunds, please contact our support team.
+    </p>
+    <div class="flex space-x-4 text-sm">
+      <a href="mailto:support@bookstore.com" 
+         class="text-blue-600 hover:text-blue-800 font-medium">
+        📧 Email Support
+      </a>
+      <a href="tel:+1234567890" 
+         class="text-blue-600 hover:text-blue-800 font-medium">
+        📞 Call Support
+      </a>
+    </div>
+  </div>
+</div>

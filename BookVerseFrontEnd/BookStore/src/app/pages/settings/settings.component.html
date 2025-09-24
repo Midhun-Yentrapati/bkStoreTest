@@ -1,0 +1,144 @@
+<div class="settings-container">
+  <div class="settings-wrapper">
+    
+    <!-- Settings Header -->
+    <div class="settings-header">
+      <h1 class="settings-title">
+        <span class="material-icons">settings</span>
+        Account Settings
+      </h1>
+      <p class="settings-subtitle">Manage your account preferences and security settings</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <span class="material-icons">check_circle</span>
+      {{ successMessage }}
+    </div>
+    
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="material-icons">error</span>
+      {{ errorMessage }}
+    </div>
+
+    <div class="settings-content">
+      
+      <!-- Password Change Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">
+            <span class="material-icons">lock</span>
+            Change Password
+          </h3>
+          <p class="section-description">Update your password to keep your account secure</p>
+          <div class="help-text">
+            <strong>Password Requirements:</strong>
+            <ul>
+              <li>Current password must be correct</li>
+              <li>New password must be at least 8 characters long</li>
+              <li>New password should contain uppercase, lowercase, numbers, and special characters</li>
+              <li>Confirm password must match the new password</li>
+            </ul>
+          </div>
+        </div>
+        
+        <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <div class="password-input-container">
+              <input id="currentPassword" 
+                     [type]="showCurrentPassword ? 'text' : 'password'" 
+                     formControlName="currentPassword" 
+                     placeholder="Enter your current password"
+                     [class.error]="hasPasswordFieldError('currentPassword')">
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility('current')">
+                <span class="material-icons">{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <div *ngIf="getPasswordFieldError('currentPassword')" class="error-message">
+              <span class="material-icons">error</span>
+              {{ getPasswordFieldError('currentPassword') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <div class="password-input-container">
+              <input id="newPassword" 
+                     [type]="showNewPassword ? 'text' : 'password'" 
+                     formControlName="newPassword" 
+                     placeholder="Enter a new strong password"
+                     [class.error]="hasPasswordFieldError('newPassword')">
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+                <span class="material-icons">{{ showNewPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <div *ngIf="getPasswordFieldError('newPassword')" class="error-message">
+              <span class="material-icons">error</span>
+              {{ getPasswordFieldError('newPassword') }}
+            </div>
+            <div class="password-strength" *ngIf="passwordForm.get('newPassword')?.value">
+              <div class="strength-bar">
+                <div class="strength-fill" [class]="getPasswordStrengthClass()"></div>
+              </div>
+              <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <div class="password-input-container">
+              <input id="confirmPassword" 
+                     [type]="showConfirmPassword ? 'text' : 'password'" 
+                     formControlName="confirmPassword" 
+                     placeholder="Confirm your new password"
+                     [class.error]="hasPasswordFieldError('confirmPassword')">
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+                <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <div *ngIf="getPasswordFieldError('confirmPassword')" class="error-message">
+              <span class="material-icons">error</span>
+              {{ getPasswordFieldError('confirmPassword') }}
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" 
+                    class="save-btn" 
+                    [disabled]="isSubmittingPassword" 
+                    [class.loading]="isSubmittingPassword"
+                    [class.invalid]="!passwordForm.valid"
+                    (click)="onPasswordSubmit()">
+              <span class="material-icons">security</span>
+              {{ isSubmittingPassword ? 'Updating...' : 'Update Password' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+
+
+      
+      <!-- Danger Zone -->
+      <div class="section-card danger-zone">
+        <div class="section-header">
+          <h3 class="section-title danger">
+            <span class="material-icons">warning</span>
+            Danger Zone
+          </h3>
+          <p class="section-description">Irreversible actions that will affect your account</p>
+        </div>
+        
+        <div class="danger-actions">
+          <button (click)="deleteAccount()" class="danger-btn">
+            <span class="material-icons">delete_forever</span>
+            Delete Account
+          </button>
+          <p class="danger-warning">This action cannot be undone. All your data will be permanently deleted.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div> 

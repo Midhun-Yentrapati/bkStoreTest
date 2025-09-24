@@ -1,0 +1,33 @@
+<aside class="filter-sidebar" [formGroup]="filterForm">
+  <div class="filter-header">
+    <h3>Filters</h3>
+    <button (click)="resetFilters()" class="reset-btn">Reset</button>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="filter-section" formGroupName="categories">
+    <h4>Category</h4>
+    <div class="filter-options">
+      <div *ngFor="let category of categories" class="checkbox-wrapper">
+        <input title="Category" type="checkbox" [id]="'cat-' + category.id" [formControlName]="getSafeFormControlName(category.id)">
+        <label [for]="'cat-' + category.id">{{ category.name }}</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price Filter -->
+  <div class="filter-section">
+    <h4>Max Price</h4>
+    <div class="filter-options price-filter">
+      <input 
+        type="range" 
+        id="price-range" 
+        class="price-slider"
+        min="0" 
+        max="5000" 
+        step="50"
+        formControlName="price">
+      <label for="price-range" class="price-label">${{ filterForm.get('price')?.value }}</label>
+    </div>
+  </div>
+</aside>

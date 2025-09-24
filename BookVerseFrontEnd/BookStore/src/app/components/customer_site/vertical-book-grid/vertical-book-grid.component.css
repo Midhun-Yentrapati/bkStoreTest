@@ -1,0 +1,11 @@
+/* vertical-book-grid.component.css */
+
+.book-grid-container {
+  display: grid;
+  /* Defines a responsive grid.
+    The minmax value is now aligned with the 'compact' card's width (220px),
+    which creates a much cleaner and more intentional layout.
+  */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem; /* The space between cards */
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication Service - Complete User Management Functions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+        }
+        h4 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .emoji {
+            font-size: 1.2em;
+        }
+        .checkmark {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .endpoint {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 10px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .function-name {
+            background-color: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .summary-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .status-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        ul, ol {
+            margin-left: 20px;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .metadata {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Authentication Service - Complete User Management Functions</h1>
+
+        <h2>Executive Summary</h2>
+        <p>The User Authentication Service microservice provides <strong>comprehensive user management functions</strong> for both regular users and admin users with full CRUD operations, enterprise-grade security, and production-ready functionality.</p>
+
+        <hr>
+
+        <h2><span class="emoji">🎯</span> COMPREHENSIVE USER MANAGEMENT CAPABILITIES</h2>
+
+        <h3><span class="checkmark">✅</span> Core User CRUD Operations</h3>
+
+        <h4><strong>CREATE Operations:</strong></h4>
+        <ul>
+            <li><span class="function-name">createUser(UserDTO)</span> - Add new users to database with validation</li>
+            <li><span class="function-name">registerUser(UserDTO)</span> - Complete user registration with security checks</li>
+            <li><span class="function-name">createUsersInBulk(List&lt;UserDTO&gt;)</span> - Mass user creation for bulk operations</li>
+        </ul>
+
+        <h4><strong>READ Operations:</strong></h4>
+        <ul>
+            <li><span class="function-name">getUserById(String id)</span> - Retrieve user by unique identifier</li>
+            <li><span class="function-name">getUserByUsername(String username)</span> - Find user by username</li>
+            <li><span class="function-name">getUserByEmail(String email)</span> - Find user by email address</li>
+            <li><span class="function-name">getUserByUsernameOrEmail(String)</span> - Flexible user lookup</li>
+            <li><span class="function-name">getAllUsers(Pageable)</span> - Get all users with pagination support</li>
+            <li><span class="function-name">searchUsers(String, Pageable)</span> - Search users by search term</li>
+            <li><span class="function-name">getUsersWithFilters()</span> - Advanced filtering by type, status, verification</li>
+        </ul>
+
+        <h4><strong>UPDATE Operations:</strong></h4>
+        <ul>
+            <li><span class="function-name">updateUser(String id, UserDTO)</span> - Modify user information</li>
+            <li><span class="function-name">updateProfile(String userId, UserDTO)</span> - Update user profile data</li>
+            <li><span class="function-name">updateProfilePicture(String userId, String url)</span> - Update profile image</li>
+            <li><span class="function-name">updateUsersInBulk(List&lt;UserDTO&gt;)</span> - Mass user updates</li>
+        </ul>
+
+        <h4><strong>DELETE Operations:</strong></h4>
+        <ul>
+            <li><span class="function-name">deleteUser(String id)</span> - Remove users from database</li>
+            <li><span class="function-name">cleanupInactiveUsers(int days)</span> - Maintenance cleanup operations</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">🔧</span> ADMIN USER MANAGEMENT FUNCTIONS</h2>
+
+        <h3><span class="checkmark">✅</span> Admin Authentication & Management</h3>
+
+        <h4><strong>Admin Creation & Registration:</strong></h4>
+        <ul>
+            <li><span class="function-name">registerAdmin(AdminUserDTO)</span> - Create new admin users</li>
+            <li><span class="function-name">loginAdmin(LoginRequest)</span> - Admin-specific authentication</li>
+            <li><span class="function-name">generateAdminAccessToken()</span> - Generate JWT tokens for admins</li>
+        </ul>
+
+        <h4><strong>Admin Role Management:</strong></h4>
+        <ul>
+            <li><strong>SUPER_ADMIN</strong> - Highest level with full system access</li>
+            <li><strong>ADMIN</strong> - High level with most administrative functions</li>
+            <li><strong>MANAGER</strong> - Mid level for department/team management</li>
+            <li><strong>MODERATOR</strong> - Content moderation and user management</li>
+            <li><strong>SUPPORT</strong> - Customer support and basic operations</li>
+        </ul>
+
+        <h4><strong>Permission System:</strong></h4>
+        <ul>
+            <li><strong>Granular Permissions</strong>: USER_READ, USER_WRITE, BOOK_MANAGE, ORDER_VIEW, etc.</li>
+            <li><strong>Department Management</strong>: Department-based organization</li>
+            <li><strong>Manager Hierarchy</strong>: Self-referencing manager relationships</li>
+            <li><strong>Audit Trail</strong>: Complete tracking of admin activities</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">🔗</span> REST API ENDPOINTS AVAILABLE</h2>
+
+        <h3>User Profile Management Endpoints</h3>
+        <div class="code-block">
+            <div class="endpoint">GET    /api/users/profile              # Get authenticated user profile</div>
+            <div class="endpoint">PUT    /api/users/profile              # Update user profile information</div>
+            <div class="endpoint">PUT    /api/users/profile/picture      # Update profile picture URL</div>
+        </div>
+
+        <h3>Address Management Endpoints</h3>
+        <div class="code-block">
+            <div class="endpoint">GET    /api/users/addresses                    # Get all user addresses</div>
+            <div class="endpoint">POST   /api/users/addresses                    # Add new address</div>
+            <div class="endpoint">PUT    /api/users/addresses/{addressId}        # Update specific address</div>
+            <div class="endpoint">DELETE /api/users/addresses/{addressId}        # Delete address</div>
+            <div class="endpoint">PUT    /api/users/addresses/{addressId}/default # Set as default address</div>
+            <div class="endpoint">GET    /api/users/addresses/default            # Get default address</div>
+        </div>
+
+        <h3>Admin User Management Endpoints</h3>
+        <div class="code-block">
+            <div class="endpoint">GET    /api/users/admin/all                    # Get all users (paginated)</div>
+            <div class="endpoint">GET    /api/users/admin/search                 # Search users with filters</div>
+            <div class="endpoint">GET    /api/users/admin/{userId}               # Get specific user by ID</div>
+            <div class="endpoint">PUT    /api/users/admin/{userId}/activate      # Activate user account</div>
+            <div class="endpoint">PUT    /api/users/admin/{userId}/deactivate    # Deactivate user account</div>
+            <div class="endpoint">PUT    /api/users/admin/{userId}/lock          # Lock user account</div>
+            <div class="endpoint">PUT    /api/users/admin/{userId}/unlock        # Unlock user account</div>
+        </div>
+
+        <h3>User Statistics Endpoints</h3>
+        <div class="code-block">
+            <div class="endpoint">GET    /api/users/admin/stats/count            # User count statistics</div>
+            <div class="endpoint">GET    /api/users/admin/stats/inactive         # Get inactive users list</div>
+        </div>
+
+        <hr>
+
+        <h2><span class="emoji">🗃️</span> DATABASE OPERATIONS SUPPORTED</h2>
+
+        <h3>User Table Operations</h3>
+
+        <h4><strong>INSERT Operations:</strong></h4>
+        <ul>
+            <li>Add new user records with comprehensive validation</li>
+            <li>Automatic password hashing using BCrypt (strength 12)</li>
+            <li>Username and email uniqueness validation</li>
+            <li>Account status initialization and security settings</li>
+        </ul>
+
+        <h4><strong>SELECT Operations:</strong></h4>
+        <ul>
+            <li>Query users by ID, username, email, or combined filters</li>
+            <li>Advanced search with pagination and sorting</li>
+            <li>Filter by user type (CUSTOMER, ADMIN)</li>
+            <li>Filter by account status (ACTIVE, INACTIVE, SUSPENDED, DELETED)</li>
+            <li>Filter by verification status (email verified, phone verified)</li>
+        </ul>
+
+        <h4><strong>UPDATE Operations:</strong></h4>
+        <ul>
+            <li>Modify user profiles, contact information, and preferences</li>
+            <li>Update account status and security settings</li>
+            <li>Change passwords with proper encryption</li>
+            <li>Update verification status and timestamps</li>
+        </ul>
+
+        <h4><strong>DELETE Operations:</strong></h4>
+        <ul>
+            <li>Soft delete (mark as deleted but retain data)</li>
+            <li>Hard delete (permanent removal from database)</li>
+            <li>Cascade delete for related records (addresses, sessions)</li>
+        </ul>
+
+        <h3>Admin Users Table Operations</h3>
+
+        <h4><strong>INSERT Operations:</strong></h4>
+        <ul>
+            <li>Create admin users with specific roles and permissions</li>
+            <li>Department assignment and manager hierarchy setup</li>
+            <li>Enhanced security settings (2FA, stricter account policies)</li>
+            <li>Audit trail initialization (created_by, updated_by tracking)</li>
+        </ul>
+
+        <h4><strong>SELECT Operations:</strong></h4>
+        <ul>
+            <li>Query admins by role, department, or hierarchy level</li>
+            <li>Manager-subordinate relationship queries</li>
+            <li>Permission-based filtering and access control</li>
+            <li>Activity tracking and session monitoring</li>
+        </ul>
+
+        <h4><strong>UPDATE Operations:</strong></h4>
+        <ul>
+            <li>Modify admin roles, permissions, and department assignments</li>
+            <li>Update manager relationships and organizational structure</li>
+            <li>Change security settings and access levels</li>
+            <li>Update audit information and activity logs</li>
+        </ul>
+
+        <h4><strong>DELETE Operations:</strong></h4>
+        <ul>
+            <li>Remove admin users with proper cascade handling</li>
+            <li>Reassign subordinates to different managers</li>
+            <li>Archive admin activities and maintain audit trail</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">🔐</span> SECURITY & VALIDATION FEATURES</h2>
+
+        <h3>Data Validation</h3>
+
+        <h4><strong>Bean Validation (JSR-303):</strong></h4>
+        <ul>
+            <li>Comprehensive validation annotations on all DTOs</li>
+            <li>Field-level validation for data integrity</li>
+            <li>Custom validation rules for business logic</li>
+            <li>Error message localization and user feedback</li>
+        </ul>
+
+        <h4><strong>Business Rules Validation:</strong></h4>
+        <ul>
+            <li>Username and email uniqueness enforcement</li>
+            <li>Password complexity requirements and validation</li>
+            <li>Account status transition rules and constraints</li>
+            <li>Permission and role assignment validation</li>
+        </ul>
+
+        <h3>Password Management</h3>
+
+        <h4><strong>BCrypt Hashing:</strong></h4>
+        <ul>
+            <li>Strength 12 encryption for all user passwords</li>
+            <li>Automatic salt generation for each password</li>
+            <li>Secure password comparison and validation</li>
+            <li>Password history tracking and reuse prevention</li>
+        </ul>
+
+        <h4><strong>Password Reset Flow:</strong></h4>
+        <ul>
+            <li>Secure token-based password reset process</li>
+            <li>Email verification for password reset requests</li>
+            <li>Time-limited reset tokens with expiration</li>
+            <li>Account security notifications and alerts</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">📊</span> BULK OPERATIONS & ADVANCED FEATURES</h2>
+
+        <h3>Mass User Management</h3>
+
+        <h4><strong>Bulk Creation:</strong></h4>
+        <ul>
+            <li><span class="function-name">createUsersInBulk(List&lt;UserDTO&gt;)</span> - Create multiple users simultaneously</li>
+            <li>Batch processing with transaction management</li>
+            <li>Error handling and partial success reporting</li>
+            <li>Validation and rollback capabilities</li>
+        </ul>
+
+        <h4><strong>Bulk Updates:</strong></h4>
+        <ul>
+            <li><span class="function-name">updateUsersInBulk(List&lt;UserDTO&gt;)</span> - Update multiple users at once</li>
+            <li>Status changes and profile updates in batches</li>
+            <li>Permission and role assignment for multiple users</li>
+            <li>Audit trail maintenance for bulk operations</li>
+        </ul>
+
+        <h4><strong>Data Export:</strong></h4>
+        <ul>
+            <li><span class="function-name">exportUsers()</span> - Export all users to various formats</li>
+            <li><span class="function-name">exportUsersByType(User.UserType)</span> - Export by user classification</li>
+            <li><span class="function-name">exportUsersByStatus(User.AccountStatus)</span> - Export by account status</li>
+            <li>CSV, JSON, and XML export format support</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">🎯</span> PRODUCTION READINESS FEATURES</h2>
+
+        <h3>Enterprise-Grade Security</h3>
+
+        <h4><strong>Authentication & Authorization:</strong></h4>
+        <ul>
+            <li>JWT-based stateless authentication system</li>
+            <li>Role-based access control with granular permissions</li>
+            <li>Multi-factor authentication support for admin users</li>
+            <li>Session management with device tracking</li>
+        </ul>
+
+        <h4><strong>Data Protection:</strong></h4>
+        <ul>
+            <li>Encryption at rest and in transit</li>
+            <li>Personal data anonymization capabilities</li>
+            <li>GDPR compliance features and data portability</li>
+            <li>Audit logging for compliance and security</li>
+        </ul>
+
+        <h3>Performance & Scalability</h3>
+
+        <h4><strong>Database Optimization:</strong></h4>
+        <ul>
+            <li>Comprehensive indexing strategy for fast queries</li>
+            <li>Connection pooling and transaction management</li>
+            <li>Query optimization and performance monitoring</li>
+            <li>Database partitioning and sharding support</li>
+        </ul>
+
+        <h4><strong>Horizontal Scaling:</strong></h4>
+        <ul>
+            <li>Stateless design for load balancer compatibility</li>
+            <li>Microservice architecture with service discovery</li>
+            <li>Database replication and failover support</li>
+            <li>Auto-scaling capabilities and resource management</li>
+        </ul>
+
+        <hr>
+
+        <h2><span class="emoji">🚀</span> DEPLOYMENT & INTEGRATION</h2>
+
+        <h3>Microservice Architecture</h3>
+
+        <h4><strong>Service Configuration:</strong></h4>
+        <ul>
+            <li><strong>Port</strong>: 8081 (User Authentication Service)</li>
+            <li><strong>Database</strong>: MySQL (production) / H2 (development)</li>
+            <li><strong>Service Discovery</strong>: Eureka integration ready</li>
+            <li><strong>API Gateway</strong>: Compatible with Spring Cloud Gateway</li>
+        </ul>
+
+        <h4><strong>External Integrations:</strong></h4>
+        <ul>
+            <li><strong>Email Service</strong>: User verification and notifications</li>
+            <li><strong>SMS Service</strong>: Phone verification and 2FA</li>
+            <li><strong>File Storage</strong>: Profile picture and document storage</li>
+            <li><strong>Analytics Service</strong>: User behavior and activity tracking</li>
+        </ul>
+
+        <hr>
+
+        <div class="summary-box">
+            <h2><span class="emoji">📋</span> SUMMARY</h2>
+
+            <h3><span class="checkmark">✅</span> COMPLETE USER MANAGEMENT CAPABILITIES</h3>
+
+            <p>The User Authentication Service microservice provides <strong>FULL user management functionality</strong> with:</p>
+
+            <ul>
+                <li><span class="checkmark">✅</span> <strong>Add New Users</strong>: Complete user registration and admin creation with validation</li>
+                <li><span class="checkmark">✅</span> <strong>Delete Users</strong>: Soft and hard delete options with proper cascade handling</li>
+                <li><span class="checkmark">✅</span> <strong>Modify Users</strong>: Profile updates, status changes, and role management</li>
+                <li><span class="checkmark">✅</span> <strong>Search Users</strong>: Advanced filtering, pagination, and analytics</li>
+                <li><span class="checkmark">✅</span> <strong>Bulk Operations</strong>: Mass user management, export, and maintenance</li>
+                <li><span class="checkmark">✅</span> <strong>Admin Management</strong>: Complete admin user CRUD operations with role hierarchy</li>
+                <li><span class="checkmark">✅</span> <strong>Address Management</strong>: Full address CRUD with GPS and delivery optimization</li>
+                <li><span class="checkmark">✅</span> <strong>Session Management</strong>: Multi-device JWT session tracking and security</li>
+                <li><span class="checkmark">✅</span> <strong>Security Controls</strong>: Account locking, activation, verification, and audit trails</li>
+            </ul>
+
+            <h3><span class="emoji">🎉</span> Production-Ready Status</h3>
+
+            <p><span class="status-badge">PRODUCTION-READY</span></p>
+            <p><strong>The User Authentication Service is PRODUCTION-READY with enterprise-grade user management functionality, comprehensive security features, and scalable architecture suitable for high-volume applications.</strong></p>
+        </div>
+
+        <div class="metadata">
+            <strong>Document Generated</strong>: 2025-01-10 15:51:01 IST<br>
+            <strong>Service Version</strong>: User Authentication Service v1.0<br>
+            <strong>Framework</strong>: Spring Boot 3.5.5 with Spring Security 6+<br>
+            <strong>Database</strong>: MySQL 8.0+ / H2 (development)<br>
+            <strong>Architecture</strong>: J2EE Microservice with JWT Authentication
+        </div>
+    </div>
+</body>
+</html>

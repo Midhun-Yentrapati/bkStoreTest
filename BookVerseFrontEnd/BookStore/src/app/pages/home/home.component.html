@@ -1,0 +1,165 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text fade-in">
+        <h1 class="hero-title">Discover Your Next Great Read</h1>
+        <p class="hero-subtitle">Explore thousands of books across every genre. From bestsellers to hidden gems, find your perfect literary companion.</p>
+        <div class="hero-actions">
+          
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">50K+</span>
+            <span class="stat-label">Books Available</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">10K+</span>
+            <span class="stat-label">Happy Readers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">4.8★</span>
+            <span class="stat-label">Average Rating</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual slide-in-up">
+        <div class="hero-books-stack">
+          <div class="book-card book-1">
+            <div class="book-spine"></div>
+            <div class="book-cover">
+              <span class="material-icons">auto_stories</span>
+            </div>
+          </div>
+          <div class="book-card book-2">
+            <div class="book-spine"></div>
+            <div class="book-cover">
+              <span class="material-icons">menu_book</span>
+            </div>
+          </div>
+          <div class="book-card book-3">
+            <div class="book-spine"></div>
+            <div class="book-cover">
+              <span class="material-icons">import_contacts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="main-content-container">
+    <div class="features-header text-center">
+      <h2 class="section-title">Why Choose BookVerse?</h2>
+      <p class="section-subtitle">Experience the future of book discovery with our modern platform</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card card-elevated">
+        <div class="feature-icon">
+          <span class="material-icons">local_shipping</span>
+        </div>
+        <h3 class="feature-title">Fast Delivery</h3>
+        <p class="feature-description">Get your books delivered within 2-3 business days with our express shipping.</p>
+      </div>
+      <div class="feature-card card-elevated">
+        <div class="feature-icon">
+          <span class="material-icons">verified_user</span>
+        </div>
+        <h3 class="feature-title">Secure Shopping</h3>
+        <p class="feature-description">Shop with confidence using our secure payment system and buyer protection.</p>
+      </div>
+      <div class="feature-card card-elevated">
+        <div class="feature-icon">
+          <span class="material-icons">favorite</span>
+        </div>
+        <h3 class="feature-title">Curated Selection</h3>
+        <p class="feature-description">Discover handpicked books across all genres, selected by our literary experts.</p>
+      </div>
+      <div class="feature-card card-elevated">
+        <div class="feature-icon">
+          <span class="material-icons">support_agent</span>
+        </div>
+        <h3 class="feature-title">24/7 Support</h3>
+        <p class="feature-description">Our dedicated support team is here to help you with any questions or concerns.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Book Collections Section -->
+<section class="collections-section">
+  <div class="main-content-container">
+    <div class="home-sections-container">
+      <app-horizontal-book-section
+        sectionTitle="📚 Newly Launched Books"
+        [books]="newlyLaunchedBooks">
+      </app-horizontal-book-section>
+
+      <app-horizontal-book-section
+        sectionTitle="🔥 Best Sellers"
+        [books]="bestSellers">
+      </app-horizontal-book-section>
+
+      <app-horizontal-book-section
+        sectionTitle="💰 Special Offers"
+        [books]="specialOffers">
+      </app-horizontal-book-section>
+    </div>
+
+    <!-- Category Navigation -->
+    <div id="browse-categories" class="category-section">
+      <div class="category-header text-center">
+        <h2 class="section-title">Browse by Category</h2>
+        <p class="section-subtitle">Find books that match your interests</p>
+      </div>
+      <app-category-nav
+        [categories]="categories"
+        (categorySelected)="onCategorySelected($event)">
+      </app-category-nav>
+    </div>
+
+    <!-- Books Grid -->
+    <div *ngIf="books.length > 0" class="books-grid-section">
+      <div *ngIf="filtreredBooks.length === 0" class="empty-state">
+        <div class="empty-content">
+          <span class="material-icons empty-icon">search_off</span>
+          <h3 class="empty-title">No books found</h3>
+          <p class="empty-description">No books available in this category. Try browsing other categories.</p>
+          <button class="btn btn-primary" (click)="onCategorySelected('')">
+            <span class="material-icons">refresh</span>
+            Show All Books
+          </button>
+        </div>
+      </div>
+      <app-vertical-book-grid
+        *ngIf="filtreredBooks.length > 0"
+        [books]="getLimitedBooks()">
+      </app-vertical-book-grid>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+  <div class="main-content-container">
+    <div class="newsletter-content">
+      <div class="newsletter-text">
+        <h2 class="newsletter-title">Stay Updated</h2>
+        <p class="newsletter-subtitle">Get notified about new releases, exclusive offers, and reading recommendations.</p>
+      </div>
+      <div class="newsletter-form">
+        <div class="input-group">
+          <input type="email" class="form-control" placeholder="Enter your email address">
+          <button class="btn btn-primary">
+            <span class="material-icons">send</span>
+            Subscribe
+          </button>
+        </div>
+        <p class="newsletter-privacy">We respect your privacy. Unsubscribe at any time.</p>
+      </div>
+    </div>
+  </div>
+</section>

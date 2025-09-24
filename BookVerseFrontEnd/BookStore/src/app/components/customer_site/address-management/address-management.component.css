@@ -1,0 +1,114 @@
+/* Address Management Component Styles */
+
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+/* Error States */
+.border-error {
+  border-color: var(--error-color) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1) !important;
+}
+
+.border-success {
+  border-color: var(--success-color) !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+}
+
+.text-error {
+  color: var(--error-color);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+/* Form Check Cards */
+.form-check-card {
+  flex: 1;
+  min-width: 200px;
+}
+
+.form-check-card .form-check-input {
+  display: none;
+}
+
+.form-check-card .form-check-label {
+  display: block;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  background: var(--bg-card);
+}
+
+.form-check-card .form-check-input:checked + .form-check-label {
+  border-color: var(--primary-accent);
+  background: var(--primary-accent-light);
+}
+
+.form-check-content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Card Header */
+.card-header {
+  background: var(--bg-accent);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--primary-accent-light);
+  border-radius: 50%;
+  border-top-color: var(--primary-accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+  
+  .col-md-6 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .d-flex.gap-3.justify-content-end {
+    flex-direction: column;
+  }
+  
+  .d-flex.gap-3.justify-content-end .btn {
+    width: 100%;
+  }
+  
+  .form-check-card {
+    min-width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .d-flex.gap-3.flex-wrap {
+    flex-direction: column;
+  }
+}

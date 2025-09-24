@@ -1,0 +1,27 @@
+/* dashboard-widget.component.css */
+
+.widget:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px var(--widget-bg), 0 10px 10px -5px var(--widget-bg);
+}
+
+.widget {
+  cursor: pointer;
+  background-color: var(--widget-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Added transform and box-shadow to transition */
+}
+
+.widget h3 {
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+.widget p {
+  color: var(--widget-text);
+  line-height: 1.5;
+}

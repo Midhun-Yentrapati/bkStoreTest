@@ -1,0 +1,64 @@
+.chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modern-chart-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.modern-chart-wrapper:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.error-message,
+.loading-message,
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+.loading-message {
+  background: #f0f9ff;
+  color: #0284c7;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.no-data-message {
+  background: #f9fafb;
+  color: #6b7280;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.loading-message p,
+.error-message p,
+.no-data-message p {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}

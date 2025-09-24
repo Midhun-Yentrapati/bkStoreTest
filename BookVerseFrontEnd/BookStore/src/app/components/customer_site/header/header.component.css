@@ -1,0 +1,604 @@
+/* HEADER COMPONENT STYLING */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  padding: 1rem 3rem;
+  background-color: rgb(59 130 246 / 0.9);
+  color: var(--text-on-header);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: background-color var(--transition-speed) ease;
+}
+
+/* Light theme header is now handled by CSS variables in styles.css */
+
+/* Ensure all text elements use proper header text color with enhanced visibility */
+.app-header,
+.app-header *,
+.app-header .material-icons {
+  color: var(--text-on-header) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Text colors now handled by CSS variables */
+
+/* Ensure SVG elements use current color */
+.app-header svg {
+  color: var(--text-on-header);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+/* SVG colors now handled by CSS variables */
+
+/* --- Left Section: Compact Logo --- */
+.header-left {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-on-header) !important;
+  transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.05);
+}
+
+.logo-svg {
+  transition: transform 0.3s ease;
+  color: var(--text-on-header);
+}
+
+.logo-link:hover .logo-svg {
+  transform: rotate(-5deg);
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-on-header) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo text colors now handled by CSS variables */
+
+/* --- Center Section: Enhanced Search Bar --- */
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 2rem;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-on-header);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+}
+
+/* Light theme specific search input improvements */
+body[data-theme="light"] .search-container input {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #000000 !important;
+}
+
+.search-container input::placeholder {
+  color: var(--text-on-header);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Light theme specific placeholder */
+body[data-theme="light"] .search-container input::placeholder {
+  color: #666666;
+  opacity: 1;
+}
+
+.search-container input:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  outline: none;
+}
+
+/* Light theme specific search input focus */
+body[data-theme="light"] .search-container input:focus {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  outline: 2px solid #000000 !important;
+  outline-offset: 1px;
+  color: #000000 !important;
+}
+
+.search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 36px;
+  width: 36px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-on-header);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+}
+
+/* Light theme specific search button */
+body[data-theme="light"] .search-button {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  color: #7c3aed;
+}
+
+.search-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Light theme specific search button hover */
+body[data-theme="light"] .search-button:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  color: #7c3aed;
+}
+
+/* --- Right Section: Actions --- */
+.header-right {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Enhanced material icons visibility */
+.material-icons {
+  color: var(--text-on-header) !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-smoothing: antialiased !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Material icons colors now handled by CSS variables */
+
+/* Ensure buttons have proper text color */
+.action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-on-header) !important;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Action button colors now handled by CSS variables */
+
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  color: var(--text-on-header) !important;
+}
+
+/* Button colors now handled by CSS variables */
+
+/* Icon button styles for logged-in users */
+.icon-btn {
+  padding: 0.6rem;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+}
+
+.icon-btn .material-icons {
+  font-size: 1.3rem;
+}
+
+.signup-btn {
+  background-color: transparent;
+  border: 2px solid var(--primary-accent);
+  border-radius: 25px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-speed) ease;
+}
+
+.signup-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+}
+
+/* Light theme specific signup button */
+body[data-theme="light"] .signup-btn {
+  background-color: #ffffff;
+  color: #7c3aed; /* Lavender color */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="light"] .signup-btn:hover {
+  background-color: #f8fafc;
+  color: #6d28d9; /* Darker lavender on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Dark theme specific signup button */
+body[data-theme="dark"] .signup-btn {
+  background-color: #000000;
+  color: #7c3aed; /* Lavender color */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] .signup-btn:hover {
+  background-color: #1a1a1a;
+  color: #8b5cf6; /* Lighter lavender on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.theme-toggle {
+  padding: 0.6rem;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Theme toggle colors now handled by CSS variables */
+
+/* Settings Dropdown Styles - Completely Rewritten */
+.user-menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-btn {
+  position: relative;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.settings-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.settings-btn[aria-expanded="true"] {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(0);
+}
+
+/* Dropdown Menu */
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 300px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  z-index: 2000;
+  animation: slideDown 0.2s ease-out;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* User Info Header */
+.user-dropdown-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-container);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary-accent);
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 15px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+/* Dropdown Options */
+.user-dropdown-options {
+  padding: 8px 0;
+}
+
+.user-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  text-align: left;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-container);
+  color: var(--primary-accent);
+}
+
+.user-dropdown-item:active {
+  background: var(--primary-accent);
+  color: white;
+  transform: scale(0.98);
+}
+
+.user-dropdown-item:focus {
+  outline: 2px solid var(--primary-accent);
+  outline-offset: -2px;
+  background: var(--bg-container);
+}
+
+.user-dropdown-item .material-icons {
+  font-size: 20px;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.user-dropdown-item:hover .material-icons {
+  color: var(--primary-accent);
+}
+
+.user-dropdown-item:active .material-icons {
+  color: white;
+}
+
+.item-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Logout Item Specific Styles */
+.logout-item {
+  color: #dc3545;
+  margin-top: 4px;
+}
+
+.logout-item:hover {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.logout-item:active {
+  background: #dc3545;
+  color: white;
+}
+
+.logout-item .material-icons {
+  color: #dc3545;
+}
+
+.logout-item:active .material-icons {
+  color: white;
+}
+
+/* Divider */
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
+  opacity: 0.5;
+}
+
+/* Backdrop */
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1999;
+  background: transparent;
+  cursor: default;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .header-center {
+    margin: 0 1rem;
+  }
+  
+  .search-container {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 1rem;
+  }
+  
+  .header-center {
+    margin: 0 0.75rem;
+  }
+  
+  .search-container {
+    max-width: 300px;
+  }
+  
+  .search-container input {
+    font-size: 0.9rem;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.1rem;
+  }
+  
+  .user-dropdown-menu {
+    min-width: 280px;
+    right: -8px;
+  }
+  
+  .user-dropdown-header {
+    padding: 14px 16px;
+  }
+  
+  .user-dropdown-item {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-right .action-btn:not(.icon-btn) {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .search-container {
+    max-width: 250px;
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .user-dropdown-menu {
+    min-width: 260px;
+    right: -16px;
+  }
+}
+
+/* Badge styles for cart and wishlist */
+.cart-wishlist-btn {
+  position: relative;
+}
+
+/* Cart and wishlist button colors now handled by CSS variables */
+
+.badge-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme specific badge */
+body[data-theme="light"] .badge-count {
+  background-color: #e53e3e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.badge-count:empty {
+  display: none;
+}

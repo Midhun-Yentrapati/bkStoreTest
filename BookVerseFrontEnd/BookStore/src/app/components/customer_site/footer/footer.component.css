@@ -1,0 +1,114 @@
+/*
+ * This file styles the site footer using the new global design system.
+ */
+
+.site-footer {
+  /* Use the new background and text colors from the global theme */
+  background-color: var(--bg-footer);
+  color: var(--text-on-footer);
+  padding: 3rem 0; /* More vertical padding, side padding is handled by the container */
+  transition: all var(--transition-speed) ease;
+}
+
+.footer-container {
+  /* Use the same compact layout as the main content */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 5vw, 4rem); /* Match main content's side padding */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+
+.footer-column {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  /* The logo color should stand out */
+  color: var(--text-on-footer);
+  margin-bottom: 1rem;
+}
+
+.footer-column p {
+  line-height: 1.7;
+  opacity: 0.8; /* Slightly muted text for paragraphs */
+}
+
+.footer-column h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-on-footer);
+  margin-bottom: 1.5rem;
+  opacity: 1; /* Headings should be fully opaque */
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 0.85rem;
+}
+
+.footer-column ul li a {
+  text-decoration: none;
+  color: var(--text-on-footer);
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out, font-weight 0.2s ease-in-out;
+}
+
+/* Style for hover and active links */
+.footer-column ul li a:hover,
+.footer-column ul li a.active-link {
+  opacity: 1;
+  font-weight: 600; /* Makes the active link bold */
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  /* Use a subtle background derived from the footer's text color */
+  background-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-on-footer);
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+[data-theme="dark"] .social-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.social-icon:hover {
+  background-color: var(--primary-accent);
+  color: var(--text-on-header); /* Use text color that contrasts with the accent */
+  transform: scale(1.1);
+}
+
+.footer-bottom-bar {
+  text-align: center;
+  padding: 2rem 0 0;
+  margin-top: 2rem;
+  /* Use a semi-transparent border */
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .footer-bottom-bar {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}

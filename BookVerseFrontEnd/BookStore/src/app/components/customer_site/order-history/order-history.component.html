@@ -1,0 +1,64 @@
+<div class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="mb-4">My Orders</h2>
+      </div>
+    </div>
+  
+    <ng-container *ngIf="orders.length > 0; else noOrders">
+      <div class="list-group">
+        <div class="list-group-item list-group-item-action mb-3 shadow-sm rounded-3" *ngFor="let order of orders">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Order #{{ order.id }}</h5>
+            <small class="text-muted">{{ order.orderDate | date:'medium' }}</small>
+          </div>
+          <p class="mb-1">Total: <span class="fw-bold text-primary">₹{{ order.totalAmount | number:'1.2-2' }}</span></p>
+          <p class="mb-2">
+            Order Status: 
+                            <span class="badge" [ngClass]="getStatusBadgeClass(order.orderStatus)">
+                  {{ getOrderStatusText(order.orderStatus) }}
+                </span>
+          </p>
+          <p class="mb-2">
+            Payment Status: 
+            <span class="badge" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus)">
+              {{ getPaymentStatusText(order.paymentStatus) }}
+            </span>
+          </p>
+          <p class="mb-2">
+            Payment Method: <strong>{{ order.paymentMethod }}</strong>
+          </p>
+          <p class="mb-2">
+            Delivery Address: 
+            <small class="text-muted">
+              {{ order.shippingAddress.name }}, {{ order.shippingAddress.address }}, {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} - {{ order.shippingAddress.pincode }}
+            </small>
+          </p>
+          <ul class="list-unstyled mb-2 small">
+            <li *ngFor="let item of order.items">
+              {{ item.title }} (x{{ item.quantity }}) - ₹{{ item.price | number:'1.2-2' }} each
+            </li>
+          </ul>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="viewOrderDetails(order.id!)">
+              <i class="bi bi-info-circle me-1"></i> View Details
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="cancelOrder(order.id!)"
+                    [disabled]="!canCancelOrder(order)">
+              <i class="bi bi-x-circle me-1"></i> Cancel Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  
+    <ng-template #noOrders>
+      <div class="row">
+        <div class="col-12 text-center">
+          <div class="alert alert-info" role="alert">
+            You haven't placed any orders yet.
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>

@@ -1,0 +1,140 @@
+<header class="app-header">
+  <!-- Left Section: Compact Logo & Brand -->
+  <div class="header-left">
+    <a class="logo-link" (click)="navigateToHome()"> 
+      <svg class="logo-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 19.5C4 18.1193 5.11929 17 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6.5 17C6.5 15.6193 7.61929 14.5 9 14.5H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 14.5C9 13.1193 10.1193 12 11.5 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11.5 12C11.5 10.6193 12.6193 9.5 14 9.5H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14 9.5C14 8.11929 15.1193 7 16.5 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M17 2H6.5C5.11929 2 4 3.11929 4 4.5V19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">BookVerse</span>
+    </a>
+  </div>
+
+  <!-- Center Section: Search Bar -->
+  <div class="header-center">
+    <div class="search-container">
+      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search books, authors, categories..." />
+      <button class="search-button" (click)="onSearch()" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Right Section: User Actions -->
+  <div class="header-right">
+  
+
+    <!-- Guest Actions -->
+    <ng-container *ngIf="!isLoggedIn()">
+      <button (click)="onLogin()" class="action-btn login-btn">Login</button>
+      <button (click)="onSignup()" class="action-btn signup-btn">Sign Up</button>
+    </ng-container>
+
+    <!-- Logged-in User Actions -->
+    <ng-container *ngIf="isLoggedIn()">
+      <!-- Wishlist -->
+      <button (click)="goToWishlist()" class="action-btn icon-btn cart-wishlist-btn" aria-label="Wishlist">
+        <span class="material-icons">favorite_border</span>
+        <span class="badge badge-count" *ngIf="(wishlistItemCount$ | async) as count; else: noBadge">{{ count > 99 ? '99+' : count }}</span>
+      </button>
+      
+      <!-- Shopping Cart -->
+      <button (click)="goToCart()" class="action-btn icon-btn cart-wishlist-btn" aria-label="Cart">
+        <span class="material-icons">shopping_cart</span>
+        <span class="badge badge-count" *ngIf="(cartItemCount$ | async) as count; else: noBadge">{{ count > 99 ? '99+' : count }}</span>
+      </button>
+
+      <ng-template #noBadge></ng-template>
+      
+      <!-- Settings Dropdown -->
+      <div class="user-menu-container">
+        <button 
+          (click)="toggleSettingsDropdown()" 
+          class="action-btn icon-btn settings-btn" 
+          aria-label="User Menu"
+          [attr.aria-expanded]="showSettingsDropdown"
+          aria-haspopup="true">
+          <span class="material-icons">account_circle</span>
+        </button>
+        
+        <!-- Dropdown Menu -->
+        <div 
+          *ngIf="showSettingsDropdown" 
+          class="user-dropdown-menu"
+          role="menu"
+          aria-label="User menu">
+          
+          <!-- User Info Header -->
+          <div class="user-dropdown-header">
+            <div class="user-avatar">
+              <img [src]="currentUser()?.profilePicture || getDefaultAvatar()" [alt]="getUserDisplayName()">
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{ getUserDisplayName() }}</div>
+              <div class="user-email">{{ currentUser()?.email }}</div>
+            </div>
+          </div>
+          
+          <div class="dropdown-divider"></div>
+          
+          <!-- Menu Options -->
+          <div class="user-dropdown-options">
+            <button 
+              type="button" 
+              class="user-dropdown-item"
+              role="menuitem"
+              (click)="handleProfileClick()"
+              tabindex="0">
+              <span class="material-icons">person</span>
+              <span class="item-text">My Profile</span>
+            </button>
+            
+            <button 
+              type="button" 
+              class="user-dropdown-item"
+              role="menuitem"
+              (click)="goToOrders()"
+              tabindex="0">
+              <span class="material-icons">receipt_long</span>
+              <span class="item-text">My Orders</span>
+            </button>
+            
+            <button 
+              type="button" 
+              class="user-dropdown-item"
+              role="menuitem"
+              (click)="handleSettingsClick()"
+              tabindex="0">
+              <span class="material-icons">settings</span>
+              <span class="item-text">Settings</span>
+            </button>
+            
+            <div class="dropdown-divider"></div>
+            
+            <button 
+              type="button" 
+              class="user-dropdown-item logout-item"
+              role="menuitem"
+              (click)="handleLogoutClick()"
+              tabindex="0">
+              <span class="material-icons">logout</span>
+              <span class="item-text">Sign Out</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Backdrop -->
+        <div 
+          *ngIf="showSettingsDropdown" 
+          class="dropdown-backdrop" 
+          (click)="closeDropdown()"
+          aria-hidden="true">
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</header>

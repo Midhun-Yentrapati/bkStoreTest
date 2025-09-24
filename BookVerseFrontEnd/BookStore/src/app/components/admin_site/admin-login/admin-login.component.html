@@ -1,0 +1,73 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-md">
+    <div class="bg-white shadow-lg rounded-lg px-8 py-8">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Admin Login</h2>
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email:</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{ 'border-red-500 focus:ring-red-500': f['email'].invalid && f['email'].touched }"
+          />
+          <div *ngIf="f['email'].invalid && f['email'].touched" class="mt-2 text-sm text-red-600">
+            <div *ngIf="f['email'].errors?.['required']">Email is required.</div>
+            <div *ngIf="f['email'].errors?.['email']">Enter a valid email address.</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password:</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [ngClass]="{ 'border-red-500 focus:ring-red-500': f['password'].invalid && f['password'].touched }"
+          />
+          <div *ngIf="f['password'].invalid && f['password'].touched" class="mt-2 text-sm text-red-600">
+            <div *ngIf="f['password'].errors?.['required']">Password is required.</div>
+            <div *ngIf="f['password'].errors?.['minlength']">Password must be at least 8 characters long.</div>
+            <div *ngIf="f['password'].errors?.['pattern']">
+              Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.
+            </div>
+          </div>
+        </div>
+
+        <!-- Display error or success messages -->
+        <div *ngIf="errorMessage" class="p-4 text-sm text-red-800 bg-red-100 border border-red-300 rounded-md">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="p-4 text-sm text-green-800 bg-green-100 border border-green-300 rounded-md">
+          {{ successMessage }}
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid || isLoading"
+          class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Logging In...
+          </span>
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a [routerLink]="['/forgot-password']" class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+          Forgot Password?
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

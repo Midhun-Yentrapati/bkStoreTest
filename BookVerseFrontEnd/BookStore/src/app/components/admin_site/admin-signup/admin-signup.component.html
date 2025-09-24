@@ -1,0 +1,90 @@
+<!-- src/app/admin-signup/admin-signup.component.html -->
+
+<div class="signup-container">
+  <div class="signup-card">
+    <h2>Create New Admin Account</h2>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Enter a username"
+          [ngClass]="{ 'is-invalid': f['username'].invalid && f['username'].touched }"
+        />
+        <div *ngIf="f['username'].invalid && f['username'].touched" class="validation-message">
+          <div *ngIf="f['username'].errors?.['required']">Username is required.</div>
+          <div *ngIf="f['username'].errors?.['minlength']">Username must be at least 3 characters.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [ngClass]="{ 'is-invalid': f['email'].invalid && f['email'].touched }"
+        />
+        <div *ngIf="f['email'].invalid && f['email'].touched" class="validation-message">
+          <div *ngIf="f['email'].errors?.['required']">Email is required.</div>
+          <div *ngIf="f['email'].errors?.['email']">Enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          [ngClass]="{ 'is-invalid': f['password'].invalid && f['password'].touched }"
+        />
+        <div *ngIf="f['password'].invalid && f['password'].touched" class="validation-message">
+          <div *ngIf="f['password'].errors?.['required']">Password is required.</div>
+          <div *ngIf="f['password'].errors?.['minlength']">Password must be at least 8 characters long.</div>
+          <div *ngIf="f['password'].errors?.['pattern']">
+            Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          placeholder="Confirm your password"
+          [ngClass]="{ 'is-invalid': f['confirmPassword'].invalid && f['confirmPassword'].touched || signupForm.errors?.['mismatch'] && f['confirmPassword'].touched }"
+        />
+        <div *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched" class="validation-message">
+          <div *ngIf="f['confirmPassword'].errors?.['required']">Confirm Password is required.</div>
+        </div>
+        <div *ngIf="signupForm.errors?.['mismatch'] && f['confirmPassword'].touched" class="validation-message">
+          Passwords do not match.
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="message error-message">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="message success-message">
+        {{ successMessage }}
+      </div>
+
+      <button type="submit" [disabled]="signupForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Register Admin</span>
+        <span *ngIf="isLoading">Registering...</span>
+      </button>
+    </form>
+
+    <div class="links">
+      <a [routerLink]="['/admin-login']">Back to Login</a>
+    </div>
+  </div>
+</div>

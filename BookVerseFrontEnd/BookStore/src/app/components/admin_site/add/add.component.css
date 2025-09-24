@@ -1,0 +1,419 @@
+/* Reset & Base Styles */
+
+/* Form Container */
+.add-book-container {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.add-book-form {
+  padding: 20px;
+  padding-top: 80px;
+  max-width: 800px;
+  margin: auto;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+/* Enhanced Form Styling */
+.form-step {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress Indicator Styling */
+.progress-indicator {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.step-circle.active {
+  background-color: #3b82f6;
+  color: white;
+  border: 2px solid #3b82f6;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.step-circle.completed {
+  background-color: #10b981;
+  color: white;
+  border: 2px solid #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.step-circle.pending {
+  background-color: #374151;
+  color: #9ca3af;
+  border: 2px solid #374151;
+}
+
+/* Enhanced Input Styling */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background-color: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+  background-color: white;
+  border-color: #3b82f6;
+}
+
+.form-group input.border-red-500,
+.form-group select.border-red-500,
+.form-group textarea.border-red-500 {
+  border-color: #ef4444;
+  background-color: rgba(254, 242, 242, 0.8);
+}
+
+.form-group input.border-green-500,
+.form-group select.border-green-500,
+.form-group textarea.border-green-500 {
+  border-color: #10b981;
+  background-color: rgba(240, 253, 244, 0.8);
+}
+
+/* Enhanced Button Styling */
+.inline-flex.items-center {
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.inline-flex.items-center:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.inline-flex.items-center:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Category Selection Enhancements */
+.form-step h3 {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.grid button {
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grid button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.grid button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Selected Categories */
+.inline-flex.items-center.px-3.py-1 {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Image Management */
+.grid img {
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.grid img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Error Messages */
+.text-red-500 {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* Character Counter */
+.text-gray-400.text-xs {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Success/Error Banners */
+.bg-green-50 {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+}
+
+.bg-red-50 {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+}
+
+/* Navigation Buttons */
+.flex.justify-between .inline-flex {
+  min-width: 120px;
+  justify-content: center;
+}
+
+/* File Upload Button Styling */
+.form-group button {
+  transition: all 0.2s ease;
+}
+
+.form-group button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Preview Enhancements */
+.grid img {
+  transition: transform 0.2s ease;
+}
+
+.grid img:hover {
+  transform: scale(1.05);
+}
+
+/* Radio Button Styling */
+input[type="radio"] {
+  accent-color: #3b82f6;
+}
+
+/* Standardized Page Header */
+.page-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.header-title {
+  flex: 1;
+  text-align: left;
+  min-width: 200px;
+}
+
+.page-title {
+  color: white;
+  font-size: 1.8em;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  color: #d1d5db;
+  opacity: 0.9;
+  margin: 0;
+  font-size: 1em;
+  font-weight: normal;
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-title {
+    text-align: center;
+    min-width: unset;
+  }
+
+  .header-actions {
+    align-self: center;
+  }
+
+  .add-book-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .progress-indicator {
+    padding: 1rem;
+  }
+
+  .step-circle {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .grid.grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid.grid-cols-1.md\\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Loading States */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Accessibility Improvements */
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Headings */
+.add-book-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: var(--text-color);
+}
+
+/* Table Layout */
+.add-book-form table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.add-book-form th {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+.add-book-form td {
+  padding: 10px;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.add-book-form table,
+.add-book-form td {
+  border: 1px solid var(--border-color);
+}
+
+.add-book-form label {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* Inputs */
+.add-book-form input,
+.add-book-form textarea {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+/* Button */
+.add-book-form button {
+  padding: 10px 20px;
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.add-book-form button:hover {
+  background-color: #0056b3;
+  color: var(--button-primary-text);
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 40px; /* Fixed size for circular button */
+  height: 40px; /* Fixed size for circular button */
+}
+body.dark-theme .back-button {
+  color: #fff;
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+body.dark-theme .back-button:hover {
+  background-color: #444;
+  color: #fff;
+}

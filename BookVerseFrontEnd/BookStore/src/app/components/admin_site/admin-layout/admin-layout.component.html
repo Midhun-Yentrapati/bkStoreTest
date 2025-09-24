@@ -1,0 +1,13 @@
+<!-- Main application layout without sidebar for admin -->
+<div class="flex min-h-screen flex-col bg-gray-100">
+  <!-- Top Header -->
+  <app-admin-header></app-admin-header>
+  
+  <!-- Main Content -->
+  <main class="flex-1 bg-white p-6">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

@@ -1,0 +1,98 @@
+/* Admin layout styles with proper footer integration */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'EB Garamond', serif;
+}
+
+/* Apply Garamond font to all admin content */
+.admin-layout * {
+  font-family: 'EB Garamond', serif;
+}
+
+/* Specific font weights for different elements */
+.admin-layout h1, .admin-layout h2, .admin-layout h3, 
+.admin-layout h4, .admin-layout h5, .admin-layout h6 {
+  font-family: 'EB Garamond', serif;
+  font-weight: 600;
+}
+
+.admin-layout p, .admin-layout span, .admin-layout div {
+  font-family: 'EB Garamond', serif;
+  font-weight: 400;
+}
+
+.admin-layout button, .admin-layout input, .admin-layout select, 
+.admin-layout textarea, .admin-layout label {
+  font-family: 'EB Garamond', serif;
+  font-weight: 500;
+}
+
+/* Sidebar hover effects */
+nav a:hover svg {
+  transform: translateX(2px);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Active link styling */
+nav a.active {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border-right: 3px solid #1d4ed8;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .w-64 {
+    width: 100%;
+    position: absolute;
+    z-index: 50;
+    height: 100vh;
+  }
+}
+
+/* Custom scrollbar for main content */
+main::-webkit-scrollbar {
+  width: 6px;
+}
+
+main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Add spacing between admin header and main content */
+main.flex-1 {
+  padding-top: 20px; /* Space between admin header and content */
+}
+
+/* Additional spacing for admin content areas */
+.admin-content-wrapper {
+  margin-top: 10px;
+  padding: 0 20px;
+}
+
+/* Ensure footer stays at bottom */
+app-footer {
+  margin-top: auto;
+}
+
+/* Main content area should grow to fill available space */
+main {
+  flex-grow: 1;
+}
