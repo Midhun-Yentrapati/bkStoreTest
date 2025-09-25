@@ -1,0 +1,387 @@
+<div class="profile-container">
+  <div class="profile-wrapper">
+    
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-header-content">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar">
+            <img [src]="currentUser()?.profilePicture || 'https://ui-avatars.com/api/?name=User&background=7F60A1&color=fff&size=200'" 
+                 [alt]="currentUser()?.fullName || 'User'">
+            <div *ngIf="isEditMode" class="avatar-overlay">
+              <input type="file" id="profilePicture" accept="image/*" (change)="onProfilePictureChange($event)" hidden>
+              <label for="profilePicture" class="avatar-edit-btn">
+                <span class="material-icons">camera_alt</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-info">
+          <h1 class="profile-name">{{ currentUser()?.fullName || 'User' }}</h1>
+          <p class="profile-email">{{ currentUser()?.email }}</p>
+          <div class="profile-meta">
+            <span class="meta-item">
+              <span class="material-icons">person</span>
+              {{ currentUser()?.username }}
+            </span>
+            <span class="meta-item" *ngIf="currentUser()?.mobileNumber">
+              <span class="material-icons">phone</span>
+              {{ currentUser()?.mobileNumber }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <button (click)="toggleEditMode()" class="edit-profile-btn" [class.cancel]="isEditMode">
+            <span class="material-icons">{{ isEditMode ? 'close' : 'edit' }}</span>
+            {{ isEditMode ? 'Cancel' : 'Edit Profile' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <span class="material-icons">check_circle</span>
+      {{ successMessage }}
+    </div>
+    
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="material-icons">error</span>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+      
+      <!-- Personal Information Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">
+            <span class="material-icons">person</span>
+            Personal Information
+          </h3>
+        </div>
+        
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="isEditMode; else viewMode">
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input id="fullName" type="text" formControlName="fullName" 
+                     placeholder="Enter your full name"
+                     [class.error]="hasFieldError('fullName')">
+              <div *ngIf="getFieldError('fullName')" class="error-message">
+                {{ getFieldError('fullName') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input id="username" type="text" formControlName="username" 
+                     placeholder="Choose a username"
+                     [class.error]="hasFieldError('username')">
+              <div *ngIf="getFieldError('username')" class="error-message">
+                {{ getFieldError('username') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input id="email" type="email" formControlName="email" 
+                     placeholder="Enter your email"
+                     [class.error]="hasFieldError('email')">
+              <div *ngIf="getFieldError('email')" class="error-message">
+                {{ getFieldError('email') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="mobileNumber">Mobile Number</label>
+              <input id="mobileNumber" type="tel" formControlName="mobileNumber" 
+                     placeholder="10-digit mobile number"
+                     [class.error]="hasFieldError('mobileNumber')">
+              <div *ngIf="getFieldError('mobileNumber')" class="error-message">
+                {{ getFieldError('mobileNumber') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input id="dateOfBirth" type="date" formControlName="dateOfBirth">
+            </div>
+
+            <div class="form-group full-width">
+              <label for="bio">Bio</label>
+              <textarea id="bio" formControlName="bio" rows="4" 
+                        placeholder="Tell us about yourself..."
+                        [class.error]="hasFieldError('bio')"></textarea>
+              <div *ngIf="getFieldError('bio')" class="error-message">
+                {{ getFieldError('bio') }}
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="save-btn" [disabled]="profileForm.invalid || isSubmitting" [class.loading]="isSubmitting">
+              <span class="material-icons">save</span>
+              {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+
+        <!-- View Mode -->
+        <ng-template #viewMode>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Full Name</label>
+              <span>{{ currentUser()?.fullName || 'Not provided' }}</span>
+            </div>
+            
+            <div class="info-item">
+              <label>Username</label>
+              <span>{{ currentUser()?.username || 'Not provided' }}</span>
+            </div>
+            
+            <div class="info-item">
+              <label>Email</label>
+              <span>{{ currentUser()?.email || 'Not provided' }}</span>
+            </div>
+            
+            <div class="info-item">
+              <label>Mobile Number</label>
+              <span>{{ currentUser()?.mobileNumber || 'Not provided' }}</span>
+            </div>
+            
+            <div class="info-item">
+              <label>Date of Birth</label>
+              <span>{{ currentUser()?.dateOfBirth || 'Not provided' }}</span>
+            </div>
+            
+            <div class="info-item full-width">
+              <label>Bio</label>
+              <span>{{ currentUser()?.bio || 'Not provided' }}</span>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Address Management Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title">
+            <span class="material-icons">location_on</span>
+            Delivery Addresses
+          </h3>
+          <button (click)="toggleAddressForm()" class="add-address-btn">
+            <span class="material-icons">add</span>
+            Add Address
+          </button>
+        </div>
+
+        <!-- Add New Address Form -->
+        <div *ngIf="showAddressForm" class="address-form-container">
+          <form [formGroup]="newAddressForm" (ngSubmit)="addAddress()">
+            <h4 class="form-title">{{ isEditingAddress ? 'Edit Address' : 'Add New Address' }}</h4>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="addressType">Address Type</label>
+                <select id="addressType" formControlName="addressType">
+                  <option *ngFor="let type of addressTypes" [value]="type.value">
+                    {{ type.label }} - {{ type.description }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="addressName">Name</label>
+                <input id="addressName" type="text" formControlName="name" 
+                       placeholder="Enter your name"
+                       [class.error]="hasAddressFieldError('name')">
+                <div *ngIf="getAddressFieldError('name')" class="error-message">
+                  {{ getAddressFieldError('name') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input id="phone" type="tel" formControlName="phone" 
+                       placeholder="10-digit phone number"
+                       [class.error]="hasAddressFieldError('phone')">
+                <div *ngIf="getAddressFieldError('phone')" class="error-message">
+                  {{ getAddressFieldError('phone') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="alternatePhone">Alternate Phone (Optional)</label>
+                <input id="alternatePhone" type="tel" formControlName="alternatePhone" 
+                       placeholder="10-digit alternate phone number"
+                       [class.error]="hasAddressFieldError('alternatePhone')">
+                <div *ngIf="getAddressFieldError('alternatePhone')" class="error-message">
+                  {{ getAddressFieldError('alternatePhone') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="pincode">Pincode</label>
+                <input id="pincode" type="text" formControlName="pincode" 
+                       placeholder="6-digit pincode"
+                       [class.error]="hasAddressFieldError('pincode')">
+                <div *ngIf="getAddressFieldError('pincode')" class="error-message">
+                  {{ getAddressFieldError('pincode') }}
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="address">Address</label>
+                <input id="address" type="text" formControlName="address" 
+                       placeholder="House/Flat number, street, apartment, suite, etc."
+                       [class.error]="hasAddressFieldError('address')">
+                <div *ngIf="getAddressFieldError('address')" class="error-message">
+                  {{ getAddressFieldError('address') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="locality">Locality</label>
+                <input id="locality" type="text" formControlName="locality" 
+                       placeholder="Locality/Area"
+                       [class.error]="hasAddressFieldError('locality')">
+                <div *ngIf="getAddressFieldError('locality')" class="error-message">
+                  {{ getAddressFieldError('locality') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="city">City</label>
+                <input id="city" type="text" formControlName="city" 
+                       placeholder="City"
+                       [class.error]="hasAddressFieldError('city')">
+                <div *ngIf="getAddressFieldError('city')" class="error-message">
+                  {{ getAddressFieldError('city') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="state">State</label>
+                <select id="state" formControlName="state" [class.error]="hasAddressFieldError('state')">
+                  <option value="">Select State</option>
+                  <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+                </select>
+                <div *ngIf="getAddressFieldError('state')" class="error-message">
+                  {{ getAddressFieldError('state') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country" formControlName="country">
+                  <option value="India">India</option>
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Australia">Australia</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="landmark">Landmark (Optional)</label>
+                <input id="landmark" type="text" formControlName="landmark" 
+                       placeholder="Nearby landmark">
+              </div>
+            </div>
+
+            <!-- Mock Map Integration -->
+            <div class="map-section">
+              <label>Location on Map (Optional)</label>
+              <div class="mock-map" (click)="onMapClick($event)">
+                <div class="map-placeholder">
+                  <span class="material-icons">map</span>
+                  <p>Click to select location on map</p>
+                  <p *ngIf="selectedMapCoordinates" class="coordinates">
+                    Selected: {{ selectedMapCoordinates.latitude.toFixed(4) }}, {{ selectedMapCoordinates.longitude.toFixed(4) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="isDefault">
+                <span class="checkmark"></span>
+                Set as default address
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" (click)="toggleAddressForm()" class="cancel-btn">
+                Cancel
+              </button>
+              <button type="submit" class="save-btn" [disabled]="newAddressForm.invalid">
+                <span class="material-icons">{{ isEditingAddress ? 'save' : 'add' }}</span>
+                {{ isEditingAddress ? 'Update Address' : 'Add Address' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Address List -->
+        <div class="address-list">
+          <div *ngIf="isLoadingAddresses" class="loading-addresses">
+            <span class="material-icons rotating">refresh</span>
+            <p>Loading addresses...</p>
+          </div>
+          
+          <div *ngFor="let address of addresses" class="address-card" [class.default]="address.isDefault">
+            <div class="address-header">
+              <div class="address-type">
+                <span class="material-icons">{{ address.addressType === 'HOME' ? 'home' : address.addressType === 'WORK' ? 'work' : 'location_on' }}</span>
+                <span class="type-label">{{ address.name }}</span>
+                <span *ngIf="address.isDefault" class="default-badge">Default</span>
+              </div>
+              <div class="address-actions">
+                <button (click)="editAddress(address)" class="action-btn edit" title="Edit address">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button *ngIf="!address.isDefault" (click)="setDefaultAddress(address.id!)" class="action-btn" title="Set as default">
+                  <span class="material-icons">star_border</span>
+                </button>
+                <button (click)="deleteAddress(address.id!)" class="action-btn delete" title="Delete address">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </div>
+            
+            <div class="address-details">
+              <p class="contact-info">
+                <span class="material-icons">phone</span>
+                {{ address.phone }}
+                <span *ngIf="address.alternatePhone" class="alternate-phone">
+                  / {{ address.alternatePhone }}
+                </span>
+              </p>
+              <p class="street">{{ address.address }}</p>
+              <p class="location">{{ address.locality }}, {{ address.city }}, {{ address.state }} {{ address.pincode }}</p>
+              <p class="country">{{ address.country }}</p>
+              <p *ngIf="address.landmark" class="landmark">
+                <span class="material-icons">place</span>
+                Near {{ address.landmark }}
+              </p>
+            </div>
+          </div>
+          
+          <div *ngIf="!isLoadingAddresses && addresses.length === 0" class="no-addresses">
+            <span class="material-icons">location_off</span>
+            <p>No addresses added yet</p>
+            <p class="add-first-address">Add your first address to get started</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div> 

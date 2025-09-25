@@ -1,0 +1,46 @@
+<div class="search-page-container">
+  <!-- Page Header -->
+  <div class="search-header">
+    <h1>Search Results for "{{ searchQuery }}"</h1>
+    <p *ngIf="!isLoading" class="results-count">{{ totalResults }} books found</p>
+  </div>
+  
+  <!-- Main Layout Grid -->
+  <div class="search-layout">
+    <!-- Left Column: Filter Sidebar -->
+    <div class="filter-column">
+      <app-filter-sidebar (filtersChanged)="onFiltersChanged($event)"></app-filter-sidebar>
+    </div>
+
+    <!-- Right Column: Results & Similar Books -->
+    <div class="results-column">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-indicator">
+        <p>Loading results...</p>
+      </div>
+
+      <!-- Content when not loading -->
+      <div *ngIf="!isLoading">
+        <!-- Primary Search Results -->
+        <app-vertical-book-grid 
+          *ngIf="searchResults.length > 0; else noResults"
+          [books]="searchResults">
+        </app-vertical-book-grid>
+
+        <!-- MODIFIED: "Similar Books" Section -->
+        <div *ngIf="similarBooks.length > 0" class="similar-books-section">
+          <h2 class="similar-books-title">You Might Also Like</h2>
+          <!-- Re-using the vertical grid component for a 2x3 layout -->
+          <app-vertical-book-grid [books]="similarBooks"></app-vertical-book-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template to show when there are no results -->
+<ng-template #noResults>
+  <div class="no-results-message">
+    <p>No books found for your search. Try adjusting your filters or searching for something else.</p>
+  </div>
+</ng-template>

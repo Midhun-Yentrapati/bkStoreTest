@@ -1,0 +1,561 @@
+<div class="page-container">
+  <div class="content-card" *ngIf="editableBook; else loadingOrError">
+    <!-- Header Section with Back Button -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1 class="page-title">📝 {{ isEditMode ? 'Edit Book' : 'Book Details' }}</h1>
+          <p class="page-subtitle">{{ isEditMode ? 'Modify book information and details' : 'View comprehensive book information' }}</p>
+        </div>
+        <div class="header-actions">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="banner success-banner">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage && editableBook" class="banner error-banner">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Book Image Section -->
+    <div class="book-image-container">
+      <img
+        [src]="imagePreviewUrl || 'https://placehold.co/150x200?text=No+Image'"
+        alt="Book Cover"
+        class="book-image"
+      />
+
+      <div *ngIf="isEditMode" class="image-edit-options-overlay">
+        <!-- Image Input Type Selection -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-white mb-2">Image Input Method</label>
+          <div class="flex gap-4">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                value="url"
+                [(ngModel)]="imageInputType"
+                [ngModelOptions]="{standalone: true}"
+                (change)="onImageInputTypeChange()"
+                class="text-blue-600 focus:ring-blue-500 border-gray-300">
+              <span class="ml-2 text-sm text-white">Image URL</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                value="filepath"
+                [(ngModel)]="imageInputType"
+                [ngModelOptions]="{standalone: true}"
+                (change)="onImageInputTypeChange()"
+                class="text-blue-600 focus:ring-blue-500 border-gray-300">
+              <span class="ml-2 text-sm text-white">File Path</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Image Input Fields -->
+        <div class="mb-4">
+          <!-- URL Input -->
+          <div *ngIf="imageInputType === 'url'">
+            <label for="imageUrl" class="block text-sm font-medium text-white mb-2">Image URL</label>
+            <input
+              type="url"
+              id="imageUrl"
+              [(ngModel)]="newImageUrl"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="updateImageFromInput()"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="https://example.com/image.jpg">
+          </div>
+
+          <!-- File Path Input -->
+          <div *ngIf="imageInputType === 'filepath'">
+            <label for="filePath" class="block text-sm font-medium text-white mb-2">File Path</label>
+            <input
+              type="text"
+              id="filePath"
+              [(ngModel)]="newFilePath"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="updateImageFromInput()"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="images/book-cover.jpg">
+            <div class="text-xs text-gray-400 mt-1">
+              Enter the path to image in public folder (e.g., images/1984.jpg)
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Image Display -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-white mb-2">Current Image</label>
+          <div class="border border-gray-300 rounded-lg p-3 bg-white min-h-[100px] flex items-center justify-center">
+            <div *ngIf="getFirstImageUrl(); else noCurrentImage" class="text-center">
+              <img [src]="getFirstImageUrl()" 
+                   alt="Current book image"
+                   class="max-w-full max-h-20 object-contain mx-auto mb-2">
+              <div class="text-xs text-gray-600">{{ getFirstImageUrl() }}</div>
+            </div>
+            <ng-template #noCurrentImage>
+              <div class="text-gray-500 text-sm">No image set</div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Book Details Form -->
+    <form [formGroup]="bookForm" class="book-details">
+      <div class="detail-row">
+        <label>ID:</label>
+        <span>{{ editableBook.id }}</span>
+      </div>
+
+      <!-- Book Performance Statistics -->
+      <div class="statistics-section">
+        <div class="stats-header">
+          <h3>📊 Book Performance</h3>
+          <p class="stats-subtitle">Sales and engagement metrics</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon books-sold">📚</div>
+            <div class="stat-content">
+              <div class="stat-label">Books Sold</div>
+              <div class="stat-value">{{ editableBook.noOfBooksSold || 0 | number }}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon revenue">💰</div>
+            <div class="stat-content">
+              <div class="stat-label">Total Revenue</div>
+              <div class="stat-value">₹{{ editableBook.totalRevenue || 0 | number:'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon reviews">⭐</div>
+            <div class="stat-content">
+              <div class="stat-label">Reviews</div>
+              <div class="stat-value">{{ editableBook.reviewCount || 0 | number }}</div>
+              <div class="stat-extra">{{ editableBook.averageRating || 0 | number:'1.1-1' }}/5.0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stock">📦</div>
+            <div class="stat-content">
+              <div class="stat-label">Stock Level</div>
+              <div class="stat-value">{{ editableBook.stockActual || 0 | number }}</div>
+              <div class="stat-extra" [class]="getStockStatusClass()">{{ getStockStatus() }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="bookName">Title:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.title }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="bookName" 
+            type="text" 
+            formControlName="title"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('title')?.invalid && bookForm.get('title')?.touched"
+            [class.border-green-500]="bookForm.get('title')?.valid && bookForm.get('title')?.touched"
+            placeholder="Enter book title" />
+          <div *ngIf="getFieldError('title')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="authorName">Author:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.author }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="authorName" 
+            type="text" 
+            formControlName="author"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('author')?.invalid && bookForm.get('author')?.touched"
+            [class.border-green-500]="bookForm.get('author')?.valid && bookForm.get('author')?.touched"
+            placeholder="Enter author name" />
+          <div *ngIf="getFieldError('author')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('author') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="description">Description:</label>
+        <div> 
+          <span *ngIf="!isEditMode">{{ editableBook.description }}</span>
+          <div *ngIf="isEditMode">
+            <textarea 
+              id="description" 
+              formControlName="description"
+              class="w-full p-2 border rounded"
+              [class.border-red-500]="bookForm.get('description')?.invalid && bookForm.get('description')?.touched"
+              [class.border-green-500]="bookForm.get('description')?.valid && bookForm.get('description')?.touched"
+              rows="4"
+              placeholder="Enter book description (minimum 10 characters)"></textarea>
+            <div *ngIf="getFieldError('description')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('description') }}
+            </div>
+            <div class="text-gray-400 text-xs mt-1">
+              {{ bookForm.get('description')?.value?.length || 0 }}/2000 characters
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="price">Price:</label>
+        <span *ngIf="!isEditMode">₹{{ editableBook.price | number : '1.2-2' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="price" 
+            type="number" 
+            formControlName="price"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('price')?.invalid && bookForm.get('price')?.touched"
+            [class.border-green-500]="bookForm.get('price')?.valid && bookForm.get('price')?.touched"
+            min="0.01" 
+            step="0.01"
+            placeholder="Enter price" />
+          <div *ngIf="getFieldError('price')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('price') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="quantity">Display Stock:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.stockDisplay }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="quantity" 
+            type="number" 
+            formControlName="stockDisplay"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('stockDisplay')?.invalid && bookForm.get('stockDisplay')?.touched"
+            [class.border-green-500]="bookForm.get('stockDisplay')?.valid && bookForm.get('stockDisplay')?.touched"
+            min="0"
+            placeholder="Enter display stock quantity" />
+          <div *ngIf="getFieldError('stockDisplay')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('stockDisplay') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="actual_quantity">Actual Stock:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.stockActual }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="actual_quantity" 
+            type="number" 
+            formControlName="stockActual"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('stockActual')?.invalid && bookForm.get('stockActual')?.touched"
+            [class.border-green-500]="bookForm.get('stockActual')?.valid && bookForm.get('stockActual')?.touched"
+            min="0"
+            placeholder="Enter actual stock quantity" />
+          <div *ngIf="getFieldError('stockActual')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('stockActual') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Book Details -->
+      <div class="detail-row">
+        <label for="isbn">ISBN:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.isbn || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="isbn" 
+            type="text" 
+            formControlName="isbn"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('isbn')?.invalid && bookForm.get('isbn')?.touched"
+            [class.border-green-500]="bookForm.get('isbn')?.valid && bookForm.get('isbn')?.touched"
+            placeholder="Enter ISBN-10 or ISBN-13" />
+          <div *ngIf="getFieldError('isbn')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('isbn') }}
+          </div>
+          <div class="text-gray-400 text-xs mt-1">
+            Optional. Enter a valid ISBN-10 (10 digits) or ISBN-13 (13 digits)
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="publisher">Publisher:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.publisher || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="publisher" 
+            type="text" 
+            formControlName="publisher"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('publisher')?.invalid && bookForm.get('publisher')?.touched"
+            [class.border-green-500]="bookForm.get('publisher')?.valid && bookForm.get('publisher')?.touched"
+            placeholder="Enter publisher" />
+          <div *ngIf="getFieldError('publisher')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('publisher') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="publicationDate">Publication Date:</label>
+        <span *ngIf="!isEditMode">{{ formatDate(editableBook.publicationDate) || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="publicationDate" 
+            type="date" 
+            formControlName="publicationDate"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('publicationDate')?.invalid && bookForm.get('publicationDate')?.touched"
+            [class.border-green-500]="bookForm.get('publicationDate')?.valid && bookForm.get('publicationDate')?.touched" />
+          <div *ngIf="getFieldError('publicationDate')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('publicationDate') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="edition">Edition:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.edition || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="edition" 
+            type="text" 
+            formControlName="edition"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('edition')?.invalid && bookForm.get('edition')?.touched"
+            [class.border-green-500]="bookForm.get('edition')?.valid && bookForm.get('edition')?.touched"
+            placeholder="e.g., 1st Edition, 2nd Edition" />
+          <div *ngIf="getFieldError('edition')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('edition') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="language">Language:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.language || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="language" 
+            type="text" 
+            formControlName="language"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('language')?.invalid && bookForm.get('language')?.touched"
+            [class.border-green-500]="bookForm.get('language')?.valid && bookForm.get('language')?.touched"
+            placeholder="e.g., English, Spanish" />
+          <div *ngIf="getFieldError('language')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('language') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="format">Format:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.format || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <select 
+            id="format" 
+            formControlName="format"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('format')?.invalid && bookForm.get('format')?.touched"
+            [class.border-green-500]="bookForm.get('format')?.valid && bookForm.get('format')?.touched">
+            <option value="">Select format</option>
+            <option value="Hardcover">Hardcover</option>
+            <option value="Paperback">Paperback</option>
+            <option value="Ebook">Ebook</option>
+            <option value="Audiobook">Audiobook</option>
+          </select>
+          <div *ngIf="getFieldError('format')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('format') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="pages">Pages:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.pages || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="pages" 
+            type="number" 
+            formControlName="pages"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('pages')?.invalid && bookForm.get('pages')?.touched"
+            [class.border-green-500]="bookForm.get('pages')?.valid && bookForm.get('pages')?.touched"
+            min="0"
+            placeholder="Number of pages" />
+          <div *ngIf="getFieldError('pages')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('pages') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="weight">Weight (kg):</label>
+        <span *ngIf="!isEditMode">{{ editableBook.weight ? (editableBook.weight + ' kg') : 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="weight" 
+            type="number" 
+            formControlName="weight"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('weight')?.invalid && bookForm.get('weight')?.touched"
+            [class.border-green-500]="bookForm.get('weight')?.valid && bookForm.get('weight')?.touched"
+            min="0"
+            step="0.01"
+            placeholder="Weight in kg" />
+          <div *ngIf="getFieldError('weight')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('weight') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="dimensions">Dimensions:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.dimensions || 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="dimensions" 
+            type="text" 
+            formControlName="dimensions"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('dimensions')?.invalid && bookForm.get('dimensions')?.touched"
+            [class.border-green-500]="bookForm.get('dimensions')?.valid && bookForm.get('dimensions')?.touched"
+            placeholder="e.g., 15.2 x 22.9 x 2.5 cm" />
+          <div *ngIf="getFieldError('dimensions')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('dimensions') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="mrp">MRP:</label>
+        <span *ngIf="!isEditMode">{{ editableBook.mrp ? ('₹' + (editableBook.mrp | number : '1.2-2')) : 'Not specified' }}</span>
+        <div *ngIf="isEditMode">
+          <input 
+            id="mrp" 
+            type="number" 
+            formControlName="mrp"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('mrp')?.invalid && bookForm.get('mrp')?.touched"
+            [class.border-green-500]="bookForm.get('mrp')?.valid && bookForm.get('mrp')?.touched"
+            min="0" 
+            step="0.01"
+            placeholder="Enter MRP" />
+          <div *ngIf="getFieldError('mrp')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('mrp') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label>Book Categories:</label>
+        <div *ngIf="!isEditMode" class="flex flex-wrap gap-1">
+          <span *ngFor="let category of editableBook.categories"
+                [class]="getCategoryBadgeClasses(category)">
+            {{ category.name }}
+          </span>
+          <span *ngIf="!editableBook.categories || editableBook.categories.length === 0"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            No categories
+          </span>
+        </div>
+        <div *ngIf="isEditMode">
+          <input
+            id="bookCategories"
+            type="text"
+            [value]="getCategoriesDisplay(editableBook.categories)"
+            (input)="setCategoriesFromInput($event)"
+            class="w-full p-2 border rounded"
+            [ngClass]="{'border-red-500': !editableBook.categories || editableBook.categories.length === 0, 'border-green-500': editableBook.categories && editableBook.categories.length > 0}"
+            placeholder="Comma-separated categories" />
+          <div *ngIf="!editableBook.categories || editableBook.categories.length === 0" class="text-red-500 text-sm mt-1">
+            At least one category is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <label for="bookDataCategory">Sales Category:</label>
+        <span *ngIf="!isEditMode">{{ selectedSalesCategory || 'Not Set' }}</span>
+        <div *ngIf="isEditMode">
+          <select 
+            id="bookDataCategory" 
+            formControlName="salesCategory"
+            class="w-full p-2 border rounded"
+            [class.border-red-500]="bookForm.get('salesCategory')?.invalid && bookForm.get('salesCategory')?.touched"
+            [class.border-green-500]="bookForm.get('salesCategory')?.valid && bookForm.get('salesCategory')?.touched">
+            <option value="">-- Select Category --</option>
+            <option *ngFor="let cat of getSalesCategoryOptions()" [value]="cat">
+              {{ cat }}
+            </option>
+          </select>
+          <div *ngIf="getFieldError('salesCategory')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('salesCategory') }}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="window-actions">
+      <ng-container *ngIf="!isEditMode">
+        <button class="action-button primary-button" (click)="enterEditMode()">
+          <span class="material-symbols-outlined button-icon">edit</span>
+          Edit
+        </button>
+        <button class="action-button delete-button" (click)="onDelete()">
+          <span class="material-symbols-outlined button-icon">delete</span>
+          Delete
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="isEditMode">
+        <button 
+          class="action-button save-button" 
+          (click)="saveChanges()"
+          [disabled]="!canSaveChanges() || isLoading">
+          <span class="material-symbols-outlined button-icon">save</span>
+          {{ isLoading ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button class="action-button cancel-button" (click)="cancelEdit()">
+          <span class="material-symbols-outlined button-icon">cancel</span>
+          Cancel
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-template #loadingOrError>
+    <div *ngIf="isLoading" class="state-container">
+      <p>Loading book details...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="state-container error-message">
+      <p>{{ errorMessage }}</p>
+      <button class="action-button" (click)="goBack()">Go Back</button>
+    </div>
+  </ng-template>
+</div>

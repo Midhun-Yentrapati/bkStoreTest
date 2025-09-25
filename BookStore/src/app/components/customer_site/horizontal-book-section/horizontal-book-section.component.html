@@ -1,0 +1,11 @@
+<section>
+  <h2 class="section-title">{{ sectionTitle }}</h2>
+  
+  <div class="horizontal-scroll-container">
+    <app-book-card
+      *ngFor="let book of books"
+      [book]="book"
+      cardSize="big">
+    </app-book-card>
+  </div>
+</section>

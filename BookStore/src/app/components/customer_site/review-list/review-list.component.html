@@ -1,0 +1,51 @@
+<div class="reviews-container">
+  <!-- Reviews Summary (only show if there are reviews) -->
+  <div class="reviews-header" *ngIf="reviewsWithText.length > 0">
+    <h3 class="reviews-title">Customer Reviews</h3>
+    <div class="reviews-summary">
+      <app-star-rating 
+        [rating]="averageRating" 
+        [interactive]="false" 
+        size="small">
+      </app-star-rating>
+      <span class="reviews-count">{{ reviewsWithText.length }} review{{ reviewsWithText.length === 1 ? '' : 's' }}</span>
+    </div>
+  </div>
+
+  <!-- Reviews List -->
+  <div class="reviews-list" *ngIf="reviewsWithText.length > 0">
+    <div class="review-item" *ngFor="let review of reviewsWithText">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="reviewer-avatar">
+            {{ getInitials(review.userName) }}
+          </div>
+          <div class="reviewer-details">
+            <h4 class="reviewer-name">{{ review.userName }}</h4>
+            <div class="review-meta">
+              <app-star-rating 
+                [rating]="review.rating" 
+                [interactive]="false" 
+                size="small">
+              </app-star-rating>
+              <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="review-content" *ngIf="review.review">
+        <p class="review-text">{{ review.review }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Reviews State -->
+  <div class="no-reviews" *ngIf="reviewsWithText.length === 0">
+    <div class="no-reviews-icon">
+      <span class="material-icons">rate_review</span>
+    </div>
+    <h3>No Reviews Yet</h3>
+    <p>Be the first to share your thoughts about "{{ bookTitle }}"</p>
+  </div>
+</div> 

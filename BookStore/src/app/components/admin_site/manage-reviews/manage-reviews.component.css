@@ -1,0 +1,19 @@
+.manage-reviews-container { padding: 16px; }
+.title { font-size: 1.5rem; margin-bottom: 12px; }
+.actions { margin-bottom: 12px; }
+.toggle-btn { padding: 6px 12px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+.search-input { margin-left: 8px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 3px; min-width: 220px; }
+.sort-select { margin-left: 8px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 3px; }
+.alert { padding: 8px 10px; margin: 8px 0; background: #f9f9f9; border: 1px solid #eee; }
+.alert.success { background: #e8f5e8; border-color: #c8e6c9; }
+.alert.error { background: #ffebee; border-color: #ffcdd2; }
+.table-wrapper { overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+.review { max-width: 480px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pagination { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
+.pagination button { padding: 4px 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 3px; }
+.pagination button.active { background: #007bff; color: #fff; border-color: #007bff; }
+.pagination button:disabled { opacity: 0.6; cursor: not-allowed; }
+.delete-btn { padding: 4px 8px; background: #dc3545; color: white; border: none; cursor: pointer; border-radius: 3px; }
+.delete-btn:hover { opacity: 0.9; } 

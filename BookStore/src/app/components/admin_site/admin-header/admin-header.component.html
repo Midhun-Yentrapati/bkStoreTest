@@ -1,0 +1,30 @@
+<header class="app-header">
+  <!-- Left Section: Logo & Brand -->
+  <div class="header-left">
+    <a class="logo-link" (click)="navigateToAdminDashboard()" style="cursor: pointer;">
+      <svg class="logo-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 19.5C4 18.1193 5.11929 17 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6.5 17C6.5 15.6193 7.61929 14.5 9 14.5H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 14.5C9 13.1193 10.1193 12 11.5 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11.5 12C11.5 10.6193 12.6193 9.5 14 9.5H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14 9.5C14 8.11929 15.1193 7 16.5 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M17 2H6.5C5.11929 2 4 3.11929 4 4.5V19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">BookVerse Admin</span>
+    </a>
+  </div>
+
+  <!-- Center Section: Empty (no search bar needed) -->
+  <div class="header-center">
+    <!-- Intentionally empty -->
+  </div>
+
+  <!-- Right Section: Admin Actions -->
+  <div class="header-right">
+    <!-- Notifications -->
+    <app-admin-notifications></app-admin-notifications>
+    
+    <!-- Logout Button -->
+    <button (click)="onLogoutClick()" class="action-btn logout-btn">Logout</button>
+  </div>
+</header>

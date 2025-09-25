@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JWT Authentication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>JWT Authentication Test</h1>
+    
+    <div class="section">
+        <h2>Step 1: Login</h2>
+        <input type="text" id="username" placeholder="Username" value="IronMan">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 2: Test JWT Claims</h2>
+        <button onclick="testJwtClaims()">Test JWT Claims</button>
+        <div id="jwtResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 3: Test Admin Endpoint</h2>
+        <button onclick="testAdminEndpoint()">Test Admin Endpoint</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+
+    <script>
+        let jwtToken = '';
+        
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usernameOrEmail: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('loginResult');
+                
+                if (data.success && data.accessToken) {
+                    jwtToken = data.accessToken;
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>Login Successful!</strong><br>
+                        User: ${data.user.username}<br>
+                        Role: ${data.user.userRole}<br>
+                        Token: ${jwtToken.substring(0, 20)}...<br>
+                        <small>Token stored for testing</small>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>Login Failed:</strong> ${data.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').className = 'result error';
+                document.getElementById('loginResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+        
+        async function testJwtClaims() {
+            if (!jwtToken) {
+                document.getElementById('jwtResult').className = 'result error';
+                document.getElementById('jwtResult').innerHTML = 'Please login first!';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/debug/jwt-claims', {
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('jwtResult');
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>JWT Claims:</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>Error:</strong> ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                document.getElementById('jwtResult').className = 'result error';
+                document.getElementById('jwtResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+        
+        async function testAdminEndpoint() {
+            if (!jwtToken) {
+                document.getElementById('adminResult').className = 'result error';
+                document.getElementById('adminResult').innerHTML = 'Please login first!';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/users/admin/customers', {
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                const resultDiv = document.getElementById('adminResult');
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>Admin Endpoint Success!</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <strong>Admin Endpoint Failed (${response.status}):</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('adminResult').className = 'result error';
+                document.getElementById('adminResult').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

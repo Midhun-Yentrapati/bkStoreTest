@@ -1,0 +1,76 @@
+<div class="share-modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="share-modal" (click)="$event.stopPropagation()">
+    <div class="share-modal-header">
+      <h3 class="share-modal-title">Share Book</h3>
+      <button class="close-btn" (click)="closeModal.emit()" aria-label="Close">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="share-modal-content" *ngIf="book">
+      <div class="book-preview">
+        <img [src]="book.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" [alt]="book.title" class="book-image">
+        <div class="book-info">
+          <h4 class="book-title">{{ book.title }}</h4>
+          <p class="book-author">by {{ book.author }}</p>
+          <p class="book-price">₹{{ book.price | number:'1.2-2' }}</p>
+        </div>
+      </div>
+
+      <div class="share-options">
+        <div class="share-option">
+          <button class="share-btn copy-btn" (click)="copyToClipboard()" [class.success]="copySuccess">
+            <span class="material-icons">{{ copySuccess ? "check" : "content_copy" }}</span>
+            <span class="btn-text">{{ copySuccess ? "Copied!" : "Copy Link" }}</span>
+          </button>
+        </div>
+
+        <div class="share-option" *ngIf="isWebShareSupported">
+          <button class="share-btn native-share-btn" (click)="shareWithWebAPI()">
+            <span class="material-icons">share</span>
+            <span class="btn-text">Share</span>
+          </button>
+        </div>
+
+        <div class="social-share-grid">
+          <button class="social-btn facebook-btn" (click)="shareToSocial('facebook')">
+            <span class="material-icons">facebook</span>
+            <span>Facebook</span>
+          </button>
+          
+          <button class="social-btn twitter-btn" (click)="shareToSocial('twitter')">
+            <span class="material-icons">alternate_email</span>
+            <span>Twitter</span>
+          </button>
+          
+          <button class="social-btn linkedin-btn" (click)="shareToSocial('linkedin')">
+            <span class="material-icons">work</span>
+            <span>LinkedIn</span>
+          </button>
+          
+          <button class="social-btn whatsapp-btn" (click)="shareToSocial('whatsapp')">
+            <span class="material-icons">chat</span>
+            <span>WhatsApp</span>
+          </button>
+        </div>
+
+        <div class="share-option">
+          <button class="share-btn email-btn" (click)="shareViaEmail()">
+            <span class="material-icons">email</span>
+            <span class="btn-text">Share via Email</span>
+          </button>
+        </div>
+
+        <div class="share-link-section">
+          <label class="share-link-label">Share Link:</label>
+          <div class="share-link-container">
+            <input type="text" [value]="shareLink" readonly class="share-link-input" #shareInput>
+            <button class="copy-link-btn" (click)="shareInput.select(); copyToClipboard()" title="Copy link">
+              <span class="material-icons">content_copy</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

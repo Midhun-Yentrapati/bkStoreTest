@@ -1,0 +1,68 @@
+<div class="book-card" [ngClass]="[cardSize, getStockStatus()]">
+  <!-- Book Link Area -->
+  <a [routerLink]="['/book', getBookIdAsString()]" class="card-link">
+    <div class="card-image-container">
+      <img [src]="getFirstImageUrl()" [alt]="book.title" class="card-image">
+      
+      <!-- Stock Status Badge -->
+      <div class="stock-badge" [ngClass]="getStockStatus()">
+        <span *ngIf="getStockStatus() === 'out-of-stock'">Out of Stock</span>
+        <span *ngIf="getStockStatus() === 'low-stock'">Only {{ book.stock_actual }} left</span>
+        <span *ngIf="getStockStatus() === 'in-stock'">In Stock</span>
+      </div>
+
+      <!-- Wishlist Button (Floating) -->
+      <button 
+        *ngIf="showActions && isLoggedIn()"
+        class="wishlist-btn"
+        [class.active]="isInWishlist$ | async"
+        (click)="toggleWishlist($event)"
+        [disabled]="addingToWishlist"
+        [attr.aria-label]="(isInWishlist$ | async) ? 'Remove from wishlist' : 'Add to wishlist'">
+        <span class="material-icons">
+          {{ (isInWishlist$ | async) ? 'favorite' : 'favorite_border' }}
+        </span>
+      </button>
+    </div>
+
+    <div class="card-body">
+      <div class="card-content">
+        <h3 class="card-title">{{ book.title }}</h3>
+        <p class="card-author">by {{ book.author }}</p>
+        
+        <!-- Categories -->
+        <div class="card-categories" *ngIf="getCategoryNames().length">
+          <span class="category-tag" *ngFor="let category of getCategoryNames().slice(0, 2)">
+            {{ category }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <div class="price-section">
+          <span class="card-price">₹{{ book.price | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </a>
+
+  <!-- Action Buttons -->
+  <div class="card-actions" *ngIf="showActions">
+    <button 
+      class="btn btn-primary add-to-cart-btn"
+      (click)="addToCart($event)"
+      [disabled]="addingToCart || isOutOfStock() || !isLoggedIn()"
+      [attr.aria-label]="'Add ' + book.title + ' to cart'">
+      <span *ngIf="addingToCart" class="spinner"></span>
+      <span class="material-icons" *ngIf="!addingToCart">shopping_cart</span>
+      <span class="btn-text">{{ addingToCart ? 'Adding...' : isOutOfStock() ? 'Out of Stock' : 'Add to Cart' }}</span>
+    </button>
+
+    <!-- Login Prompt for Guest Users -->
+    <div class="login-prompt" *ngIf="!isLoggedIn()">
+      <small class="text-muted">
+        <a [routerLink]="['/login']" class="login-link">Login</a> to add items
+      </small>
+    </div>
+  </div>
+</div>

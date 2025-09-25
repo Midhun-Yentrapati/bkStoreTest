@@ -1,0 +1,319 @@
+<!-- Book Inventory Admin Panel -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200">
+  <!-- Header Section -->
+  <div class="px-6 py-4 border-b border-gray-200">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h1 class="text-2xl font-bold text-gray-900">Book Inventory</h1>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          (click)="showAddPage()"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        >
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Add Book
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Advanced Search Section -->
+  <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+    <form [formGroup]="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Basic search (keep for backward compatibility) -->
+      <div class="hidden">
+        <input type="text" formControlName="query" />
+      </div>
+      
+      <!-- Advanced search fields -->
+      <div class="relative">
+        <input
+          type="text"
+          formControlName="searchById"
+          placeholder="Search by ID"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <svg class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      
+      <div class="relative">
+        <input
+          type="text"
+          formControlName="searchByTitle"
+          placeholder="Search by Title"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <svg class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      
+      <div class="relative">
+        <input
+          type="text"
+          formControlName="searchByAuthor"
+          placeholder="Search by Author"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <svg class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      
+      <div class="md:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
+        <!-- Price range -->
+        <div class="flex space-x-2 items-center">
+          <input
+            type="number"
+            formControlName="minPrice"
+            placeholder="Min Price"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            min="0"
+            step="0.01"
+          />
+          <span class="text-gray-500">to</span>
+          <input
+            type="number"
+            formControlName="maxPrice"
+            placeholder="Max Price"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            min="0"
+            step="0.01"
+          />
+        </div>
+        
+        <!-- Sort options -->
+        <div class="flex space-x-2">
+          <select 
+            formControlName="sortBy"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="none">Sort by...</option>
+            <option value="price">Price</option>
+            <option value="stock_display">Display Stock</option>
+            <option value="stock_actual">Actual Stock</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="id" selected>ID</option>
+          </select>
+          
+          <select 
+            formControlName="sortOrder"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="asc">↑ Ascending</option>
+            <option value="desc">↓ Descending</option>
+          </select>
+        </div>
+        
+        <!-- Clear filters -->
+        <div>
+          <button
+            type="button"
+            (click)="clearAllFilters()"
+            class="w-full px-4 py-2 bg-red-100 text-red-600 text-sm font-medium rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+          >
+            Clear Filters
+          </button>
+        </div>
+        
+        <!-- Items per page -->
+        <div class="flex space-x-2 items-center">
+          <label for="itemsPerPage" class="text-gray-700 text-sm font-medium">Items per page:</label>
+          <select 
+            id="itemsPerPage" 
+            (change)="changeItemsPerPage($event)" 
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Pagination info -->
+  <div class="px-6 py-3 bg-gray-50 flex justify-between items-center border-b border-gray-200">
+    <div class="text-sm text-gray-600">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} books
+    </div>
+    
+    <!-- Loading indicator -->
+    <div *ngIf="loading" class="text-sm text-blue-600 flex items-center">
+      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Loading books...
+    </div>
+    
+    <div *ngIf="error" class="text-sm text-red-600">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Table Section with Horizontal Scroll -->
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Book ID
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
+              Title
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+              Author
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px]">
+              Description
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+              Categories
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Price
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Display Stock
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Actual Stock
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let book of paginatedBooks; trackBy: trackByBookId; let even = even" 
+              [class]="even ? 'bg-white' : 'bg-gray-50'" 
+              class="hover:bg-blue-50 transition-colors">
+            <!-- Book ID -->
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              #{{ book.id }}
+            </td>
+            <!-- Title -->
+            <td class="px-4 py-4 text-sm text-gray-900 max-w-[200px]">
+              <div class="font-medium truncate" [title]="book.title">
+                {{ book.title }}
+              </div>
+            </td>
+            <!-- Author -->
+            <td class="px-4 py-4 text-sm text-gray-700 max-w-[150px]">
+              <div class="truncate" [title]="book.author">
+                {{ book.author }}
+              </div>
+            </td>
+            <!-- Description -->
+            <td class="px-4 py-4 text-sm text-gray-600 max-w-[300px]">
+              <div class="line-clamp-3" [title]="book.description">
+                {{ book.description }}
+              </div>
+            </td>
+            <!-- Categories -->
+            <td class="px-4 py-4 text-sm">
+              <div class="flex flex-wrap gap-1 max-w-[150px]">
+                <span *ngFor="let category of book.categories" 
+                      [class]="getCategoryBadgeClasses(category)">
+                  {{ getCategoryDisplayName(category) }}
+                </span>
+              </div>
+            </td>
+            <!-- Price -->
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+              ₹{{ book.price }}
+            </td>
+            <!-- Display Stock -->
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                    [class]="book.stock_display > 10 ? 'bg-green-100 text-green-800' : book.stock_display > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
+                {{ book.stock_display }}
+              </span>
+            </td>
+            <!-- Actual Stock -->
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                    [class]="book.stock_actual > 10 ? 'bg-green-100 text-green-800' : book.stock_actual > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
+                {{ book.stock_actual }}
+              </span>
+            </td>
+            <!-- Actions -->
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+              <button
+                type="button"
+                (click)="goToEditPage(book.id)"
+                class="inline-flex items-center px-3 py-1.5 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                Details
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredBooks.length === 0" class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+    </svg>
+    <h3 class="mt-4 text-sm font-medium text-gray-900">No books found</h3>
+    <p class="mt-1 text-sm text-gray-500">
+      No matching books found. 
+      <button 
+        type="button" 
+        (click)="clearAllFilters()" 
+        class="text-blue-600 hover:text-blue-800 font-medium"
+      >
+        Clear all filters
+      </button>
+    </p>
+  </div>
+  
+  <!-- Pagination Controls -->
+  <div *ngIf="totalPages > 1" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+    <div class="flex justify-center items-center space-x-2">
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Previous
+      </button>
+      
+      <div class="flex space-x-1">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          (click)="goToPage(page)"
+          [class]="page === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium"
+        >
+          {{ page }}
+        </button>
+      </div>
+      
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

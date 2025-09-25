@@ -1,0 +1,73 @@
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
+.star-button.interactive {
+  cursor: pointer;
+}
+
+.star-button.interactive:hover {
+  transform: scale(1.1);
+}
+
+.star-button .material-icons {
+  transition: color 0.2s ease;
+}
+
+.star-button.filled .material-icons {
+  color: #ffc107;
+}
+
+.star-button.half .material-icons {
+  color: #ffc107;
+}
+
+.star-button.empty .material-icons {
+  color: #e0e0e0;
+}
+
+.star-button.interactive:hover .material-icons {
+  color: #ffb300;
+}
+
+.rating-text {
+  margin-left: 8px;
+  font-weight: 500;
+  color: #666;
+}
+
+/* Size variations */
+.size-small .star-button .material-icons {
+  font-size: 16px;
+}
+
+.size-small .rating-text {
+  font-size: 12px;
+}
+
+.size-medium .star-button .material-icons {
+  font-size: 20px;
+}
+
+.size-medium .rating-text {
+  font-size: 14px;
+}
+
+.size-large .star-button .material-icons {
+  font-size: 28px;
+}
+
+.size-large .rating-text {
+  font-size: 16px;
+} 

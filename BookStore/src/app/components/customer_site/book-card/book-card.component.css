@@ -1,0 +1,444 @@
+/* Book Card Component */
+.book-card {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-speed) var(--transition-spring);
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Dark mode styling for book cards - make text purple */
+[data-theme="dark"] .book-card .card-title {
+  color: #a855f7 !important;
+}
+
+[data-theme="dark"] .book-card .card-author {
+  color: #a855f7 !important;
+}
+
+[data-theme="dark"] .book-card .category-tag {
+  color: #a855f7 !important;
+  background: rgba(168, 85, 247, 0.1) !important;
+  border: 1px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Additional specific overrides for dark mode */
+[data-theme="dark"] .book-card h3.card-title {
+  color: #a855f7 !important;
+}
+
+[data-theme="dark"] .book-card p.card-author {
+  color: #a855f7 !important;
+}
+
+[data-theme="dark"] .book-card .card-content .card-title {
+  color: #a855f7 !important;
+}
+
+[data-theme="dark"] .book-card .card-content .card-author {
+  color: #a855f7 !important;
+}
+
+/* Force purple color for all text elements in book cards in dark mode */
+[data-theme="dark"] .book-card * {
+  color: #a855f7 !important;
+}
+
+/* But keep specific colors for buttons and badges */
+[data-theme="dark"] .book-card .add-to-cart-btn {
+  color: white !important;
+}
+
+[data-theme="dark"] .book-card .stock-badge {
+  color: white !important;
+}
+
+[data-theme="dark"] .book-card .wishlist-btn .material-icons {
+  color: #6b7280 !important;
+}
+
+[data-theme="dark"] .book-card .wishlist-btn.active .material-icons {
+  color: var(--error-color) !important;
+}
+
+[data-theme="dark"] .book-card .wishlist-btn:hover .material-icons {
+  color: var(--error-color) !important;
+}
+
+.book-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--border-color-hover);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.book-card.out-of-stock {
+  opacity: 0.7;
+}
+
+.book-card.out-of-stock .card-image {
+  filter: grayscale(0.5);
+}
+
+/* Card Link */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Image Container */
+.card-image-container {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  background: linear-gradient(135deg, var(--bg-accent) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-speed);
+}
+
+.book-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+/* Stock Badge */
+.stock-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-xs);
+  font-size: 0.75rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}
+
+.stock-badge.in-stock {
+  background: rgba(16, 185, 129, 0.9);
+  color: white;
+}
+
+.stock-badge.low-stock {
+  background: rgba(245, 158, 11, 0.9);
+  color: white;
+}
+
+.stock-badge.out-of-stock {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  z-index: 2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wishlist-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.wishlist-btn .material-icons {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  transition: color var(--transition-speed);
+}
+
+.wishlist-btn.active .material-icons {
+  color: var(--error-color);
+}
+
+.wishlist-btn:hover .material-icons {
+  color: var(--error-color);
+}
+
+.wishlist-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Card Body */
+.card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.02) 100%);
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.card-author {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Categories */
+.card-categories {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.category-tag {
+  background: linear-gradient(135deg, var(--primary-accent-light) 0%, rgba(99, 102, 241, 0.1) 100%);
+  color: var(--primary-accent);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-xs);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(4px);
+  transition: all var(--transition-speed);
+}
+
+.category-tag:hover {
+  background: linear-gradient(135deg, var(--primary-accent) 0%, rgba(99, 102, 241, 0.8) 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: auto;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary-accent);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--primary-accent) 0%, rgba(99, 102, 241, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Action Buttons */
+.card-actions {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-accent);
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-speed);
+  background: linear-gradient(135deg, var(--primary-accent) 0%, rgba(99, 102, 241, 0.9) 100%);
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+}
+
+.add-to-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, var(--primary-accent) 100%);
+}
+
+.add-to-cart-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.add-to-cart-btn .material-icons {
+  font-size: 1.125rem;
+}
+
+.add-to-cart-btn .spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Login Prompt */
+.login-prompt {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.login-link {
+  color: var(--primary-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* Card Sizes */
+.book-card.compact {
+  max-width: 260px;
+  width: 100%;
+}
+
+.book-card.big {
+  max-width: 260px;
+  width: 260px;
+}
+
+.book-card.big .card-body {
+  padding: 1.5rem;
+}
+
+.book-card.big .card-title {
+  font-size: 1.125rem;
+}
+
+.book-card.big .card-price {
+  font-size: 1.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .book-card {
+    max-width: 100%;
+  }
+
+  .card-image-container {
+    aspect-ratio: 2/3;
+  }
+
+  .stock-badge,
+  .wishlist-btn {
+    top: 0.5rem;
+  }
+
+  .stock-badge {
+    left: 0.5rem;
+  }
+
+  .wishlist-btn {
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .wishlist-btn .material-icons {
+    font-size: 1rem;
+  }
+
+  .card-body {
+    padding: 0.75rem;
+  }
+
+  .card-actions {
+    padding: 0.75rem;
+  }
+
+  .add-to-cart-btn {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .card-author {
+    font-size: 0.8rem;
+  }
+}
+
+/* Focus States for Accessibility */
+.wishlist-btn:focus-visible,
+.add-to-cart-btn:focus-visible,
+.login-link:focus-visible {
+  outline: 2px solid var(--primary-accent);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .book-card {
+    border: 2px solid var(--border-color);
+  }
+
+  .stock-badge {
+    border: 1px solid currentColor;
+  }
+}

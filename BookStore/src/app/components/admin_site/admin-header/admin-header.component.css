@@ -1,0 +1,179 @@
+/* ADMIN HEADER COMPONENT STYLING - Based on Customer Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  padding: 1rem 3rem;
+  background-color: rgb(59 130 246 / 0.9);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  min-height: 64px;
+  width: 100%;
+}
+
+/* Ensure all text elements use proper header text color */
+.app-header,
+.app-header *,
+.app-header .material-icons {
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure SVG elements use current color */
+.app-header svg {
+  color: white;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+/* --- Left Section: Logo --- */
+.header-left {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: white !important;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.logo-link:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.logo-link:active {
+  transform: scale(0.98);
+}
+
+.logo-svg {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.logo-text {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* --- Center Section: Empty --- */
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Right Section: Actions --- */
+.header-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Action Buttons */
+.action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: white !important;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* Icon Button Styles */
+.icon-btn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+}
+
+/* Notification Button */
+.notification-btn {
+  position: relative;
+}
+
+.notification-btn .material-icons {
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0;
+}
+
+/* Logout Button */
+.logout-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.1rem;
+  }
+  
+  .header-right {
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    display: none;
+  }
+  
+  .action-btn {
+    padding: 0.4rem;
+  }
+}
+
+/* Admin Header Styles Complete */

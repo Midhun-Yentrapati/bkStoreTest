@@ -1,0 +1,273 @@
+<div class="cart-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="bi bi-arrow-clockwise spin"></i>
+      <p>Loading cart...</p>
+    </div>
+  </div>
+
+  <!-- Content Section (only show when not loading) -->
+  <ng-container *ngIf="!isLoading">
+    <!-- Header Section -->
+    <div class="cart-header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h1 class="cart-title">
+              <i class="bi bi-cart-fill me-3"></i>
+              Shopping Cart
+            </h1>
+            <p class="cart-subtitle" *ngIf="cartItems && cartItems.length > 0">
+              {{ cartItems.length }} {{ cartItems.length === 1 ? 'item' : 'items' }} in you cart
+            </p>
+          </div>
+          <div class="col-md-4 text-end">
+            <div class="cart-progress" *ngIf="cartItems && cartItems.length > 0">
+              <div class="progress-step active">
+                <i class="bi bi-cart-check"></i>
+                <span>Cart</span>
+              </div>
+              <div class="progress-line"></div>
+              <div class="progress-step">
+                <i class="bi bi-truck"></i>
+                <span>Checkout</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="cart-content">
+      <div class="container mb-5">
+        <ng-container *ngIf="cartItems && cartItems.length > 0; else emptyCart">
+          <div class="row g-4">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+              <div class="cart-items-container">
+                <div class="cart-items-header">
+                  <h4 class="section-title">Your Items</h4>
+                  <button class="btn btn-outline-danger btn-sm" (click)="clearCart()" *ngIf="cartItems && cartItems.length > 1">
+                    <i class="bi bi-trash me-2"></i>Clear Cart
+                  </button>
+                </div>
+                
+                <ng-container *ngFor="let item of cartItems; trackBy: trackByItemId">
+                  <div class="cart-item" *ngIf="item && item.book">
+                    <div class="item-image" (click)="navigateToBook(item.book.id)">
+                      <img 
+                        [src]="item.book.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" 
+                        [alt]="item.book.title" 
+                        alt="Book Image"
+                        >
+                      <div class="image-overlay">
+                        <i class="bi bi-eye"></i>
+                      </div>
+                    </div>
+                    
+                    <div class="item-details">
+                      <h5 class="item-title" (click)="navigateToBook(item.book.id)">{{ item.book.title }}</h5>
+                      <p class="item-author">by {{ item.book.author }}</p>
+                      
+                      <div class="item-categories">
+                        <span class="category-pill" *ngFor="let category of item.book.categories?.slice(0, 2)">
+                          {{ typeof category === 'string' ? category : category.name }}
+                        </span>
+                      </div>
+                      
+                      <div class="stock-indicator" [ngClass]="{
+                        'in-stock': item.book.stock_display > 5,
+                        'low-stock': item.book.stock_display > 0 && item.book.stock_display <= 5,
+                        'out-of-stock': item.book.stock_display <= 0
+                      }">
+                        <i class="bi" [ngClass]="{
+                          'bi-check-circle': item.book.stock_display > 5,
+                          'bi-exclamation-triangle': item.book.stock_display > 0 && item.book.stock_display <= 5,
+                          'bi-x-circle': item.book.stock_display <= 0
+                        }"></i>
+                        <span *ngIf="item.book.stock_display > 5">In Stock</span>
+                        <span *ngIf="item.book.stock_display > 0 && item.book.stock_display <= 5">Only {{ item.book.stock_display }} left</span>
+                        <span *ngIf="item.book.stock_display <= 0">Out of Stock</span>
+                      </div>
+                    </div>
+                    
+                    <div class="item-actions">
+                      <div class="price-section">
+                        <span class="unit-price">₹{{ item.book.price | number:'1.2-2' }}</span>
+                        <span class="multiply">×</span>
+                        <span class="quantity">{{ item.quantity }}</span>
+                      </div>
+                      
+                      <div class="quantity-controls">
+                        <button 
+                          class="qty-btn minus" 
+                          (click)="changeQuantityBy(item, -1)"
+                          [disabled]="item.quantity === 1">-
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <input 
+                          type="number" 
+                          title="Quantity"
+                          class="qty-input"
+                          [value]="item.quantity"
+                          (change)="updateQuantityFromInput(item, $event)"
+                          min="1"
+                          [max]="item.book.stock_display">
+                        <button 
+                          class="qty-btn plus" 
+                          (click)="changeQuantityBy(item, 1)"
+                          [disabled]="item.quantity >= item.book.stock_display">+
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </div>
+                      
+                      <div class="item-total">
+                        <span class="total-label">Total:</span>
+                        <span class="total-amount">₹{{ (item.book.price * item.quantity) | number:'1.2-2' }}</span>
+                      </div>
+                      
+                      <button class="remove-btn" (click)="removeFromCart(item)"> Remove
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+              <div class="order-summary mt-5">
+                <div class="summary-header">
+                  <h4 class="summary-title">
+                    <i class="bi bi-receipt me-2"></i>
+                    Order Summary
+                  </h4>
+                  <div class="item-count">
+                    <i class="bi bi-cart me-1"></i>
+                    {{ getTotalItems() }} {{ getTotalItems() === 1 ? 'item' : 'items' }}
+                  </div>
+                </div>
+                
+                <div class="summary-details">
+                  <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ (totalPrice || 0) | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Shipping</span>
+                    <span class="shipping-info">
+                      <span *ngIf="(totalPrice || 0) >= 500" class="free-shipping">FREE</span>
+                      <span *ngIf="(totalPrice || 0) < 500">₹50</span>
+                    </span>
+                  </div>
+                  <div class="summary-row" *ngIf="(totalPrice || 0) >= 500">
+                    <span class="discount-text">
+                      <i class="bi bi-check-circle-fill me-1"></i>
+                      Free shipping applied!
+                    </span>
+                  </div>
+                  <div class="summary-row" *ngIf="(totalPrice || 0) < 500">
+                    <span class="promo-text">
+                      <i class="bi bi-info-circle me-1"></i>
+                      Add ₹{{ 500 - (totalPrice || 0) | number:'1.2-2' }} more for free shipping
+                    </span>
+                  </div>
+                  
+                  <hr class="summary-divider">
+                  
+                  <div class="summary-row total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-amount">₹{{ (getFinalTotal() || 0) | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+                
+                <div class="promo-section">
+                  <div class="promo-code">
+                    <input 
+                      type="text" 
+                      placeholder="Enter promo code" 
+                      class="promo-input"
+                      [(ngModel)]="promoCode"
+                      (input)="validatePromoCode()"
+                      [ngClass]="{'border-red-500': promoCodeError, 'border-green-500': promoCodeValid && promoCode}"
+                      maxlength="20" />
+                    <button 
+                      class="btn btn-outline-secondary btn-sm"
+                      (click)="applyPromoCode()"
+                      [disabled]="!promoCode || promoCodeError || isApplyingPromo">
+                      {{ isApplyingPromo ? 'Applying...' : 'Apply' }}
+                    </button>
+                  </div>
+                  <div *ngIf="promoCodeError" class="text-red-500 text-sm mt-1">
+                    {{ promoCodeError }}
+                  </div>
+                  <div *ngIf="promoCodeValid && promoCode" class="text-green-500 text-sm mt-1">
+                    Promo code looks valid!
+                  </div>
+                  <div *ngIf="appliedPromoCode" class="text-green-600 text-sm mt-1 font-medium">
+                    ✓ Promo code "{{ appliedPromoCode }}" applied successfully!
+                  </div>
+                </div>
+                
+                <div class="checkout-section">
+                  <button 
+                    class="btn btn-checkout" 
+                    (click)="checkout()" 
+                    [disabled]="!cartItems || cartItems.length === 0 || hasOutOfStockItems()">
+                    <i class="bi bi-lock-fill me-2"></i>
+                    <span>Proceed to Secure Checkout</span>
+                  </button>
+                  
+                  <div class="security-badges">
+                    <div class="security-item">
+                      <i class="bi bi-shield-check"></i>
+                      <span>Secure Payment</span>
+                    </div>
+                    <div class="security-item">
+                      <i class="bi bi-truck"></i>
+                      <span>Fast Delivery</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="continue-shopping">
+                  <button class="btn btn-outline-primary" routerLink="/">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Continue Shopping
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #emptyCart>
+          <div class="empty-cart">
+            <div class="empty-content">
+              <div class="empty-icon">
+                <i class="bi bi-cart-x"></i>
+              </div>
+              <h3 class="empty-title">Your cart is empty</h3>
+              <p class="empty-description">
+                Looks like you haven't added anything to your cart yet. Start browsing to find amazing books!
+              </p>
+              <div class="empty-actions">
+                <button class="btn btn-primary btn-lg" routerLink="/">
+                  <i class="bi bi-book me-2"></i>
+                  Start Shopping
+                </button>
+                <button class="btn btn-outline-secondary btn-lg ms-3" routerLink="/wishlist">
+                  <i class="bi bi-heart me-2"></i>
+                  View Wishlist
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+</div> 

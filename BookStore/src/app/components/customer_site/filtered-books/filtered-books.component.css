@@ -1,0 +1,100 @@
+/* Additional Tailwind utilities for line clamping */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+th {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+  color: #000;
+  background-color: #fff;
+}
+body.dark-theme .books-table td {
+  color: #fff;
+  background-color: #222;
+}
+
+body.light-theme .books-table td {
+  color: #ddd;
+}
+
+/* List in Cells */
+.books-table ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.books-table li {
+  margin-bottom: 4px;
+}
+
+/* Link Styling */
+.books-table a {
+  color: #00bcd4;
+  text-decoration: none;
+}
+
+.books-table a:hover {
+  text-decoration: underline;
+}
+.book-button {
+  background-color: #007bff; /* A nice blue color */
+}
+
+.book-button:hover {
+  @apply bg-blue-700;
+}
+
+.book-button:active {
+  background-color: #004085; /* Even darker blue when clicked */
+  transform: translateY(0); /* Resets position when clicked */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Smaller shadow when active */
+}
+/* Responsive Scroll */
+@media screen and (max-width: 1024px) {
+  .books-table {
+    font-size: 14px;
+    overflow-x: auto;
+  }
+
+  .view-books-container {
+    padding: 10px;
+  }
+}
+
+/* New style for filter info */
+.filter-info {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  color: #00bcd4; /* A slightly different color for emphasis */
+}
+
+.filter-info strong {
+  color: var(--text-color);
+}
+.back-button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 40px; /* Fixed size for circular button */
+  height: 40px; /* Fixed size for circular button */
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}

@@ -1,0 +1,140 @@
+<div class="wishlist-container">
+  <!-- Header Section -->
+  <div class="wishlist-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="wishlist-title">
+            <i class="bi bi-heart-fill me-3"></i>
+            My Wishlist
+          </h1>
+          <p class="wishlist-subtitle" *ngIf="wishlistItems.length > 0">
+            You have {{ wishlistItems.length }} {{ wishlistItems.length === 1 ? 'book' : 'books' }} in your wishlist
+          </p>
+        </div>
+        <div class="col-md-4 text-end">
+          <div class="wishlist-stats" *ngIf="wishlistItems.length > 0">
+            <div class="stat-item">
+              <span class="stat-number">{{ wishlistItems.length }}</span>
+              <span class="stat-label">Books</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">₹{{ getTotalValue() | number:'1.2-2' }}</span>
+              <span class="stat-label">Total Value</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="wishlist-content">
+    <div class="container">
+      <ng-container *ngIf="wishlistItems.length > 0; else emptyWishlist">
+        <!-- Compact Card Grid -->
+        <div class="wishlist-grid">
+          <div class="wishlist-card" *ngFor="let item of wishlistItems; trackBy: trackByBookId">
+            <!-- Card Header with Wishlist Badge -->
+            <div class="card-header">
+              
+              <div class="stock-status" [ngClass]="{
+                'in-stock': item.book.stock_actual > 5,
+                'low-stock': item.book.stock_actual > 0 && item.book.stock_actual <= 5,
+                'out-of-stock': item.book.stock_actual <= 0
+              }">
+                <i class="bi" [ngClass]="{
+                  'bi-check-circle-fill': item.book.stock_actual > 5,
+                  'bi-exclamation-triangle-fill': item.book.stock_actual > 0 && item.book.stock_actual <= 5,
+                  'bi-x-circle-fill': item.book.stock_actual <= 0
+                }"></i>
+                <span *ngIf="item.book.stock_actual > 5">In Stock</span>
+                <span *ngIf="item.book.stock_actual > 0 && item.book.stock_actual <= 5">{{ item.book.stock_actual }} left</span>
+                <span *ngIf="item.book.stock_actual <= 0">Out of Stock</span>
+              </div>
+            </div>
+
+            <!-- Book Image -->
+            <div class="book-image-wrapper" (click)="navigateToBook(item.book.id)">
+              <img [src]="item.book.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" [alt]="item.book.title" class="book-image">
+              <div class="image-overlay">
+                <i class="bi bi-eye-fill"></i>
+                <span>View Details</span>
+              </div>
+            </div>
+            
+            <!-- Book Details -->
+            <div class="book-details">
+              <!-- Categories -->
+              <div class="book-categories">
+                <span class="category-tag" *ngFor="let category of item.book.categories?.slice(0, 2)">
+                  {{ typeof category === 'string' ? category : category.name }}
+                </span>
+              </div>
+              
+              <!-- Title and Author -->
+              <h5 class="book-title" (click)="navigateToBook(item.book.id)">{{ item.book.title }}</h5>
+              <p class="book-author">by {{ item.book.author }}</p>
+              
+              <!-- Price -->
+              <div class="price-section">
+                <span class="current-price">₹{{ item.book.price | number:'1.2-2' }}</span>
+              </div>
+            </div>
+            
+            <!-- Card Actions -->
+            <div class="card-actions">
+              <button 
+                class="btn btn-primary btn-move-cart" 
+                (click)="moveToCart(item)"
+                [disabled]="item.book.stock_actual <= 0">
+                <i class="bi bi-cart-plus me-2"></i>
+                <span>{{ item.book.stock_actual <= 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
+              </button>
+              <button 
+                class="btn btn-remove" 
+                (click)="removeFromWishlist(item)"
+                title="Remove from wishlist">
+                <i class="bi bi-trash">Remove</i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bulk Actions -->
+        <div class="bulk-actions" *ngIf="wishlistItems.length > 1">
+          <div class="row">
+            <div class="col-12 text-center">
+              <button class="btn btn-outline-primary btn-lg me-3" (click)="moveAllToCart()">
+                <i class="bi bi-cart-plus me-2"></i>
+                Add All to Cart
+              </button>
+              <button class="btn btn-outline-danger btn-lg" (click)="clearWishlist()">
+                <i class="bi bi-trash me-2"></i>
+                Clear Wishlist
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyWishlist>
+        <div class="empty-wishlist">
+          <div class="empty-content">
+            <div class="empty-icon">
+              <i class="bi bi-heart"></i>
+            </div>
+            <h3 class="empty-title">Your wishlist is empty</h3>
+            <p class="empty-description">
+              Discover amazing books and add them to your wishlist to save for later!
+            </p>
+            <button class="btn btn-primary btn-lg" routerLink="/">
+              <i class="bi bi-book me-2"></i>
+              Browse Books
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div> 

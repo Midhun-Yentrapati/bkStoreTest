@@ -1,0 +1,90 @@
+<div class="category-management-container">
+  <div class="content-card">
+    
+    <!-- Header Section with Back Button -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1 class="page-title">Category Management</h1>
+          <p class="page-subtitle">Manage book categories and classifications</p>
+        </div>
+        <div class="header-actions">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="add-category-section">
+      <h3>Add New Category</h3>
+      <div class="add-input-group">
+        <input
+          type="text"
+          [(ngModel)]="newCategoryName"
+          placeholder="Category Name"
+          (keyup.enter)="onAddCategory()"
+          [ngClass]="{'border-red-500': categoryInputError, 'border-green-500': !categoryInputError && newCategoryName && newCategoryName.length >= 2}"
+          class="category-input"
+          maxlength="50" />
+        <button 
+          class="action-button save-button" 
+          (click)="onAddCategory()"
+          [disabled]="!newCategoryName || newCategoryName.length < 2">
+          <span class="material-symbols-outlined button-icon">add</span> Add Category
+        </button>
+      </div>
+      <div *ngIf="categoryInputError" class="text-red-500 text-sm mt-1">
+        Category name must be at least 2 characters long.
+      </div>
+      <div *ngIf="newCategoryName && newCategoryName.length >= 2" class="text-green-500 text-sm mt-1">
+        Category name looks good!
+      </div>
+    </div>
+
+    <div class="categories-list-section">
+      <h3>Existing Categories</h3>
+      <div *ngIf="isLoading" class="state-container">
+        <p>Loading categories...</p>
+      </div>
+
+      <div *ngIf="!isLoading && categories.length === 0" class="state-container">
+        <p>No categories found.</p>
+      </div>
+
+      <table *ngIf="!isLoading && categories.length > 0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories">
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td class="action-buttons-cell">
+              <button class="action-button delete-button" (click)="onDelete(category.id)">
+                <span class="material-symbols-outlined button-icon">delete</span> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="errorMessage" class="banner error-banner">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="banner success-banner">
+      {{ successMessage }}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+.chart-container {
+  width: 95%; /* Increased to cover almost full width, leaving a small margin */
+  max-width: none; /* Remove max-width constraint to allow it to expand fully */
+  margin: 50px auto; /* Keep auto margins for horizontal centering, or use 50px 2.5% for slight side spacing */
+  padding: 30px; /* Increased padding for more internal space */
+  border: 1px solid var(--border-color); /* Themed border color */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: center;
+  background-color: var(--widget-bg); /* Themed background color */
+}
+
+h2 {
+  color: var(--widget-text); /* Themed text color */
+  margin-bottom: 15px; /* Slightly more space below heading */
+  font-size: 2em; /* Make heading larger */
+}
+
+.chart-description {
+  color: var(--widget-text); /* Themed text color */
+  font-size: 1.1em; /* Slightly larger description text */
+  margin-bottom: 30px; /* More space below description */
+}
+
+canvas {
+  width: 100% !important; /* Retain full width of its container */
+  height: 600px; /* Significantly increased height for a bigger chart */
+  max-height: 80vh; /* Add a max height based on viewport height for very tall screens */
+  background-color: var(--widget-bg); /* Themed canvas background color */
+}
+
+.error-message, .loading-message, .no-data-message {
+  padding: 25px; /* Increased padding */
+  font-size: 1.1em; /* Larger text */
+  background-color: var(--widget-bg); /* Themed background color */
+  color: var(--text-color); /* Themed text color */
+  border: 1px solid var(--border-color); /* Themed border color */
+  border-radius: 5px;
+  margin-top: 30px; /* More space above messages */
+}
+.loading-message {
+  background-color: var(--widget-bg); /* Themed background color */
+  color: var(--text-color); /* Themed text color */
+  border-color: var(--border-color); /* Themed border color */
+}
+.no-data-message {
+  background-color: var(--widget-bg); /* Themed background color */
+  color: var(--text-color); /* Themed text color */
+  border-color: var(--border-color); /* Themed border color */
+}
+.back-button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 40px; /* Fixed size for circular button */
+  height: 40px; /* Fixed size for circular button */
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}

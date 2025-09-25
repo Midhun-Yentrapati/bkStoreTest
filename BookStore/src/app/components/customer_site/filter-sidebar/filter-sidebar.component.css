@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+
+.filter-sidebar {
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  height: fit-content; /* Allows it to size to its content */
+  position: sticky; /* Makes the filter stick on scroll */
+  top: calc(var(--header-height) + 2rem); /* Position below the header */
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.filter-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.reset-btn {
+  background: none;
+  border: none;
+  color: var(--primary-accent);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.filter-section {
+  margin-bottom: 2rem;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.filter-options .checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.filter-options label {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.filter-options input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-accent);
+}
+
+.price-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.price-slider {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.price-label {
+  font-weight: 600;
+  color: var(--primary-accent);
+  margin-left: 0;
+}

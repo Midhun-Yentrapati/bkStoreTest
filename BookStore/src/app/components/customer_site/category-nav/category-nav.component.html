@@ -1,0 +1,12 @@
+<!-- category-nav.component.html -->
+<div class="category-nav-container">
+  <button
+    *ngFor="let category of categories"
+    [ngClass]="{'btn-primary': selectedCategory === category,
+                 'btn-outline-secondary': selectedCategory !== category}"
+    (click)="selectCategory(category)"
+    class="btn rounded-pill px-4 py-2 fs-6 fw-medium"
+  >
+    {{ category }}
+  </button>
+</div>

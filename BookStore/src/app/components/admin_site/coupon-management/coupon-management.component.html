@@ -1,0 +1,312 @@
+<div class="coupon-management p-4">
+  <!-- Header -->
+  <div class="header-section mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">Coupon Management</h2>
+      <button class="btn btn-primary" (click)="showCreateCouponForm()">
+        <i class="material-icons me-2">add</i>
+        Create Coupon
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section mb-4 card p-3">
+    <div class="row align-items-end">
+      <div class="col-md-6">
+        <label class="form-label">Search Coupons</label>
+        <input type="text" 
+               class="form-control" 
+               placeholder="Search by code or title..."
+               [value]="searchTerm"
+               (input)="onSearchChange($any($event.target).value)">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Filter by Status</label>
+        <select class="form-select" 
+                [value]="filterStatus" 
+                (change)="onFilterChange($any($event.target).value)">
+          <option value="all">All Coupons</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="expired">Expired</option>
+          <option value="upcoming">Upcoming</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="text-muted">
+          {{ filteredCoupons.length }} / {{ coupons.length }} coupons
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit Form -->
+  <div class="coupon-form-section mb-4" *ngIf="showCreateForm">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{ editingCoupon ? 'Edit' : 'Create' }} Coupon</h5>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="couponForm" (ngSubmit)="submitCoupon()">
+          <div class="row">
+            <!-- Basic Information -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Coupon Code *</label>
+                <input type="text" 
+                       class="form-control" 
+                       formControlName="code"
+                       placeholder="e.g., SAVE20, WELCOME10"
+                       style="text-transform: uppercase;">
+                <div class="form-text">Use only letters and numbers (4-15 characters)</div>
+                <div *ngIf="couponForm.get('code')?.invalid && couponForm.get('code')?.touched" 
+                     class="text-danger small">
+                  Please enter a valid coupon code (4-15 uppercase letters/numbers)
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Title *</label>
+                <input type="text" 
+                       class="form-control" 
+                       formControlName="title"
+                       placeholder="e.g., Welcome Offer">
+                <div *ngIf="couponForm.get('title')?.invalid && couponForm.get('title')?.touched" 
+                     class="text-danger small">
+                  Title is required (max 100 characters)
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Description *</label>
+                <textarea class="form-control" 
+                          formControlName="description"
+                          rows="3"
+                          placeholder="Describe the offer..."></textarea>
+                <div *ngIf="couponForm.get('description')?.invalid && couponForm.get('description')?.touched" 
+                     class="text-danger small">
+                  Description is required (max 500 characters)
+                </div>
+              </div>
+            </div>
+
+            <!-- Discount Configuration -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Discount Type *</label>
+                <select class="form-select" formControlName="discountType">
+                  <option value="percentage">Percentage</option>
+                  <option value="fixed_amount">Fixed Amount</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Discount Value *</label>
+                <div class="input-group">
+                  <span class="input-group-text" *ngIf="couponForm.value.discountType === 'percentage'">%</span>
+                  <span class="input-group-text" *ngIf="couponForm.value.discountType === 'fixed_amount'">₹</span>
+                  <input type="number" 
+                         class="form-control" 
+                         formControlName="discountValue"
+                         [placeholder]="couponForm.value.discountType === 'percentage' ? 'e.g., 20' : 'e.g., 100'">
+                </div>
+                <div *ngIf="couponForm.get('discountValue')?.invalid && couponForm.get('discountValue')?.touched" 
+                     class="text-danger small">
+                  Please enter a valid discount value
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Minimum Order Amount *</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" 
+                         class="form-control" 
+                         formControlName="minOrderAmount"
+                         placeholder="e.g., 500">
+                </div>
+              </div>
+
+              <div class="mb-3" *ngIf="couponForm.value.discountType === 'percentage'">
+                <label class="form-label">Maximum Discount Amount *</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" 
+                         class="form-control" 
+                         formControlName="maxDiscountAmount"
+                         placeholder="e.g., 200">
+                </div>
+              </div>
+            </div>
+
+            <!-- Usage Limits and Validity -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Total Usage Limit *</label>
+                <input type="number" 
+                       class="form-control" 
+                       formControlName="usageLimit"
+                       placeholder="e.g., 100">
+                <div class="form-text">Maximum number of times this coupon can be used</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Per User Limit *</label>
+                <input type="number" 
+                       class="form-control" 
+                       formControlName="userLimit"
+                       placeholder="e.g., 1">
+                <div class="form-text">Maximum times a single user can use this coupon</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Scope *</label>
+                <select class="form-select" formControlName="scope">
+                  <option value="order">Entire Order</option>
+                  <option value="item">Per Item</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Valid From *</label>
+                <input type="date" 
+                       class="form-control" 
+                       formControlName="validFrom">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Valid Until *</label>
+                <input type="date" 
+                       class="form-control" 
+                       formControlName="validUntil">
+                <div *ngIf="couponForm.get('validUntil')?.hasError('dateRange')" 
+                     class="text-danger small">
+                  End date must be after start date
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" 
+                         type="checkbox" 
+                         formControlName="isActive">
+                  <label class="form-check-label">
+                    Active (users can use this coupon)
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex gap-2 justify-content-end">
+            <button type="button" 
+                    class="btn btn-secondary" 
+                    (click)="cancelForm()">
+              Cancel
+            </button>
+            <button type="submit" 
+                    class="btn btn-primary"
+                    [disabled]="couponForm.invalid || submitLoading">
+              <span *ngIf="!submitLoading">{{ editingCoupon ? 'Update' : 'Create' }} Coupon</span>
+              <span *ngIf="submitLoading">{{ editingCoupon ? 'Updating...' : 'Creating...' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coupons List -->
+  <div class="coupons-list">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2">Loading coupons...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredCoupons.length === 0" class="text-center py-5">
+      <i class="material-icons display-1 text-muted">local_offer</i>
+      <h5 class="mt-3">No coupons found</h5>
+      <p class="text-muted">
+        {{ coupons.length === 0 ? 'Create your first coupon to get started.' : 'Try adjusting your search or filters.' }}
+      </p>
+    </div>
+
+    <!-- Coupons Grid -->
+    <div class="row" *ngIf="!loading && filteredCoupons.length > 0">
+      <div class="col-lg-4 col-md-6 mb-4" *ngFor="let coupon of filteredCoupons">
+        <div class="card coupon-card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-0 fw-bold">{{ coupon.code }}</h6>
+              <small class="text-muted">{{ coupon.title }}</small>
+            </div>
+            <span class="badge" [ngClass]="getCouponStatusClass(coupon)">
+              {{ getCouponStatusText(coupon) }}
+            </span>
+          </div>
+          
+          <div class="card-body">
+            <div class="discount-info mb-3">
+              <div class="discount-amount">{{ getDiscountText(coupon) }}</div>
+              <div class="text-muted small">
+                Min order: ₹{{ coupon.minOrderAmount }}
+                <span *ngIf="coupon.maxDiscountAmount > 0">
+                  • Max discount: ₹{{ coupon.maxDiscountAmount }}
+                </span>
+              </div>
+            </div>
+
+            <p class="text-muted small mb-3">{{ coupon.description }}</p>
+
+            <!-- Usage Stats -->
+            <div class="usage-stats mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted">Usage</small>
+                <small class="fw-medium">{{ coupon.usageCount }} / {{ coupon.usageLimit }}</small>
+              </div>
+              <div class="progress progress-sm">
+                <div class="progress-bar" 
+                     [style.width.%]="getUsagePercentage(coupon)"
+                     [ngClass]="getUsagePercentage(coupon) > 80 ? 'bg-warning' : 'bg-success'"></div>
+              </div>
+            </div>
+
+            <!-- Validity -->
+            <div class="validity-info mb-3">
+              <small class="text-muted d-block">
+                <i class="material-icons me-1" style="font-size: 16px;">schedule</i>
+                {{ coupon.validFrom | date:'MMM d' }} - {{ coupon.validUntil | date:'MMM d, y' }}
+              </small>
+            </div>
+          </div>
+
+          <div class="card-footer bg-transparent">
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-primary flex-fill" 
+                      (click)="editCoupon(coupon)">
+                <i class="material-icons me-1">edit</i>
+                Edit
+              </button>
+              <button class="btn btn-sm" 
+                      [ngClass]="coupon.isActive ? 'btn-outline-warning' : 'btn-outline-success'"
+                      (click)="toggleCouponStatus(coupon)">
+                <i class="material-icons me-1">{{ coupon.isActive ? 'pause' : 'play_arrow' }}</i>
+                {{ coupon.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+              <button class="btn btn-sm btn-outline-danger" 
+                      (click)="deleteCoupon(coupon)">
+                <i class="material-icons">delete</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

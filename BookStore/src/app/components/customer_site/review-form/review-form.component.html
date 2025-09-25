@@ -1,0 +1,111 @@
+<div class="review-form-container">
+  <!-- Main Review Section Header -->
+  <div class="review-section-header">
+    <h2 class="section-title">
+      <span class="material-icons">rate_review</span>
+      Customer Reviews & Ratings
+    </h2>
+    <p class="section-description">Share your experience and help other readers discover great books</p>
+  </div>
+
+  <!-- Write Review Toggle Button -->
+  <div class="write-review-action">
+    <button 
+      class="write-review-btn" 
+      (click)="toggleForm()"
+      [class.active]="showForm"
+      [class.disabled]="!isLoggedIn">
+      <span class="material-icons">
+        {{ showForm ? 'close' : 'edit' }}
+      </span>
+      <span class="button-text">{{ showForm ? 'Cancel Review' : (existingReview ? 'Edit My Review' : 'Write a Review') }}</span>
+    </button>
+    
+    <!-- Authentication Required Message -->
+    <div class="auth-required-message" *ngIf="!isLoggedIn">
+      <div class="auth-message-content">
+        <span class="material-icons">lock</span>
+        <span>Please log in to write a review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Form -->
+  <div class="review-form" [class.expanded]="showForm" *ngIf="showForm">
+    <div class="form-header">
+      <h3 class="form-title">
+        <span class="material-icons">create</span>
+        {{ existingReview ? 'Edit Your Review' : 'Write Your Review' }}
+      </h3>
+      <p class="form-subtitle">Share your honest thoughts about "{{ bookTitle }}" to help other book lovers</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #reviewForm="ngForm" class="review-submission-form">
+      <!-- Rating Section -->
+      <div class="rating-section">
+        <div class="section-header">
+          <label class="rating-label">
+            <span class="material-icons">star</span>
+            Rate This Book *
+          </label>
+          <span class="required-indicator">Required</span>
+        </div>
+        <div class="rating-input-area">
+          <app-star-rating 
+            [rating]="rating" 
+            [interactive]="!isSubmitting" 
+            size="large"
+            (ratingChange)="onRatingChange($event)">
+          </app-star-rating>
+          <span class="rating-text" *ngIf="rating > 0">
+            {{ rating }} star{{ rating === 1 ? '' : 's' }} - {{ getRatingText(rating) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Review Text Section -->
+      <div class="review-section">
+        <div class="section-header">
+          <label for="review-text" class="review-label">
+            <span class="material-icons">chat</span>
+            Write Your Review
+          </label>
+          <span class="optional-indicator">Optional</span>
+        </div>
+        <textarea 
+          id="review-text"
+          [(ngModel)]="review" 
+          name="review"
+          class="review-textarea"
+          placeholder="What did you think of this book? Share details about the plot, characters, writing style, or anything that other readers might find helpful..."
+          rows="6"
+          maxlength="1000"
+          [disabled]="isSubmitting">
+        </textarea>
+        <div class="character-count">
+          <span [class.warning]="review.length > 800">{{ review.length }}/1000 characters</span>
+        </div>
+      </div>
+
+      <!-- Submit Actions -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="onCancel()"
+          [disabled]="isSubmitting">
+          <span class="material-icons">close</span>
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary submit-review-btn" 
+          [disabled]="!isFormValid || isSubmitting || !hasChanges">
+          <span class="material-icons" *ngIf="isSubmitting">hourglass_empty</span>
+          <span class="material-icons" *ngIf="!isSubmitting">{{ existingReview ? 'edit' : 'send' }}</span>
+          <span class="button-text">{{ isSubmitting ? 'Submitting Review...' : (existingReview ? 'Update Review' : 'Submit Review') }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

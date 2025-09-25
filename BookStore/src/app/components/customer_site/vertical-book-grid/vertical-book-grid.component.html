@@ -1,0 +1,10 @@
+<!-- vertical-book-grid.component.html -->
+
+<!-- The grid container now directly holds the cards -->
+<div class="book-grid-container">
+  <app-book-card
+    *ngFor="let book of books"
+    [book]="book"
+    cardSize="compact">
+  </app-book-card>
+</div>

@@ -1,0 +1,4784 @@
+{
+  "users": [
+    {
+      "id": "a1b2-c3d4-e5f6-g7h8",
+      "fullName": "Midhun Sai",
+      "username": "midhuny",
+      "email": "midhunyentrapati@gmail.com",
+      "mobileNumber": "9392717070",
+      "password": "Midhun@64",
+      "profilePicture": "https://ui-avatars.com/api/?name=Midhun%20Sai&background=7F60A1&color=fff&size=200",
+      "dateOfBirth": "2003-12-14",
+      "bio": "hero",
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "lastUpdated": "2025-08-12T11:57:18.337Z",
+      "displayName": "Midhun Sai",
+      "phoneNumber": "9392717070",
+      "gender": "male",
+      "address": "plot no 122, Vijayaganapathi nagar, navalur",
+      "city": "Sample City",
+      "state": "Tamil Nadu",
+      "zipCode": "123987",
+      "country": "India"
+    },
+    {
+      "id": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "fullName": "Sumanth Kumar",
+      "username": "sumath sai",
+      "email": "sumanth@gmail.com",
+      "mobileNumber": "9999999999",
+      "password": "83094017",
+      "profilePicture": "https://ui-avatars.com/api/?name=Sumanth&background=7F60A1&color=fff&size=200",
+      "createdAt": "2025-08-16T19:22:14.877Z",
+      "lastUpdated": "2025-08-22T12:08:10.433Z",
+      "dateOfBirth": "2003-12-31",
+      "bio": "Hello, I like reading triller"
+    },
+    {
+      "id": "0f886a2d-c8c4-468d-bfe0-ef467ec22257",
+      "fullName": "Vijay",
+      "username": "vijay",
+      "email": "vijay@gmail.com",
+      "mobileNumber": "1234567890",
+      "password": "Vijay@123",
+      "profilePicture": "https://ui-avatars.com/api/?name=Vijay&background=7F60A1&color=fff&size=200",
+      "createdAt": "2025-08-22T12:54:21.916Z",
+      "lastUpdated": "2025-08-24T13:25:10.699Z"
+    },
+    {
+      "id": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "fullName": "Padmesh Balachandran",
+      "username": "Omen",
+      "email": "pb25@gmail.com",
+      "mobileNumber": "9879789780",
+      "password": "Password@123",
+      "profilePicture": "https://ui-avatars.com/api/?name=Padmesh%20Balachandran&background=7F60A1&color=fff&size=200",
+      "createdAt": "2025-08-28T04:59:21.130Z",
+      "lastUpdated": "2025-08-28T04:59:21.130Z"
+    }
+  ],
+  "cart": [
+    {
+      "id": "e9b12bbb-77fd-4462-8974-2e92b48274bb",
+      "bookId": "7",
+      "userId": "a1b2-c3d4-e5f6-g7h8",
+      "quantity": 1,
+      "addedAt": "2025-08-14T10:15:47.042Z"
+    }
+  ],
+  "wishlist": [
+    {
+      "id": "74909b6f-a341-4a81-9e2b-fbe7b9c62304",
+      "bookId": "2",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:10.402Z"
+    },
+    {
+      "id": "0b8aad89-65e6-457d-814e-9388e9e4314f",
+      "bookId": "7",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:11.817Z"
+    },
+    {
+      "id": "0cfbf17e-4133-4026-a138-28343df14938",
+      "bookId": "8",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:21.603Z"
+    },
+    {
+      "id": "6c104036-0bc7-48e5-a777-f20c24e76bea",
+      "bookId": "10",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:24.019Z"
+    },
+    {
+      "id": "4b652dfe-c610-4f9f-a088-940165aab336",
+      "bookId": "15",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:25.250Z"
+    },
+    {
+      "id": "881cd864-d1a3-4885-a6b0-cfdcc784d1eb",
+      "bookId": "32",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:28.283Z"
+    },
+    {
+      "id": "24e25bb5-6f01-4355-8e99-948ade530289",
+      "bookId": "40",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:29.353Z"
+    },
+    {
+      "id": "cfc4dfed-4c52-47a4-98ab-a49ba43bea17",
+      "bookId": "55",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:32.558Z"
+    },
+    {
+      "id": "a997f0cb-82fc-44f9-b2e8-ae4d91fd79a0",
+      "bookId": "62",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:34.868Z"
+    },
+    {
+      "id": "eee5451e-ff60-4e0d-b2ba-fd86d56edeca",
+      "bookId": "66",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:36.090Z"
+    },
+    {
+      "id": "55d6c701-e892-42f8-ba6a-a44934e646eb",
+      "bookId": "70",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:39.005Z"
+    },
+    {
+      "id": "98d8201c-2001-4b04-8f13-c991400dffc5",
+      "bookId": "74",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:40.140Z"
+    },
+    {
+      "id": "c1deba66-cc6a-4b9e-8d77-23668cc25515",
+      "bookId": "80",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:42.497Z"
+    },
+    {
+      "id": "dbb0bb13-6e8b-46c5-a329-70f38ec0da62",
+      "bookId": "83",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:20:43.651Z"
+    },
+    {
+      "id": "29160beb-3284-4964-b16f-26c10e6177cc",
+      "bookId": "4",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:04.717Z"
+    },
+    {
+      "id": "cb37d20e-8d98-49c8-a85f-4b3e61a1fdfc",
+      "bookId": "11",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:05.742Z"
+    },
+    {
+      "id": "88213910-4a73-4275-bdc4-2b49461ee964",
+      "bookId": "12",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:06.705Z"
+    },
+    {
+      "id": "315112ed-bc9c-4ad7-84de-74c8d63458e2",
+      "bookId": "13",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:09.593Z"
+    },
+    {
+      "id": "a56541b4-dba4-4965-9e53-962bfd3c930b",
+      "bookId": "16",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:10.700Z"
+    },
+    {
+      "id": "c447d77a-5c4e-4c12-8344-78b213a5e949",
+      "bookId": "18",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:12.811Z"
+    },
+    {
+      "id": "fd00a23a-3611-4c22-8508-ec650de6a591",
+      "bookId": "28",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:13.909Z"
+    },
+    {
+      "id": "0cada5aa-e6a9-464b-97f3-5685df41d758",
+      "bookId": "33",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:16.873Z"
+    },
+    {
+      "id": "35f3172e-9d7f-414e-9323-a61255d3d770",
+      "bookId": "46",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:17.928Z"
+    },
+    {
+      "id": "726126a4-1c6a-4ae0-9f53-eb0b68fd74a2",
+      "bookId": "49",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:18.953Z"
+    },
+    {
+      "id": "0a4a5199-ad6c-4748-be61-c34626e7e7db",
+      "bookId": "57",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:21.165Z"
+    },
+    {
+      "id": "aff0fdbe-41dc-4164-bf87-8a76844c3cfe",
+      "bookId": "61",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:23.922Z"
+    },
+    {
+      "id": "2b190a1f-9130-4770-ae0f-29ccb99c960c",
+      "bookId": "65",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:24.996Z"
+    },
+    {
+      "id": "399cea35-5b9f-4602-a8d9-78ea53bc60e0",
+      "bookId": "69",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:26.168Z"
+    },
+    {
+      "id": "57db408b-b221-4bbe-81fc-88c11b93615e",
+      "bookId": "73",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:28.517Z"
+    },
+    {
+      "id": "2da3be17-d1a9-4dd1-9d52-411149a6d9c1",
+      "bookId": "14",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "addedAt": "2025-08-29T04:21:39.501Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "294c38e8-72d3-4d82-968e-f9bfe3773f59",
+      "userId": "a1b2-c3d4-e5f6-g7h8",
+      "items": [
+        {
+          "id": "7f2ee9bb-6e7f-408d-bb7c-3d5ec128ca2d",
+          "bookId": "9",
+          "title": "Harry Potter and the Goblet of Fire",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 330,
+          "image_urls": [
+            "images/Harry Potter and the Goblet of Fire.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-12T12:20:35.725Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "9a32",
+        "name": "YENTRAPATI MIDHUN SAI",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "Cognizant Office, Sipcot",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Tamil Nadu",
+        "landmark": "",
+        "addressType": "Work",
+        "userId": "a1b2-c3d4-e5f6-g7h8",
+        "isActive": true,
+        "createdAt": "2025-08-12T12:20:17.147Z",
+        "updatedAt": "2025-08-12T12:20:17.147Z",
+        "country": "India"
+      },
+      "orderDate": "2025-08-12T12:20:35.725Z",
+      "orderStatus": "confirmed",
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "paymentDetails": {
+        "transactionId": "TXN175500123572590XHWMESR",
+        "gateway": "COD_SYSTEM",
+        "method": "COD",
+        "amount": 460,
+        "currency": "INR",
+        "timestamp": "2025-08-12T12:20:35.725Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 330,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 60,
+      "discount": 0,
+      "finalAmount": 460,
+      "totalPayable": 460,
+      "estimatedDelivery": "2025-08-19T12:20:35.725Z",
+      "trackingId": "BVLS73JDZUV",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-12T12:20:35.725Z",
+          "note": "Order placed successfully"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2025-08-29T06:02:16.758Z",
+          "note": "Order status updated to confirmed by admin"
+        }
+      ],
+      "createdAt": "2025-08-12T12:20:35.725Z",
+      "updatedAt": "2025-08-29T06:02:16.758Z"
+    },
+    {
+      "id": "22c44897-9191-4f27-99e7-b03e416dd861",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "a3380cff-9fed-41ef-84ac-cdacc73462d0",
+          "bookId": "12",
+          "title": "Harry Potter and the Deathly Hallows",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 360,
+          "image_urls": [
+            "images/Harry Potter and the Deathly Hallows.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-21T11:36:11.812Z"
+        },
+        {
+          "id": "f8b21b4d-693a-4a05-8ab6-3ca33b07f06d",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 2,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-21T11:36:11.812Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-21T11:35:40.682Z"
+      },
+      "orderDate": "2025-08-21T11:36:11.812Z",
+      "orderStatus": "delivered",
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "paymentDetails": {
+        "transactionId": "TXN1755776171811C42PJ682L",
+        "gateway": "COD_SYSTEM",
+        "method": "COD",
+        "amount": 1177,
+        "currency": "INR",
+        "timestamp": "2025-08-21T11:36:11.811Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 980,
+      "platformFee": 20,
+      "shippingFee": 0,
+      "taxes": 177,
+      "discount": 0,
+      "finalAmount": 1177,
+      "totalPayable": 1177,
+      "estimatedDelivery": "2025-08-28T11:36:11.812Z",
+      "trackingId": "BV6BFIP2Z5H",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-21T11:36:11.812Z",
+          "note": "Order placed successfully"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2025-08-21T11:38:03.363Z",
+          "note": "Order status updated to confirmed by admin"
+        },
+        {
+          "status": "processing",
+          "timestamp": "2025-08-21T11:38:09.210Z",
+          "note": "Order status updated to processing by admin"
+        },
+        {
+          "status": "shipped",
+          "timestamp": "2025-08-21T11:38:13.517Z",
+          "note": "Order status updated to shipped by admin"
+        },
+        {
+          "status": "delivered",
+          "timestamp": "2025-08-21T11:38:42.782Z",
+          "note": "Order status updated to delivered by admin"
+        }
+      ],
+      "createdAt": "2025-08-21T11:36:11.812Z",
+      "updatedAt": "2025-08-21T11:38:42.782Z"
+    },
+    {
+      "id": "fe7e574f-b05d-4238-a5aa-a58db6f8e154",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "bd238a56-b8d1-400a-8807-63d0f008b282",
+          "bookId": "13",
+          "title": "The Hunger Games",
+          "author": "Suzanne Collins",
+          "quantity": 1,
+          "price": 280,
+          "image_urls": [
+            "images/The Hunger Games.jpg"
+          ],
+          "category": "Fiction",
+          "addedAt": "2025-08-22T12:10:15.277Z"
+        },
+        {
+          "id": "4d6b08e2-757c-4f9c-accf-c65ae9702e1b",
+          "bookId": "10",
+          "title": "Harry Potter and the Order of the Phoenix",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 340,
+          "image_urls": [
+            "images/Harry Potter and the Order of the Phoenix.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:10:15.277Z"
+        },
+        {
+          "id": "8fdd26fa-18b5-4e3b-8b44-bfd7452ab0aa",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:10:15.277Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-21T11:35:40.682Z"
+      },
+      "orderDate": "2025-08-22T12:10:15.277Z",
+      "orderStatus": "confirmed",
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "paymentDetails": {
+        "transactionId": "TXN1755864615277U78MX6JLN",
+        "gateway": "COD_SYSTEM",
+        "method": "COD",
+        "amount": 1118,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:10:15.277Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 930,
+      "platformFee": 20,
+      "shippingFee": 0,
+      "taxes": 168,
+      "discount": 0,
+      "finalAmount": 1118,
+      "totalPayable": 1118,
+      "estimatedDelivery": "2025-08-29T12:10:15.277Z",
+      "trackingId": "BVOOT7NR2N6",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:10:15.277Z",
+          "note": "Order placed successfully"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2025-08-29T06:02:27.042Z",
+          "note": "Order status updated to confirmed by admin"
+        }
+      ],
+      "createdAt": "2025-08-22T12:10:15.277Z",
+      "updatedAt": "2025-08-29T06:02:27.042Z"
+    },
+    {
+      "id": "ae9d92bf-e132-4793-954b-021203e6946b",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "5f3d68cf-3a5a-4c09-8de7-7e83658fc10b",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:17:42.348Z"
+        },
+        {
+          "id": "fa91ef64-43fe-45ea-bd21-efca93e1139f",
+          "bookId": "19",
+          "title": "The Battle of the Labyrinth",
+          "author": "Rick Riordan",
+          "quantity": 1,
+          "price": 285,
+          "image_urls": [
+            "images/The Battle of the Labyrinth.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:17:42.348Z"
+        },
+        {
+          "id": "3eb33e7f-aadf-4c8d-a9b9-f5ce3d89d5cd",
+          "bookId": "5",
+          "title": "The Silmarillion",
+          "author": "J.R.R. Tolkien",
+          "quantity": 1,
+          "price": 450,
+          "image_urls": [
+            "images/The Silmarillion.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:17:42.348Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-22T12:15:01.650Z",
+        "isDefault": false
+      },
+      "orderDate": "2025-08-22T12:17:42.348Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755865062348XC3G1LDKC",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 1254,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:17:42.348Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 1045,
+      "platformFee": 20,
+      "shippingFee": 0,
+      "taxes": 189,
+      "discount": 0,
+      "finalAmount": 1254,
+      "totalPayable": 1254,
+      "estimatedDelivery": "2025-08-29T12:17:42.348Z",
+      "trackingId": "BVPJR9OKD1L",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:17:42.348Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:17:42.348Z",
+      "updatedAt": "2025-08-22T12:17:42.348Z"
+    },
+    {
+      "id": "d124222d-e37f-4536-8b13-5df34c63820f",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "23a10e03-1728-4146-9373-dc74ff4e0fd9",
+          "bookId": "4",
+          "title": "The Return of the King",
+          "author": "J.R.R. Tolkien",
+          "quantity": 1,
+          "price": 400,
+          "image_urls": [
+            "images/The Return of the King.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:23:49.247Z"
+        },
+        {
+          "id": "e2270a61-5a06-4972-838d-b4f4fcfd0840",
+          "bookId": "3",
+          "title": "The Two Towers",
+          "author": "J.R.R. Tolkien",
+          "quantity": 1,
+          "price": 400,
+          "image_urls": [
+            "images/The Two Towers.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:23:49.247Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "0c73",
+        "name": "Sumanth",
+        "phone": "9392717070",
+        "alternatePhone": "7777777777",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Tamil Nadu",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "isActive": true,
+        "createdAt": "2025-08-20T06:33:13.566Z",
+        "updatedAt": "2025-08-22T12:15:01.649Z",
+        "country": "India",
+        "isDefault": true
+      },
+      "orderDate": "2025-08-22T12:23:49.247Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755865429247IXGCVGNNU",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 964,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:23:49.247Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 800,
+      "platformFee": 20,
+      "shippingFee": 0,
+      "taxes": 144,
+      "discount": 0,
+      "finalAmount": 964,
+      "totalPayable": 964,
+      "estimatedDelivery": "2025-08-29T12:23:49.247Z",
+      "trackingId": "BVUZQUTUL46",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:23:49.247Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:23:49.247Z",
+      "updatedAt": "2025-08-22T12:23:49.247Z"
+    },
+    {
+      "id": "a883bf50-81c0-4bf4-a95d-b1f0a0aedc46",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "1b756271-5f40-44ce-ad9d-e0c5818938d8",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:25:11.989Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "0c73",
+        "name": "Sumanth",
+        "phone": "9392717070",
+        "alternatePhone": "7777777777",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Tamil Nadu",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "isActive": true,
+        "createdAt": "2025-08-20T06:33:13.566Z",
+        "updatedAt": "2025-08-22T12:15:01.649Z",
+        "country": "India",
+        "isDefault": true
+      },
+      "orderDate": "2025-08-22T12:25:11.990Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755865511989PYT77SYT3",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 436,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:25:11.989Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 310,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 56,
+      "discount": 0,
+      "finalAmount": 436,
+      "totalPayable": 436,
+      "estimatedDelivery": "2025-08-29T12:25:11.990Z",
+      "trackingId": "BVQJUECQEC2",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:25:11.990Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:25:11.990Z",
+      "updatedAt": "2025-08-22T12:25:11.990Z"
+    },
+    {
+      "id": "1cfa2237-3101-4c14-9338-7e1f71f7b6c8",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "09911a45-c782-460c-b25f-96e23bb78845",
+          "bookId": "2",
+          "title": "The Fellowship of the Ring",
+          "author": "J.R.R. Tolkien",
+          "quantity": 1,
+          "price": 400,
+          "image_urls": [
+            "images/The Fellowship of the Ring.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:30:58.374Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-22T12:15:01.650Z",
+        "isDefault": false
+      },
+      "orderDate": "2025-08-22T12:30:58.375Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN17558658583745YUFWXEDH",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 542,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:30:58.374Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 400,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 72,
+      "discount": 0,
+      "finalAmount": 542,
+      "totalPayable": 542,
+      "estimatedDelivery": "2025-08-29T12:30:58.375Z",
+      "trackingId": "BVALJRJYIKN",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:30:58.375Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:30:58.375Z",
+      "updatedAt": "2025-08-22T12:30:58.375Z"
+    },
+    {
+      "id": "c0223271-1016-4356-80d8-819b5b06720d",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "ea566df1-28e8-4d5a-9089-4207ba82283a",
+          "bookId": "11",
+          "title": "Harry Potter and the Half-Blood Prince",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 350,
+          "image_urls": [
+            "images/Harry Potter and the Half-Blood Prince.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:32:33.252Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-22T12:15:01.650Z",
+        "isDefault": false
+      },
+      "orderDate": "2025-08-22T12:32:33.252Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755865953251CIDRS5N28",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 483,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:32:33.251Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 350,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 63,
+      "discount": 0,
+      "finalAmount": 483,
+      "totalPayable": 483,
+      "estimatedDelivery": "2025-08-29T12:32:33.252Z",
+      "trackingId": "BVJWM5HHUYI",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:32:33.252Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:32:33.252Z",
+      "updatedAt": "2025-08-22T12:32:33.252Z"
+    },
+    {
+      "id": "f46aec61-8c49-49eb-8f77-0bcc62aaac67",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "65b68bc0-4b01-45a7-8750-f7f6d72af397",
+          "bookId": "10",
+          "title": "Harry Potter and the Order of the Phoenix",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 340,
+          "image_urls": [
+            "images/Harry Potter and the Order of the Phoenix.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:33:49.522Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+        "name": "Midhun",
+        "phone": "9392717070",
+        "alternatePhone": "",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Goa",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "createdAt": "2025-08-21T11:35:40.682Z",
+        "updatedAt": "2025-08-22T12:15:01.650Z",
+        "isDefault": false
+      },
+      "orderDate": "2025-08-22T12:33:49.522Z",
+      "orderStatus": "pending",
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "paymentDetails": {
+        "transactionId": "TXN1755866029521LYQIHZ0Z5",
+        "gateway": "COD_SYSTEM",
+        "method": "COD",
+        "amount": 472,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:33:49.521Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 340,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 62,
+      "discount": 0,
+      "finalAmount": 472,
+      "totalPayable": 472,
+      "estimatedDelivery": "2025-08-29T12:33:49.522Z",
+      "trackingId": "BVD0Q7EVJN3",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:33:49.522Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:33:49.522Z",
+      "updatedAt": "2025-08-22T12:33:49.522Z"
+    },
+    {
+      "id": "27d1cd57-cc38-45bd-9ee0-c1fc8499f6ce",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "49191bd7-88c6-411e-908f-a81bb0936e52",
+          "bookId": "2",
+          "title": "The Fellowship of the Ring",
+          "author": "J.R.R. Tolkien",
+          "quantity": 1,
+          "price": 400,
+          "image_urls": [
+            "images/The Fellowship of the Ring.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:38:46.997Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "0c73",
+        "name": "Sumanth",
+        "phone": "9392717070",
+        "alternatePhone": "7777777777",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Tamil Nadu",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "isActive": true,
+        "createdAt": "2025-08-20T06:33:13.566Z",
+        "updatedAt": "2025-08-22T12:15:01.649Z",
+        "country": "India",
+        "isDefault": true
+      },
+      "orderDate": "2025-08-22T12:38:46.997Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755866326996E55DOL2CB",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 542,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:38:46.996Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 400,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 72,
+      "discount": 0,
+      "finalAmount": 542,
+      "totalPayable": 542,
+      "estimatedDelivery": "2025-08-29T12:38:46.997Z",
+      "trackingId": "BVAFYNJ1AD6",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:38:46.997Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:38:46.997Z",
+      "updatedAt": "2025-08-22T12:38:46.997Z"
+    },
+    {
+      "id": "9c5a3451-20b5-4aad-85e4-1f7c3bb3e46b",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "items": [
+        {
+          "id": "23d5c046-3a93-4e81-952b-1b44b4801fce",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:42:11.939Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "0c73",
+        "name": "Sumanth",
+        "phone": "9392717070",
+        "alternatePhone": "7777777777",
+        "pincode": "600130",
+        "address": "plot no 122, Vijayaganapathi nagar, navalur",
+        "locality": "Siruseri",
+        "city": "CNG",
+        "state": "Tamil Nadu",
+        "landmark": "graveyard",
+        "addressType": "Home",
+        "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+        "isActive": true,
+        "createdAt": "2025-08-20T06:33:13.566Z",
+        "updatedAt": "2025-08-22T12:15:01.649Z",
+        "country": "India",
+        "isDefault": true
+      },
+      "orderDate": "2025-08-22T12:42:11.939Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1755866531939LG38B0YRN",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 436,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:42:11.939Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 310,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 56,
+      "discount": 0,
+      "finalAmount": 436,
+      "totalPayable": 436,
+      "estimatedDelivery": "2025-08-29T12:42:11.939Z",
+      "trackingId": "BVC1IGAY5OV",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:42:11.939Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-22T12:42:11.939Z",
+      "updatedAt": "2025-08-22T12:42:11.939Z"
+    },
+    {
+      "id": "27b1d72e-b514-4f10-9b06-de5c9eb2758e",
+      "userId": "0f886a2d-c8c4-468d-bfe0-ef467ec22257",
+      "items": [
+        {
+          "id": "df922104-530b-4dcd-8cef-8581e3c92c65",
+          "bookId": "10",
+          "title": "Harry Potter and the Order of the Phoenix",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 340,
+          "image_urls": [
+            "images/Harry Potter and the Order of the Phoenix.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-22T12:56:21.563Z"
+        }
+      ],
+      "shippingAddress": {
+        "id": "6aff6466-e5d7-4459-892e-40e311312062",
+        "name": "Vijay",
+        "phone": "3456782345",
+        "alternatePhone": "",
+        "pincode": "123467",
+        "address": "qwertyuixcerv56gthy78ju",
+        "locality": "r564frd4edfr5gty",
+        "city": "Sample City",
+        "state": "Sample State",
+        "landmark": "",
+        "addressType": "Home",
+        "userId": "0f886a2d-c8c4-468d-bfe0-ef467ec22257",
+        "createdAt": "2025-08-22T12:56:10.483Z",
+        "updatedAt": "2025-08-22T12:56:10.483Z"
+      },
+      "orderDate": "2025-08-22T12:56:21.563Z",
+      "orderStatus": "delivered",
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "paymentDetails": {
+        "transactionId": "TXN1755867381563WBYVWHK51",
+        "gateway": "COD_SYSTEM",
+        "method": "COD",
+        "amount": 472,
+        "currency": "INR",
+        "timestamp": "2025-08-22T12:56:21.563Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 340,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 62,
+      "discount": 0,
+      "finalAmount": 472,
+      "totalPayable": 472,
+      "estimatedDelivery": "2025-08-29T12:56:21.563Z",
+      "trackingId": "BVDCCHMX41U",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-22T12:56:21.563Z",
+          "note": "Order placed successfully"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2025-08-22T12:57:35.699Z",
+          "note": "Order status updated to confirmed by admin"
+        },
+        {
+          "status": "processing",
+          "timestamp": "2025-08-22T12:57:41.106Z",
+          "note": "Order status updated to processing by admin"
+        },
+        {
+          "status": "shipped",
+          "timestamp": "2025-08-22T12:57:50.277Z",
+          "note": "Order status updated to shipped by admin"
+        },
+        {
+          "status": "delivered",
+          "timestamp": "2025-08-22T12:58:07.121Z",
+          "note": "Order status updated to delivered by admin"
+        }
+      ],
+      "createdAt": "2025-08-22T12:56:21.563Z",
+      "updatedAt": "2025-08-22T12:58:07.121Z"
+    },
+    {
+      "id": "d5ce1870-1a09-4507-bb24-c7c4c0b14428",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "items": [
+        {
+          "id": "e3633e3b-2687-4a2c-a80c-7a0f77241261",
+          "bookId": "7",
+          "title": "Harry Potter and the Chamber of Secrets",
+          "author": "J.K. Rowling",
+          "quantity": 1,
+          "price": 310,
+          "image_urls": [
+            "images/Harry Potter and the Chamber of Secrets.jpg"
+          ],
+          "category": "Fantasy",
+          "addedAt": "2025-08-28T05:34:40.499Z"
+        }
+      ],
+      "shippingAddress": {
+        "name": "Padmesh Balachandran",
+        "phone": "9789789789",
+        "alternatePhone": "",
+        "pincode": "641641",
+        "address": "2/312 , Cross street, Irugur",
+        "locality": "CBE",
+        "city": "Coimbatore",
+        "state": "Tamil Nadu",
+        "landmark": "",
+        "addressType": "Home",
+        "id": "b59c9027-75d8-4aec-9444-b734943b7fca",
+        "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+        "createdAt": "2025-08-28T05:34:20.302Z",
+        "updatedAt": "2025-08-28T05:34:20.302Z"
+      },
+      "orderDate": "2025-08-28T05:34:40.499Z",
+      "orderStatus": "delivered",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN17563592804992VNUBHBNR",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 436,
+        "currency": "INR",
+        "timestamp": "2025-08-28T05:34:40.499Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 310,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 56,
+      "discount": 0,
+      "finalAmount": 436,
+      "totalPayable": 436,
+      "estimatedDelivery": "2025-09-04T05:34:40.500Z",
+      "trackingId": "BVA63PV05NP",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-28T05:34:40.500Z",
+          "note": "Order placed successfully"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2025-08-28T05:38:39.052Z",
+          "note": "Order status updated to confirmed by admin"
+        },
+        {
+          "status": "processing",
+          "timestamp": "2025-08-28T05:39:36.230Z",
+          "note": "Order status updated to processing by admin"
+        },
+        {
+          "status": "shipped",
+          "timestamp": "2025-08-28T05:39:46.152Z",
+          "note": "Order status updated to shipped by admin"
+        },
+        {
+          "status": "delivered",
+          "timestamp": "2025-08-28T05:39:50.390Z",
+          "note": "Order status updated to delivered by admin"
+        }
+      ],
+      "createdAt": "2025-08-28T05:34:40.500Z",
+      "updatedAt": "2025-08-28T05:39:50.390Z"
+    },
+    {
+      "id": "7027a68c-a51e-499a-b6a7-37b8c967c979",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "items": [
+        {
+          "id": "ec1052b3-5aae-4be8-8716-8a332d6f0d51",
+          "bookId": "14",
+          "title": "Catching Fire",
+          "author": "Suzanne Collins",
+          "quantity": 1,
+          "price": 290,
+          "image_urls": [
+            "images/Catching Fire.jpg"
+          ],
+          "category": "Fiction",
+          "addedAt": "2025-08-28T11:22:58.972Z"
+        }
+      ],
+      "shippingAddress": {
+        "name": "Padmesh Balachandran",
+        "phone": "9789789789",
+        "alternatePhone": "",
+        "pincode": "641641",
+        "address": "2/312 , Cross street, Irugur",
+        "locality": "CBE",
+        "city": "Coimbatore",
+        "state": "Tamil Nadu",
+        "landmark": "",
+        "addressType": "Home",
+        "id": "b59c9027-75d8-4aec-9444-b734943b7fca",
+        "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+        "createdAt": "2025-08-28T05:34:20.302Z",
+        "updatedAt": "2025-08-28T05:34:20.302Z"
+      },
+      "orderDate": "2025-08-28T11:22:58.972Z",
+      "orderStatus": "pending",
+      "paymentMethod": "UPI",
+      "paymentStatus": "paid",
+      "paymentDetails": {
+        "transactionId": "TXN1756380178972O2FGQETUJ",
+        "gateway": "UPI_GATEWAY",
+        "method": "UPI",
+        "amount": 413,
+        "currency": "INR",
+        "timestamp": "2025-08-28T11:22:58.972Z",
+        "status": "success",
+        "gatewayResponse": {
+          "status": "SUCCESS",
+          "message": "Payment processed successfully"
+        }
+      },
+      "totalAmount": 290,
+      "platformFee": 20,
+      "shippingFee": 50,
+      "taxes": 53,
+      "discount": 0,
+      "finalAmount": 413,
+      "totalPayable": 413,
+      "estimatedDelivery": "2025-09-04T11:22:58.972Z",
+      "trackingId": "BV13DF3BIAD",
+      "statusHistory": [
+        {
+          "status": "pending",
+          "timestamp": "2025-08-28T11:22:58.972Z",
+          "note": "Order placed successfully"
+        }
+      ],
+      "createdAt": "2025-08-28T11:22:58.972Z",
+      "updatedAt": "2025-08-28T11:22:58.972Z"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "9a32",
+      "name": "YENTRAPATI MIDHUN SAI",
+      "phone": "9392717070",
+      "alternatePhone": "",
+      "pincode": "600130",
+      "address": "Cognizant Office, Sipcot",
+      "locality": "Siruseri",
+      "city": "CNG",
+      "state": "Tamil Nadu",
+      "landmark": "",
+      "addressType": "Work",
+      "userId": "a1b2-c3d4-e5f6-g7h8",
+      "isActive": true,
+      "createdAt": "2025-08-12T12:20:17.147Z",
+      "updatedAt": "2025-08-12T12:20:17.147Z",
+      "country": "India"
+    },
+    {
+      "id": "0c73",
+      "name": "Sumanth",
+      "phone": "9392717070",
+      "alternatePhone": "7777777777",
+      "pincode": "600130",
+      "address": "plot no 122, Vijayaganapathi nagar, navalur",
+      "locality": "Siruseri",
+      "city": "CNG",
+      "state": "Tamil Nadu",
+      "landmark": "graveyard",
+      "addressType": "Home",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "isActive": true,
+      "createdAt": "2025-08-20T06:33:13.566Z",
+      "updatedAt": "2025-08-22T12:15:01.649Z",
+      "country": "India",
+      "isDefault": true
+    },
+    {
+      "id": "1a2c7520-cb15-461a-8a10-03ea25de1b36",
+      "name": "Midhun",
+      "phone": "9392717070",
+      "alternatePhone": "",
+      "pincode": "600130",
+      "address": "plot no 122, Vijayaganapathi nagar, navalur",
+      "locality": "Siruseri",
+      "city": "CNG",
+      "state": "Goa",
+      "landmark": "graveyard",
+      "addressType": "Home",
+      "userId": "bdd91dba-d45c-4390-905f-fc43cfff0d47",
+      "createdAt": "2025-08-21T11:35:40.682Z",
+      "updatedAt": "2025-08-22T12:15:01.650Z",
+      "isDefault": false
+    },
+    {
+      "id": "6aff6466-e5d7-4459-892e-40e311312062",
+      "name": "Vijay",
+      "phone": "3456782345",
+      "alternatePhone": "",
+      "pincode": "123467",
+      "address": "qwertyuixcerv56gthy78ju",
+      "locality": "r564frd4edfr5gty",
+      "city": "Sample City",
+      "state": "Sample State",
+      "landmark": "",
+      "addressType": "Home",
+      "userId": "0f886a2d-c8c4-468d-bfe0-ef467ec22257",
+      "createdAt": "2025-08-22T12:56:10.483Z",
+      "updatedAt": "2025-08-22T12:56:10.483Z"
+    },
+    {
+      "name": "Padmesh Balachandran",
+      "phone": "9789789789",
+      "alternatePhone": "",
+      "pincode": "641641",
+      "address": "2/312 , Cross street, Irugur",
+      "locality": "CBE",
+      "city": "Coimbatore",
+      "state": "Tamil Nadu",
+      "landmark": "",
+      "addressType": "Home",
+      "id": "b59c9027-75d8-4aec-9444-b734943b7fca",
+      "userId": "bb6ae391-ebfa-4726-b19c-08fdac7a8ef8",
+      "createdAt": "2025-08-28T05:34:20.302Z",
+      "updatedAt": "2025-08-28T05:34:20.302Z"
+    }
+  ],
+  "admin_notifications": [
+    {
+      "id": "9f06fb9d-30a2-4a61-b8fe-55e16b854769",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #294c38e8 from YENTRAPATI MIDHUN SAI for ₹460",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "294c38e8-72d3-4d82-968e-f9bfe3773f59",
+        "customerName": "YENTRAPATI MIDHUN SAI",
+        "totalAmount": 460
+      },
+      "createdAt": "2025-08-12T12:20:35.738Z"
+    },
+    {
+      "id": "2d3e7b78-7989-4d57-b6b8-830ad08522eb",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #c6d23dfa from YENTRAPATI MIDHUN SAI for ₹424",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "c6d23dfa-3811-4cf6-a32d-1bec4dbd60c7",
+        "customerName": "YENTRAPATI MIDHUN SAI",
+        "totalAmount": 424
+      },
+      "createdAt": "2025-08-16T19:17:36.007Z"
+    },
+    {
+      "id": "7ee9a848-905d-46ab-9259-cebf4e80910e",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #3d6c892b from YENTRAPATI MIDHUN SAI for ₹905",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "3d6c892b-bdc7-40ba-b9fc-0c6ad41851c2",
+        "customerName": "YENTRAPATI MIDHUN SAI",
+        "totalAmount": 905
+      },
+      "createdAt": "2025-08-18T07:03:24.504Z"
+    },
+    {
+      "id": "dfe1c39c-2586-4269-98a7-e6a9491a7cde",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #22c44897 from Midhun for ₹1177",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "22c44897-9191-4f27-99e7-b03e416dd861",
+        "customerName": "Midhun",
+        "totalAmount": 1177
+      },
+      "createdAt": "2025-08-21T11:36:11.832Z"
+    },
+    {
+      "id": "d7bb3df4-d769-4601-a29c-3fde45edaa3e",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"Harry Potter and the Deathly Hallows\" (ID: 12) has only 13 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "12",
+        "bookTitle": "Harry Potter and the Deathly Hallows",
+        "currentStock": 13
+      },
+      "createdAt": "2025-08-21T11:36:11.982Z"
+    },
+    {
+      "id": "1f3792ed-433b-42df-9465-b60e07280f07",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #fe7e574f from Midhun for ₹1118",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "fe7e574f-b05d-4238-a5aa-a58db6f8e154",
+        "customerName": "Midhun",
+        "totalAmount": 1118
+      },
+      "createdAt": "2025-08-22T12:10:15.290Z"
+    },
+    {
+      "id": "fc8a5480-f9ef-482e-a6de-b196074ba378",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"Harry Potter and the Order of the Phoenix\" (ID: 10) has only 19 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "10",
+        "bookTitle": "Harry Potter and the Order of the Phoenix",
+        "currentStock": 19
+      },
+      "createdAt": "2025-08-22T12:10:15.357Z"
+    },
+    {
+      "id": "f5f5d194-9d6e-4243-8b5a-0c019a371ad5",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #ae9d92bf from Midhun for ₹1254",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "ae9d92bf-e132-4793-954b-021203e6946b",
+        "customerName": "Midhun",
+        "totalAmount": 1254
+      },
+      "createdAt": "2025-08-22T12:17:42.360Z"
+    },
+    {
+      "id": "46c2f7e0-5694-480d-b825-539f7b1528e6",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"The Silmarillion\" (ID: 5) has only 11 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "5",
+        "bookTitle": "The Silmarillion",
+        "currentStock": 11
+      },
+      "createdAt": "2025-08-22T12:17:42.423Z"
+    },
+    {
+      "id": "b35c8e9a-9e14-4942-998f-de30d3ba12b3",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #d124222d from Sumanth for ₹964",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "d124222d-e37f-4536-8b13-5df34c63820f",
+        "customerName": "Sumanth",
+        "totalAmount": 964
+      },
+      "createdAt": "2025-08-22T12:23:49.260Z"
+    },
+    {
+      "id": "a85a2eaa-d586-4193-9df3-2e40d7141bb2",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"The Return of the King\" (ID: 4) has only 14 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "4",
+        "bookTitle": "The Return of the King",
+        "currentStock": 14
+      },
+      "createdAt": "2025-08-22T12:23:49.310Z"
+    },
+    {
+      "id": "f35748c4-4ea9-4236-b981-c27672d314c2",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"The Two Towers\" (ID: 3) has only 16 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "3",
+        "bookTitle": "The Two Towers",
+        "currentStock": 16
+      },
+      "createdAt": "2025-08-22T12:23:49.311Z"
+    },
+    {
+      "id": "d99f441c-ab7b-441c-8d37-d13813bf5054",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #a883bf50 from Sumanth for ₹436",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "a883bf50-81c0-4bf4-a95d-b1f0a0aedc46",
+        "customerName": "Sumanth",
+        "totalAmount": 436
+      },
+      "createdAt": "2025-08-22T12:25:12.001Z"
+    },
+    {
+      "id": "5a545a55-7740-4650-b04d-6d995050f6ae",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #1cfa2237 from Midhun for ₹542",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "1cfa2237-3101-4c14-9338-7e1f71f7b6c8",
+        "customerName": "Midhun",
+        "totalAmount": 542
+      },
+      "createdAt": "2025-08-22T12:30:58.386Z"
+    },
+    {
+      "id": "f30766b5-32c3-4513-9c54-de29cac310fe",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"The Fellowship of the Ring\" (ID: 2) has only 19 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "2",
+        "bookTitle": "The Fellowship of the Ring",
+        "currentStock": 19
+      },
+      "createdAt": "2025-08-22T12:30:58.416Z"
+    },
+    {
+      "id": "50b901c8-b7a0-42f4-ad82-6d089f92d5e5",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #c0223271 from Midhun for ₹483",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "c0223271-1016-4356-80d8-819b5b06720d",
+        "customerName": "Midhun",
+        "totalAmount": 483
+      },
+      "createdAt": "2025-08-22T12:32:33.266Z"
+    },
+    {
+      "id": "31890c6b-64cd-4122-9db8-64d802046e20",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"Harry Potter and the Half-Blood Prince\" (ID: 11) has only 16 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "11",
+        "bookTitle": "Harry Potter and the Half-Blood Prince",
+        "currentStock": 16
+      },
+      "createdAt": "2025-08-22T12:32:33.325Z"
+    },
+    {
+      "id": "4da8b414-da40-4f2b-a4b7-e0df5c9871c7",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #f46aec61 from Midhun for ₹472",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "f46aec61-8c49-49eb-8f77-0bcc62aaac67",
+        "customerName": "Midhun",
+        "totalAmount": 472
+      },
+      "createdAt": "2025-08-22T12:33:49.539Z"
+    },
+    {
+      "id": "508400c3-566b-4cd6-8a53-329d0a38c93d",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"Harry Potter and the Order of the Phoenix\" (ID: 10) has only 18 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "10",
+        "bookTitle": "Harry Potter and the Order of the Phoenix",
+        "currentStock": 18
+      },
+      "createdAt": "2025-08-22T12:33:49.606Z"
+    },
+    {
+      "id": "2dcb5df2-7b8d-4f87-a518-8a3edcca2959",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #27d1cd57 from Sumanth for ₹542",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "27d1cd57-cc38-45bd-9ee0-c1fc8499f6ce",
+        "customerName": "Sumanth",
+        "totalAmount": 542
+      },
+      "createdAt": "2025-08-22T12:38:47.009Z"
+    },
+    {
+      "id": "b4e11ec2-99ad-4a2d-ab96-034d40e3b128",
+      "type": "low_stock",
+      "title": "Low Stock Alert",
+      "message": "Book \"The Fellowship of the Ring\" (ID: 2) has only 18 units remaining",
+      "isRead": true,
+      "priority": "high",
+      "data": {
+        "bookId": "2",
+        "bookTitle": "The Fellowship of the Ring",
+        "currentStock": 18
+      },
+      "createdAt": "2025-08-22T12:38:47.067Z"
+    },
+    {
+      "id": "85acf7ba-b47f-4069-8aec-202d6e45693c",
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #9c5a3451 from Sumanth for ₹436",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "9c5a3451-20b5-4aad-85e4-1f7c3bb3e46b",
+        "customerName": "Sumanth",
+        "totalAmount": 436
+      },
+      "createdAt": "2025-08-22T12:42:11.953Z"
+    },
+    {
+      "type": "order",
+      "title": "New Order Received",
+      "message": "New order #7027a68c from Padmesh Balachandran for ₹413",
+      "isRead": true,
+      "priority": "medium",
+      "data": {
+        "orderId": "7027a68c-a51e-499a-b6a7-37b8c967c979",
+        "customerName": "Padmesh Balachandran",
+        "totalAmount": 413
+      },
+      "id": "4c6810ee-7883-4152-8701-d6a7b5c2c191",
+      "createdAt": "2025-08-28T11:22:59.015Z"
+    }
+  ],
+  "All_categories": [
+    {
+      "id": "1",
+      "name": "Fantasy"
+    },
+    {
+      "id": "2",
+      "name": "Adventure"
+    },
+    {
+      "id": "3",
+      "name": "Romance"
+    },
+    {
+      "id": "4",
+      "name": "Triller"
+    },
+    {
+      "id": "5",
+      "name": "Mystery"
+    },
+    {
+      "id": "6",
+      "name": "Horror"
+    },
+    {
+      "id": "7",
+      "name": "Fiction"
+    },
+    {
+      "id": "8",
+      "name": "Biography"
+    },
+    {
+      "id": "9",
+      "name": "Historical"
+    },
+    {
+      "id": "10",
+      "name": "Literature"
+    },
+    {
+      "id": "11",
+      "name": "Political"
+    },
+    {
+      "id": "12",
+      "name": "Drama"
+    },
+    {
+      "id": "13",
+      "name": "Science Fiction"
+    },
+    {
+      "id": "14",
+      "name": "Sea Story"
+    },
+    {
+      "id": "15",
+      "name": "Young Adult"
+    },
+    {
+      "id": "16",
+      "name": "Dystopian"
+    },
+    {
+      "id": "17",
+      "name": "Epic"
+    },
+    {
+      "id": "18",
+      "name": "Classic"
+    },
+    {
+      "id": "21",
+      "name": "Non-Fiction"
+    },
+    {
+      "id": "22",
+      "name": "Gothic"
+    },
+    {
+      "id": "23",
+      "name": "Self-Help"
+    },
+    {
+      "id": "24",
+      "name": "Cookbook"
+    },
+    {
+      "id": "25",
+      "name": "Health &amp; Wellness"
+    },
+    {
+      "id": "26",
+      "name": "Science"
+    },
+    {
+      "id": "27",
+      "name": "Technology"
+    },
+    {
+      "id": "28",
+      "name": "History"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Fantasy"
+    },
+    {
+      "id": "2",
+      "name": "Adventure"
+    },
+    {
+      "id": "3",
+      "name": "Romance"
+    },
+    {
+      "id": "5",
+      "name": "Mystery"
+    },
+    {
+      "id": "6",
+      "name": "Horror"
+    },
+    {
+      "id": "7",
+      "name": "Fiction"
+    },
+    {
+      "id": "8",
+      "name": "Biography"
+    },
+    {
+      "id": "9",
+      "name": "Historical"
+    },
+    {
+      "id": "10",
+      "name": "Literature"
+    }
+  ],
+  "books": [
+    {
+      "id": "2",
+      "title": "The Fellowship of the Ring",
+      "author": "J.R.R. Tolkien",
+      "description": "The first volume of The Lord of the Rings. Follow Frodo Baggins as he inherits the One Ring and embarks on a perilous quest to destroy it in the fires of Mount Doom, accompanied by a diverse fellowship.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 400,
+      "stock_display": 15,
+      "stock_actual": 18,
+      "image_urls": [
+        "images/The Fellowship of the Ring.jpg"
+      ]
+    },
+    {
+      "id": "3",
+      "title": "The Two Towers",
+      "author": "J.R.R. Tolkien",
+      "description": "The second volume of The Lord of the Rings. The Fellowship is broken, and its members are scattered. Frodo and Sam continue their arduous journey to Mordor, while Aragorn, Legolas, and Gimli fight to protect Rohan.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 400,
+      "stock_display": 12,
+      "stock_actual": 16,
+      "image_urls": [
+        "images/The Two Towers.jpg"
+      ]
+    },
+    {
+      "id": "4",
+      "title": "The Return of the King",
+      "author": "J.R.R. Tolkien",
+      "description": "The final volume of The Lord of the Rings. The War of the Ring reaches its climax as Frodo and Sam approach Mount Doom, and the forces of Middle-earth make their last stand against Sauron.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 400,
+      "stock_display": 10,
+      "stock_actual": 14,
+      "image_urls": [
+        "images/The Return of the King.jpg"
+      ]
+    },
+    {
+      "id": "5",
+      "title": "The Silmarillion",
+      "author": "J.R.R. Tolkien",
+      "description": "A collection of myths and legends from the First Age of Middle-earth, detailing the creation of the world, the rise of elves and men, and the epic struggle against Morgoth, the first Dark Lord.",
+      "categories": [
+        "Fantasy",
+        "Historical"
+      ],
+      "price": 450,
+      "stock_display": 8,
+      "stock_actual": 11,
+      "image_urls": [
+        "images/The Silmarillion.jpg"
+      ]
+    },
+    {
+      "id": "7",
+      "title": "Harry Potter and the Chamber of Secrets",
+      "author": "J.K. Rowling",
+      "description": "Harry's second year at Hogwarts brings new dangers as mysterious attacks begin, leaving students petrified. Harry, Ron, and Hermione must uncover the secret of the Chamber of Secrets before it's too late.",
+      "categories": [
+        "Fantasy",
+        "Mystery"
+      ],
+      "price": 310,
+      "stock_display": 22,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Harry Potter and the Chamber of Secrets.jpg"
+      ]
+    },
+    {
+      "id": "8",
+      "title": "Harry Potter and the Prisoner of Azkaban",
+      "author": "J.K. Rowling",
+      "description": "In his third year, Harry learns that a dangerous prisoner, Sirius Black, has escaped Azkaban and is supposedly after him. The truth behind Black's escape and his connection to Harry unfolds in a thrilling mystery.",
+      "categories": [
+        "Fantasy",
+        "Mystery"
+      ],
+      "price": 320,
+      "stock_display": 20,
+      "stock_actual": 26,
+      "image_urls": [
+        "images/Harry Potter and the Prisoner of Azkaban.jpg"
+      ]
+    },
+    {
+      "id": "9",
+      "title": "Harry Potter and the Goblet of Fire",
+      "author": "J.K. Rowling",
+      "description": "Hogwarts hosts the Triwizard Tournament, a dangerous competition between three wizarding schools. Harry is mysteriously entered, forcing him to face deadly challenges and confront the return of a dark force.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 330,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Harry Potter and the Goblet of Fire.jpg"
+      ]
+    },
+    {
+      "id": "10",
+      "title": "Harry Potter and the Order of the Phoenix",
+      "author": "J.K. Rowling",
+      "description": "As the wizarding world denies the return of Voldemort, Harry faces a new year of challenges and a powerful enemy within Hogwarts. He secretly trains a group of students for the battle to come.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 340,
+      "stock_display": 40,
+      "stock_actual": 50,
+      "image_urls": [
+        "images/Harry Potter and the Order of the Phoenix.jpg"
+      ]
+    },
+    {
+      "id": "11",
+      "title": "Harry Potter and the Half-Blood Prince",
+      "author": "J.K. Rowling",
+      "description": "Voldemort's power grows, and Harry must work with Dumbledore to uncover the secrets of his past. A mysterious textbook leads Harry to new magical abilities, but dark revelations await.",
+      "categories": [
+        "Fantasy",
+        "Mystery"
+      ],
+      "price": 350,
+      "stock_display": 12,
+      "stock_actual": 16,
+      "image_urls": [
+        "images/Harry Potter and the Half-Blood Prince.jpg"
+      ]
+    },
+    {
+      "id": "12",
+      "title": "Harry Potter and the Deathly Hallows",
+      "author": "J.K. Rowling",
+      "description": "The epic conclusion. Harry, Ron, and Hermione abandon Hogwarts to hunt for Horcruxes, the magical objects that hold fragments of Voldemort's soul. Their perilous journey will determine the fate of the wizarding world.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 360,
+      "stock_display": 10,
+      "stock_actual": 13,
+      "image_urls": [
+        "images/Harry Potter and the Deathly Hallows.jpg"
+      ]
+    },
+    {
+      "id": "13",
+      "title": "The Hunger Games",
+      "author": "Suzanne Collins",
+      "description": "In a dystopian future, Katniss Everdeen volunteers to take her sister's place in the annual Hunger Games, a televised fight to the death. She must use her survival skills to outwit and outlast her competitors.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 280,
+      "stock_display": 25,
+      "stock_actual": 29,
+      "image_urls": [
+        "images/The Hunger Games.jpg"
+      ]
+    },
+    {
+      "id": "14",
+      "title": "Catching Fire",
+      "author": "Suzanne Collins",
+      "description": "After defying the Capitol, Katniss and Peeta are forced back into the arena for a special edition of the Hunger Games. The rebellion against the oppressive government begins to simmer.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 290,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/Catching Fire.jpg"
+      ]
+    },
+    {
+      "id": "15",
+      "title": "Mockingjay",
+      "author": "Suzanne Collins",
+      "description": "The rebellion explodes into full-scale war. Katniss becomes the symbol of hope, the Mockingjay, leading the districts in a final stand against the Capitol to secure freedom and justice.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 300,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Mockingjay.jpg"
+      ]
+    },
+    {
+      "id": "16",
+      "title": "The Lightning Thief",
+      "author": "Rick Riordan",
+      "description": "Percy Jackson discovers he's a demigod and embarks on a quest to clear his name and prevent a war among the Olympian gods. A thrilling adventure filled with Greek mythology.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 270,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/The Lightning Thief.jpg"
+      ]
+    },
+    {
+      "id": "17",
+      "title": "The Sea of Monsters",
+      "author": "Rick Riordan",
+      "description": "Percy and his friends sail into the Sea of Monsters to retrieve the Golden Fleece, the only magical item that can save their demigod training ground, Camp Half-Blood.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 275,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/The Sea of Monsters.jpg"
+      ]
+    },
+    {
+      "id": "18",
+      "title": "The Titan's Curse",
+      "author": "Rick Riordan",
+      "description": "Percy, Annabeth, and Thalia join the goddess Artemis on a dangerous quest to rescue Annabeth and Artemis herself, who have been captured. They face a powerful ancient enemy.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 280,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Titan's Curse.jpg"
+      ]
+    },
+    {
+      "id": "19",
+      "title": "The Battle of the Labyrinth",
+      "author": "Rick Riordan",
+      "description": "The demigods must navigate the dangerous Labyrinth to stop Luke and Kronos's army from invading Camp Half-Blood. Old friends and new enemies await in the maze.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 285,
+      "stock_display": 18,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/The Battle of the Labyrinth.jpg"
+      ]
+    },
+    {
+      "id": "20",
+      "title": "The Last Olympian",
+      "author": "Rick Riordan",
+      "description": "The final showdown. Percy and the Olympian gods prepare for war against the powerful Titan Lord Kronos and his monstrous army, with the fate of Olympus hanging in the balance.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 290,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/The Last Olympian.jpg"
+      ]
+    },
+    {
+      "id": "21",
+      "title": "The Martian",
+      "author": "Andy Weir",
+      "description": "An astronaut is presumed dead and left behind on Mars. Using his ingenuity and scientific knowledge, he must find a way to survive the harsh Martian environment and signal Earth for rescue.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 330,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Martian.jpg"
+      ]
+    },
+    {
+      "id": "22",
+      "title": "Project Hail Mary",
+      "author": "Andy Weir",
+      "description": "An astronaut wakes up on a spaceship with amnesia, millions of miles from Earth, with a mission to save humanity from an alien threat. He must piece together his memories and confront incredible challenges.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 340,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Project Hail Mary.jpg"
+      ]
+    },
+    {
+      "id": "23",
+      "title": "Artemis",
+      "author": "Andy Weir",
+      "description": "On Artemis, the first and only city on the moon, a young smuggler gets caught up in a conspiracy that threatens to destroy her home. She must use her street smarts to survive and save the lunar city.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 320,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Artemis.jpg"
+      ]
+    },
+    {
+      "id": "24",
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "description": "A timeless classic set in the American South during the 1930s, exploring racial injustice through the eyes of young Scout Finch as her lawyer father defends a black man accused of rape.",
+      "categories": [
+        "Literature",
+        "Historical"
+      ],
+      "price": 260,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/To Kill a Mockingbird.jpg"
+      ]
+    },
+    {
+      "id": "25",
+      "title": "1984",
+      "author": "George Orwell",
+      "description": "A chilling dystopian novel depicting a totalitarian society where Big Brother watches your every move. Winston Smith secretly rebels against the omnipresent Party, risking everything for freedom.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 270,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/1984.jpg"
+      ]
+    },
+    {
+      "id": "26",
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "description": "A poignant tale of love, illusion, and the American Dream set in the Roaring Twenties. Jay Gatsby's extravagant parties hide a deep yearning for a lost love, leading to inevitable tragedy.",
+      "categories": [
+        "Literature",
+        "Romance"
+      ],
+      "price": 250,
+      "stock_display": 20,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/The Great Gatsby.jpg"
+      ]
+    },
+    {
+      "id": "27",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "description": "A beloved classic of manners and romance. Elizabeth Bennet navigates social expectations and personal biases in her witty and passionate relationship with the proud Mr. Darcy.",
+      "categories": [
+        "Romance",
+        "Literature"
+      ],
+      "price": 240,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/Pride and Prejudice.jpg"
+      ]
+    },
+    {
+      "id": "28",
+      "title": "The Catcher in the Rye",
+      "author": "J.D. Salinger",
+      "description": "A controversial yet enduring story of adolescent angst and alienation. Holden Caulfield, a cynical teenager, recounts his experiences after being expelled from prep school.",
+      "categories": [
+        "Literature"
+      ],
+      "price": 230,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/The Catcher in the Rye.jpg"
+      ]
+    },
+    {
+      "id": "29",
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "description": "A philosophical novel about Santiago, a shepherd boy who journeys from Spain to the Egyptian desert in search of treasure. His quest leads him to discover his true self and destiny.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 220,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Alchemist.jpg"
+      ]
+    },
+    {
+      "id": "30",
+      "title": "The Book Thief",
+      "author": "Markus Zusak",
+      "description": "Narrated by Death, this powerful story follows Liesel Meminger, a young girl living in Nazi Germany who finds solace and rebellion in stealing books and sharing them with others.",
+      "categories": [
+        "Historical",
+        "Fiction"
+      ],
+      "price": 290,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Book Thief.jpg"
+      ]
+    },
+    {
+      "id": "31",
+      "title": "Moby Dick",
+      "author": "Herman Melville",
+      "description": "Captain Ahab's obsessive pursuit of the white whale, Moby Dick, leads his whaling ship, the Pequod, and its crew on a perilous journey across the vast ocean, testing their limits and their sanity.",
+      "categories": [
+        "Adventure",
+        "Literature"
+      ],
+      "price": 300,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Moby Dick.jpg"
+      ]
+    },
+    {
+      "id": "32",
+      "title": "Frankenstein",
+      "author": "Mary Shelley",
+      "description": "Victor Frankenstein's ambition to create life leads to the birth of a monstrous creature. A gothic tale of science, ethics, and the consequences of playing God.",
+      "categories": [
+        "Horror",
+        "Literature"
+      ],
+      "price": 260,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/Frankenstein.jpg"
+      ]
+    },
+    {
+      "id": "33",
+      "title": "The Odyssey",
+      "author": "Homer",
+      "description": "The epic journey of Odysseus as he struggles to return home to Ithaca after the Trojan War. He faces mythical creatures, vengeful gods, and treacherous obstacles.",
+      "categories": [
+        "Adventure",
+        "Literature"
+      ],
+      "price": 310,
+      "stock_display": 10,
+      "stock_actual": 15,
+      "image_urls": [
+        "images/The Odyssey.jpg"
+      ]
+    },
+    {
+      "id": "34",
+      "title": "Don Quixote",
+      "author": "Miguel de Cervantes",
+      "description": "A retired gentleman, obsessed with chivalric romances, sets out to revive knighthood with his squire, Sancho Panza. A satirical and profound exploration of idealism and reality.",
+      "categories": [
+        "Literature",
+        "Adventure"
+      ],
+      "price": 320,
+      "stock_display": 8,
+      "stock_actual": 12,
+      "image_urls": [
+        "images/Don Quixote.jpg"
+      ]
+    },
+    {
+      "id": "35",
+      "title": "The Picture of Dorian Gray",
+      "author": "Oscar Wilde",
+      "description": "A handsome young man wishes for eternal youth, and his portrait mysteriously ages and bears the scars of his sinful life. A dark and philosophical tale of beauty, hedonism, and corruption.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 270,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/The Picture of Dorian Gray.jpg"
+      ]
+    },
+    {
+      "id": "36",
+      "title": "Brave New World",
+      "author": "Aldous Huxley",
+      "description": "A dystopian vision of a future society where advancements in reproductive technology and psychological manipulation create a seemingly perfect, but ultimately dehumanizing, world.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 280,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/Brave New World.jpg"
+      ]
+    },
+    {
+      "id": "37",
+      "title": "Fahrenheit 451",
+      "author": "Ray Bradbury",
+      "description": "In a future where books are outlawed and burned by 'firemen,' Guy Montag questions his role and begins to seek out knowledge, leading him to a dangerous rebellion.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 290,
+      "stock_display": 10,
+      "stock_actual": 15,
+      "image_urls": [
+        "images/Fahrenheit 451.jpg"
+      ]
+    },
+    {
+      "id": "38",
+      "title": "The Road",
+      "author": "Cormac McCarthy",
+      "description": "A father and son trek across a desolate, post-apocalyptic landscape, trying to survive and maintain their humanity in a world ravaged by an unspecified catastrophe.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 300,
+      "stock_display": 8,
+      "stock_actual": 12,
+      "image_urls": [
+        "images/The Road.jpg"
+      ]
+    },
+    {
+      "id": "39",
+      "title": "Ready Player One",
+      "author": "Ernest Cline",
+      "description": "Escape into the dystopian future of 2045, where humanity seeks refuge in the OASIS, a sprawling virtual reality universe. When the OASIS creator dies, he leaves behind a complex Easter egg hunt, promising his immense fortune to the first to find it. Join Wade Watts as he plunges into this global treasure hunt, battling ruthless competitors and dangerous puzzles rooted in 80s pop culture.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 310,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/Ready Player One.jpg"
+      ]
+    },
+    {
+      "id": "40",
+      "title": "Ready Player Two",
+      "author": "Ernest Cline",
+      "description": "The quest for ultimate virtual reality power continues as Wade Watts inherits an even more advanced technology from the late James Halliday. This new innovation promises to unlock unprecedented levels of immersion and control within the OASIS, but it also unleashes a new, even more perilous challenge that could forever change the digital and real worlds.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 320,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/Ready Player Two.jpg"
+      ]
+    },
+    {
+      "id": "41",
+      "title": "The Nightingale",
+      "author": "Kristin Hannah",
+      "description": "A powerful and moving story of two sisters in German-occupied France during World War II, each fighting for survival and freedom in their own courageous ways.",
+      "categories": [
+        "Historical",
+        "Fiction"
+      ],
+      "price": 300,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Nightingale.jpg"
+      ]
+    },
+    {
+      "id": "42",
+      "title": "Where the Crawdads Sing",
+      "author": "Delia Owens",
+      "description": "A wild and independent young woman, Kya, raised in the North Carolina marshes, becomes the prime suspect in a murder investigation. A captivating blend of nature, mystery, and coming-of-age.",
+      "categories": [
+        "Mystery",
+        "Fiction"
+      ],
+      "price": 280,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Where the Crawdads Sing.jpg"
+      ]
+    },
+    {
+      "id": "43",
+      "title": "Educated",
+      "author": "Tara Westover",
+      "description": "A powerful memoir about a young woman who, despite growing up in a strict, fundamentalist household with no formal education, pursues knowledge and ultimately earns a PhD from Cambridge University.",
+      "categories": [
+        "Biography"
+      ],
+      "price": 320,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Educated.jpg"
+      ]
+    },
+    {
+      "id": "44",
+      "title": "The Silent Patient",
+      "author": "Alex Michaelides",
+      "description": "A gripping psychological thriller about a famous painter who murders her husband and then never speaks another word. A psychotherapist becomes obsessed with uncovering the truth behind her silence.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 290,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/The Silent Patient.jpg"
+      ]
+    },
+    {
+      "id": "45",
+      "title": "Gone Girl",
+      "author": "Gillian Flynn",
+      "description": "On their fifth wedding anniversary, Amy Dunne disappears, and her husband Nick becomes the prime suspect. A dark and twisted psychological thriller that explores the complexities of marriage and identity.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 285,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Gone Girl.jpg"
+      ]
+    },
+    {
+      "id": "46",
+      "title": "The Girl with the Dragon Tattoo",
+      "author": "Stieg Larsson",
+      "description": "A disgraced journalist and a brilliant but troubled hacker team up to investigate the disappearance of a wealthy girl 40 years prior, uncovering dark family secrets and a web of crime.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 300,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Girl with the Dragon Tattoo.jpg"
+      ]
+    },
+    {
+      "id": "47",
+      "title": "Big Little Lies",
+      "author": "Liane Moriarty",
+      "description": "The seemingly perfect lives of three mothers are shattered by a murder at a school trivia night. This darkly comedic novel explores the secrets and lies beneath suburban facades.",
+      "categories": [
+        "Mystery",
+        "Fiction"
+      ],
+      "price": 270,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Big Little Lies.jpg"
+      ]
+    },
+    {
+      "id": "48",
+      "title": "The Da Vinci Code",
+      "author": "Dan Brown",
+      "description": "Robert Langdon, a symbologist, is called to the Louvre after a murder and discovers a trail of clues hidden in Leonardo da Vinci's works that could reveal a religious mystery protected by a secret society.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 295,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/The Da Vinci Code.jpg"
+      ]
+    },
+    {
+      "id": "49",
+      "title": "Angels & Demons",
+      "author": "Dan Brown",
+      "description": "Robert Langdon is summoned to Rome to investigate a murder and uncover a plot by the ancient secret society, the Illuminati, to destroy the Vatican and exact revenge on the Catholic Church.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 290,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Angels & Demons.jpg"
+      ]
+    },
+    {
+      "id": "50",
+      "title": "Origin",
+      "author": "Dan Brown",
+      "description": "Robert Langdon finds himself at the center of a perilous quest to uncover a groundbreaking discovery that challenges the very foundations of human existence, intertwined with art, religion, and modern science.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 305,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Origin.jpg"
+      ]
+    },
+    {
+      "id": "51",
+      "title": "The Guest List",
+      "author": "Lucy Fokley",
+      "description": "A lavish wedding on a remote island takes a sinister turn when a body is discovered. As a storm traps everyone, secrets unravel, and suspects emerge among the seemingly perfect guests.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 280,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/The Guest List.jpg"
+      ]
+    },
+    {
+      "id": "52",
+      "title": "Verity",
+      "author": "Colleen Hoover",
+      "description": "A struggling writer takes a job ghostwriting for an injured author and uncovers a disturbing manuscript that reveals dark secrets about the author's family and the truth behind a tragedy.",
+      "categories": [
+        "Thriller",
+        "Romance"
+      ],
+      "price": 260,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Verity.jpg"
+      ]
+    },
+    {
+      "id": "53",
+      "title": "The Last Thing He Told Me",
+      "author": "Laura Dave",
+      "description": "Before he vanishes, Owen Michaels leaves a note: 'Protect her.' His wife, Hannah, discovers he's not who he said he was, and she must team up with his teenage daughter to uncover the truth.",
+      "categories": [
+        "Thriller",
+        "Mystery"
+      ],
+      "price": 275,
+      "stock_display": 17,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/The Last Thing He Told Me.jpg"
+      ]
+    },
+    {
+      "id": "55",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "description": "An actionable guide to building good habits and breaking bad ones. Learn how small changes can lead to remarkable results in all aspects of your life.",
+      "categories": [
+        "Biography"
+      ],
+      "price": 350,
+      "stock_display": 30,
+      "stock_actual": 35,
+      "image_urls": [
+        "images/Atomic Habits.jpg"
+      ]
+    },
+    {
+      "id": "56",
+      "title": "The Subtle Art of Not Giving a F*ck",
+      "author": "Mark Manson",
+      "description": "A counterintuitive guide to living a good life, challenging conventional self-help advice and encouraging readers to embrace uncertainty and find meaning in what truly matters.",
+      "categories": [
+        "Biography"
+      ],
+      "price": 320,
+      "stock_display": 28,
+      "stock_actual": 33,
+      "image_urls": [
+        "images/The Subtle Art of Not Giving a F_ck.jpg"
+      ]
+    },
+    {
+      "id": "57",
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "description": "An ambitious and thought-provoking exploration of humanity's history, from our origins as hunter-gatherers to the rise of empires and the challenges of the modern age.",
+      "categories": [
+        "Historical",
+        "Biography"
+      ],
+      "price": 400,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Sapiens A Brief History of Humankind.jpg"
+      ]
+    },
+    {
+      "id": "58",
+      "title": "Becoming",
+      "author": "Michelle Obama",
+      "description": "The inspiring memoir of former First Lady Michelle Obama, sharing her journey from childhood in Chicago to her years in the White House, and her reflections on identity, family, and empowerment.",
+      "categories": [
+        "Biography",
+        "Historical"
+      ],
+      "price": 420,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Becoming.jpg"
+      ]
+    },
+    {
+      "id": "59",
+      "title": "The Diary of a Young Girl",
+      "author": "Anne Frank",
+      "description": "The poignant and powerful diary of Anne Frank, a Jewish teenager who documented her life in hiding during the Nazi occupation of the Netherlands. A testament to hope and resilience.",
+      "categories": [
+        "Biography",
+        "Historical"
+      ],
+      "price": 250,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/The Diary of a Young Girl.jpg"
+      ]
+    },
+    {
+      "id": "60",
+      "title": "Steve Jobs",
+      "author": "Walter Isaacson",
+      "description": "The definitive biography of the co-founder of Apple, based on exclusive interviews with Jobs himself, his family, friends, and colleagues, offering a deep insight into his life and career.",
+      "categories": [
+        "Biography"
+      ],
+      "price": 450,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Steve Jobs.jpg"
+      ]
+    },
+    {
+      "id": "61",
+      "title": "Homo Deus: A Brief History of Tomorrow",
+      "author": "Yuval Noah Harari",
+      "description": "A provocative look into the future of humanity, exploring what might become of our species as we gain increasing control over disease, death, and even our own evolution.",
+      "categories": [
+        "Historical",
+        "Fiction"
+      ],
+      "price": 410,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Homo Deus A Brief History of Tomorrow.jpg"
+      ]
+    },
+    {
+      "id": "62",
+      "title": "Dune",
+      "author": "Frank Herbert",
+      "description": "Immerse yourself in the epic desert world of Arrakis, a planet of colossal sandworms and the sole source of 'spice,' the most valuable substance in the universe. This groundbreaking science fiction saga introduces Paul Atreides, whose family is thrust into a dangerous political struggle for control of the planet, revealing a profound story of ecology, religion, and human evolution.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 380,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Dune.jpg"
+      ]
+    },
+    {
+      "id": "63",
+      "title": "The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",
+      "author": "C.S. Lewis",
+      "description": "Step through a mysterious wardrobe into the snow-covered, magical land of Narnia, where four siblings discover a world held captive by the evil White Witch. This enchanting classic invites you to join Peter, Susan, Edmund, and Lucy as they embark on an epic battle between good and evil, aided by the majestic lion Aslan, to restore Narnia to its rightful glory.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 290,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/The Chronicles of Narnia The Lion, the Witch and the Wardrobe.jpg"
+      ]
+    },
+    {
+      "id": "64",
+      "title": "The Name of the Wind",
+      "author": "Patrick Rothfuss",
+      "description": "Follow the legendary Kvothe, a man shrouded in mystery, as he recounts his extraordinary life story, from orphaned street urchin to notorious wizard, revealing a world of magic, music, and dark secrets.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 380,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/The Name of the Wind.jpg"
+      ]
+    },
+    {
+      "id": "65",
+      "title": "The Wise Man's Fear",
+      "author": "Patrick Rothfuss",
+      "description": "Kvothe's story continues as he ventures beyond the University to learn the ways of the Adem, navigating dangerous politics, ancient mysteries, and honing his skills in a world on the brink of war.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 390,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/The Wise Man's Fear.jpg"
+      ]
+    },
+    {
+      "id": "66",
+      "title": "Mistborn: The Final Empire",
+      "author": "Brandon Sanderson",
+      "description": "In a world ruled by the immortal Lord Ruler, a young street thief named Vin discovers she possesses powerful magical abilities and joins a crew planning the impossible: to overthrow the empire.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 360,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Mistborn The Final Empire.jpg"
+      ]
+    },
+    {
+      "id": "67",
+      "title": "The Well of Ascension",
+      "author": "Brandon Sanderson",
+      "description": "After overthrowing the Final Empire, Vin and Elend struggle to maintain their fragile new world amidst political chaos, ancient prophecies, and a growing threat from the deep mist.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 370,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/The Well of Ascension.jpg"
+      ]
+    },
+    {
+      "id": "68",
+      "title": "The Hero of Ages",
+      "author": "Brandon Sanderson",
+      "description": "The epic conclusion of the Mistborn saga. As the world faces imminent destruction, Vin and Elend must uncover the final secrets of the Lord Ruler and make the ultimate sacrifice to save humanity.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 380,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/The Hero of Ages.jpg"
+      ]
+    },
+    {
+      "id": "69",
+      "title": "Redwall",
+      "author": "Brian Jacques",
+      "description": "A charming tale of brave mice, fierce rats, and woodland creatures defending their peaceful abbey from invading vermin. Filled with feasts, friendships, and epic battles.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 250,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Redwall.jpg"
+      ]
+    },
+    {
+      "id": "70",
+      "title": "Mossflower",
+      "author": "Brian Jacques",
+      "description": "A prequel to Redwall, chronicling the valiant struggle of the early inhabitants of Mossflower Wood against the cruel wildcat, Tsarmina. A story of courage, resistance, and the birth of a legend.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 255,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Mossflower.jpg"
+      ]
+    },
+    {
+      "id": "71",
+      "title": "Mattimeo",
+      "author": "Brian Jacques",
+      "description": "When the children of Redwall Abbey are kidnapped by the evil fox Slagar the Cruel, Matthias, the warrior mouse, embarks on a perilous journey to rescue them, facing new enemies and old foes.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 260,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Mattimeo.jpg"
+      ]
+    },
+    {
+      "id": "72",
+      "title": "The Ocean at the End of the Lane",
+      "author": "Neil Gaiman",
+      "description": "A man returns to his childhood home for a funeral and is drawn back to the fantastical, terrifying memories of a mysterious pond and a girl who claimed it was an ocean.",
+      "categories": [
+        "Fantasy",
+        "Mystery"
+      ],
+      "price": 300,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/The Ocean at the End of the Lane.jpg"
+      ]
+    },
+    {
+      "id": "73",
+      "title": "American Gods",
+      "author": "Neil Gaiman",
+      "description": "Shadow Moon, an ex-con, finds himself in a hidden war between the Old Gods of mythology and the New Gods of technology and media, in a sweeping journey across America.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 350,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/American Gods.jpg"
+      ]
+    },
+    {
+      "id": "74",
+      "title": "Coraline",
+      "author": "Neil Gaiman",
+      "description": "A young girl named Coraline discovers a hidden door in her new house, leading to a seemingly better, but ultimately sinister, alternate reality with an 'Other Mother' who wants to keep her forever.",
+      "categories": [
+        "Fantasy",
+        "Horror"
+      ],
+      "price": 270,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Coraline.jpg"
+      ]
+    },
+    {
+      "id": "75",
+      "title": "Stardust",
+      "author": "Neil Gaiman",
+      "description": "A young man ventures into the magical, treacherous land of Faerie to retrieve a fallen star for the woman he loves, encountering witches, goblins, and royalty along the way.",
+      "categories": [
+        "Fantasy",
+        "Adventure",
+        "Romance"
+      ],
+      "price": 280,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Stardust.jpg"
+      ]
+    },
+    {
+      "id": "76",
+      "title": "Good Omens",
+      "author": "Terry Pratchett & Neil Gaiman",
+      "description": "An angel and a demon, who have grown fond of Earth, reluctantly team up to prevent the Apocalypse when the Antichrist is accidentally misplaced, leading to hilarious and chaotic consequences.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 300,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Good Omens.jpg"
+      ]
+    },
+    {
+      "id": "78",
+      "title": "The Giver",
+      "author": "Lois Lowry",
+      "description": "In a seemingly perfect, dystopian society, twelve-year-old Jonas is chosen to be the Receiver of Memory, uncovering the dark truths and emotions hidden beneath his community's carefully controlled existence.",
+      "categories": [
+        "Fiction",
+        "Thriller"
+      ],
+      "price": 250,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/The Giver.jpg"
+      ]
+    },
+    {
+      "id": "79",
+      "title": "Catch-22",
+      "author": "Joseph Heller",
+      "description": "A satirical and darkly comedic novel set during World War II, following the absurd experiences of Captain John Yossarian, a bombardier trying to survive by any means necessary.",
+      "categories": [
+        "Literature",
+        "Historical"
+      ],
+      "price": 300,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Catch-22.jpg"
+      ]
+    },
+    {
+      "id": "80",
+      "title": "The Hitchhiker's Guide to the Galaxy",
+      "author": "Douglas Adams",
+      "description": "Arthur Dent survives the destruction of Earth by hitchhiking through space. A hilarious and absurd cosmic adventure exploring the meaning of life, the universe, and everything.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 260,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Hitchhiker's Guide to the Galaxy.jpg"
+      ]
+    },
+    {
+      "id": "81",
+      "title": "Daughter of Smoke & Bone",
+      "author": "Laini Taylor",
+      "description": "In a fantastical Prague, a young art student with blue hair, Karou, collects teeth for mysterious reasons. Her life takes a dramatic turn when she encounters a beautiful, winged stranger.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 310,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Daughter of Smoke & Bone.jpg"
+      ]
+    },
+    {
+      "id": "82",
+      "title": "Days of Blood & Starlight",
+      "author": "Laini Taylor",
+      "description": "The epic love story continues amidst war between angels and chimaera. Karou and Akiva face impossible choices as they try to bridge the divide between their warring peoples.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 320,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Days of Blood & Starlight.jpg"
+      ]
+    },
+    {
+      "id": "83",
+      "title": "Dreams of Gods & Monsters",
+      "author": "Laini Taylor",
+      "description": "The breathtaking conclusion sees Karou and Akiva confronting their destinies in a final, desperate attempt to end the ancient conflict and bring peace to their worlds.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 330,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/Dreams of Gods & Monsters.jpg"
+      ]
+    },
+    {
+      "id": "84",
+      "title": "The Golden Compass",
+      "author": "Philip Pullman",
+      "description": "Lyra Belacqua lives in a world where human souls exist outside their bodies as animal companions. She embarks on a thrilling adventure to the frozen North to save kidnapped children.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 300,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Golden Compass.jpg"
+      ]
+    },
+    {
+      "id": "85",
+      "title": "The Subtle Knife",
+      "author": "Philip Pullman",
+      "description": "Lyra crosses into a new world and meets Will Parry, a boy burdened with a mysterious, powerful knife. Their fates intertwine as they seek answers across parallel universes.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 310,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Subtle Knife.jpg"
+      ]
+    },
+    {
+      "id": "86",
+      "title": "The Amber Spyglass",
+      "author": "Philip Pullman",
+      "description": "The epic conclusion of His Dark Materials. Lyra and Will face their greatest challenges, traveling to the land of the dead and confronting the ultimate war between good and evil.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 320,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/The Amber Spyglass.jpg"
+      ]
+    },
+    {
+      "id": "87",
+      "title": "Shadow and Bone",
+      "author": "Leigh Bardugo",
+      "description": "Orphan Alina Starkov discovers she possesses a unique magical power that could save her war-torn country, thrusting her into the opulent and dangerous world of the Grisha.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 290,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Shadow and Bone.jpg"
+      ]
+    },
+    {
+      "id": "88",
+      "title": "Siege and Storm",
+      "author": "Leigh Bardugo",
+      "description": "Alina fights to control her powers and rally her forces against the menacing Darkling, facing political intrigue, betrayal, and the growing burden of her destiny.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 300,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Siege and Storm.jpg"
+      ]
+    },
+    {
+      "id": "89",
+      "title": "Ruin and Rising",
+      "author": "Leigh Bardugo",
+      "description": "The final battle for Ravka approaches. Alina must make impossible choices and face devastating sacrifices to save her country from the Darkling's tyranny and embrace her true power.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 310,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Ruin and Rising.jpg"
+      ]
+    },
+    {
+      "id": "90",
+      "title": "Six of Crows",
+      "author": "Leigh Bardugo",
+      "description": "A motley crew of criminal outcasts attempts a daring, impossible heist in the dangerous city of Ketterdam. Full of intricate schemes, betrayals, and unexpected alliances.",
+      "categories": [
+        "Fantasy",
+        "Adventure",
+        "Thriller"
+      ],
+      "price": 320,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Six of Crows.jpg"
+      ]
+    },
+    {
+      "id": "91",
+      "title": "Crooked Kingdom",
+      "author": "Leigh Bardugo",
+      "description": "Kaz Brekker and his crew must fight for their lives and their freedom after a successful heist leaves them with powerful enemies and an even more dangerous game to play.",
+      "categories": [
+        "Fantasy",
+        "Adventure",
+        "Thriller"
+      ],
+      "price": 330,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Crooked Kingdom.jpg"
+      ]
+    },
+    {
+      "id": "92",
+      "title": "The Cruel Prince",
+      "author": "Holly Black",
+      "description": "Jude, a mortal girl, lives in the treacherous High Court of Faerie and longs to belong. She becomes embroiled in dangerous political games and forbidden romance as she fights for power.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 280,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Cruel Prince.jpg"
+      ]
+    },
+    {
+      "id": "93",
+      "title": "The Wicked King",
+      "author": "Holly Black",
+      "description": "Jude now wields power over the faerie king, Cardan, but navigating the treacherous court proves even more dangerous. Alliances shift, and a brutal war threatens to erupt.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 290,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Wicked King.jpg"
+      ]
+    },
+    {
+      "id": "94",
+      "title": "The Queen of Nothing",
+      "author": "Holly Black",
+      "description": "Exiled from Faerie, Jude must find a way to return and reclaim her power, facing her deepest fears and the ultimate betrayal in the thrilling conclusion to The Folk of the Air series.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 300,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/The Queen of Nothing.jpg"
+      ]
+    },
+    {
+      "id": "95",
+      "title": "Circe",
+      "author": "Madeline Miller",
+      "description": "The captivating story of Circe, the goddess of magic and daughter of the sun god Helios, as she navigates her immortality, power, and banishment, encountering famous figures from Greek mythology.",
+      "categories": [
+        "Fantasy",
+        "Historical",
+        "Literature"
+      ],
+      "price": 340,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Circe.jpg"
+      ]
+    },
+    {
+      "id": "96",
+      "title": "The Song of Achilles",
+      "author": "Madeline Miller",
+      "description": "A stunning retelling of the Trojan War and the legendary love story between the hero Achilles and his companion Patroclus, from their childhood training to their tragic fates.",
+      "categories": [
+        "Historical",
+        "Romance",
+        "Literature"
+      ],
+      "price": 330,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Song of Achilles.jpg"
+      ]
+    },
+    {
+      "id": "97",
+      "title": "A Deadly Education",
+      "author": "Naomi Novik",
+      "description": "El Higgins, a reluctant magic-user with a destructive affinity, must survive her dangerous magical boarding school, where monsters lurk around every corner and graduation is a matter of life or death.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 290,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/A Deadly Education.jpg"
+      ]
+    },
+    {
+      "id": "98",
+      "title": "The Last Graduate",
+      "author": "Naomi Novik",
+      "description": "El and her classmates face their final year at the Scholomance, preparing for the deadly graduation ceremony that few survive. They must band together to face unprecedented dangers.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 300,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/The Last Graduate.jpg"
+      ]
+    },
+    {
+      "id": "99",
+      "title": "The Golden Enclaves",
+      "author": "Naomi Novik",
+      "description": "In the epic conclusion of the Scholomance trilogy, El and her remaining allies must face the ultimate challenge: venturing beyond the school's walls to confront the forces that threaten all magical enclaves.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 310,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/The Golden Enclaves.jpg"
+      ]
+    },
+    {
+      "id": "100",
+      "title": "Project Hail Mary",
+      "author": "Andy Weir",
+      "description": "An astronaut wakes up on a spaceship with amnesia, millions of miles from Earth, with a mission to save humanity from an alien threat. He must piece together his memories and confront incredible challenges.",
+      "categories": [
+        "Fiction",
+        "Adventure"
+      ],
+      "price": 340,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Project Hail Mary.jpg"
+      ]
+    },
+    {
+      "id": "101",
+      "title": "Prince Caspian",
+      "author": "C.S. Lewis",
+      "description": "Return to Narnia, hundreds of years after the Pevensie children left, to find a land oppressed by the tyrannical Telmarines. Prince Caspian, rightful heir to the throne, calls upon the old kings and queens of Narnia to help him reclaim his kingdom and restore the magic that has faded, leading to a desperate fight for freedom and faith.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 295,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/Prince Caspian.jpg"
+      ]
+    },
+    {
+      "id": "102",
+      "title": "The Voyage of the Dawn Treader",
+      "author": "C.S. Lewis",
+      "description": "Join Lucy and Edmund Pevensie, along with their insufferable cousin Eustace, as they are pulled back into Narnia aboard the majestic ship, the Dawn Treader. Their voyage takes them to the very edge of the world, encountering fantastical islands, wondrous creatures, and profound self-discoveries, all in search of seven lost lords and the ultimate destination beyond the known seas.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 300,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Voyage of the Dawn Treader.jpg"
+      ]
+    },
+    {
+      "id": "103",
+      "title": "The Silver Chair",
+      "author": "C.S. Lewis",
+      "description": "Venture back to Narnia with Eustace Scrubb and his schoolmate Jill Pole, tasked by Aslan with finding Prince Rilian, the lost son of King Caspian. Their quest leads them through perilous lands, encountering giants, witches, and treacherous underground realms, in a race against time to free the prince from a dark enchantment and save Narnia from an insidious evil.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 305,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/The Silver Chair.jpg"
+      ]
+    },
+    {
+      "id": "104",
+      "title": "The Horse and His Boy",
+      "author": "C.S. Lewis",
+      "description": "In the magical land of Calormen, a young boy named Shasta and a talking horse named Bree escape their enslavement and embark on a perilous journey to the free lands of Narnia. Their adventure intertwines with a hidden royal destiny, a looming war, and a deeper understanding of Aslan's guiding hand, revealing courage and friendship in unexpected places.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 290,
+      "stock_display": 19,
+      "stock_actual": 24,
+      "image_urls": [
+        "images/The Horse and His Boy.jpg"
+      ]
+    },
+    {
+      "id": "105",
+      "title": "The Magician's Nephew",
+      "author": "C.S. Lewis",
+      "description": "Travel to the very beginning of Narnia, when two children from London, Polly and Digory, accidentally stumble upon a means of inter-dimensional travel. Their misadventures lead them to a desolate world, and then to the creation of Narnia itself, witnessing its birth and the first shadow of evil, revealing the origins of the White Witch and the wardrobe.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 285,
+      "stock_display": 21,
+      "stock_actual": 26,
+      "image_urls": [
+        "images/The Magician's Nephew.jpg"
+      ]
+    },
+    {
+      "id": "106",
+      "title": "The Last Battle",
+      "author": "C.S. Lewis",
+      "description": "Witness the dramatic and poignant conclusion of Narnia, as the land faces its final, most devastating struggle. With trickery and darkness threatening to destroy all that is good, the children from our world are summoned back for the ultimate battle alongside Aslan, leading to the end of one world and the promise of another beyond it.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 310,
+      "stock_display": 17,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/The Last Battle.jpg"
+      ]
+    },
+    {
+      "id": "107",
+      "title": "Underworlds: The Battle Begins",
+      "author": "Tony Abbott",
+      "description": "Owen Brown's day takes a bizarre turn when the floor opens up and swallows his best friend, Dana. Teaming up with new allies, Owen is plunged into a hidden battle within the Greek Underworld, where ancient myths are terrifyingly real, and the fate of their friend—and perhaps the world—depends on their ability to navigate this treacherous realm.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 200,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Underworlds The Battle Begins.jpg"
+      ]
+    },
+    {
+      "id": "108",
+      "title": "Underworlds: When Monsters Escape",
+      "author": "Tony Abbott",
+      "description": "The adventure continues as Owen and his friends discover that the boundaries between worlds are weakening, allowing creatures from various Underworlds to escape into the human realm. They must now track down and contain these mythical beasts, leading them to the frigid and formidable Norse Underworld, where new gods and challenges await.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 205,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/Underworlds When Monsters Escape.jpg"
+      ]
+    },
+    {
+      "id": "109",
+      "title": "Underworlds: Revenge of the Scorpion King",
+      "author": "Tony Abbott",
+      "description": "The quest for balance intensifies as Owen and his companions find themselves in the desolate, fire-scorched Babylonian Underworld, facing the wrath of ancient entities. They must confront the legendary Scorpion King and other terrifying monsters, battling not just for their lives, but to prevent a malevolent force from dominating both the Underworlds and the human world.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 210,
+      "stock_display": 13,
+      "stock_actual": 18,
+      "image_urls": [
+        "images/Underworlds Revenge of the Scorpion King.jpg"
+      ]
+    },
+    {
+      "id": "110",
+      "title": "Underworlds: The Ice Dragon",
+      "author": "Tony Abbott",
+      "description": "The ultimate confrontation looms as the children delve deeper into the secrets of the Underworlds, facing their greatest fears and the most powerful of mythological beings. With the stakes higher than ever, they must combine their strengths and knowledge to defeat the masterminds behind the chaos and restore order to the realms before everything is lost.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 215,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/Underworlds The Ice Dragon.jpg"
+      ]
+    },
+    {
+      "id": "111",
+      "title": "Twilight",
+      "author": "Stephenie Meyer",
+      "description": "When seventeen-year-old Bella Swan moves to the gloomy town of Forks, Washington, her life takes an unexpected turn as she becomes irrevocably drawn to the enigmatic and alluring Edward Cullen. She soon discovers his family harbors a dangerous secret: they are vampires, setting the stage for a passionate, perilous romance that challenges the very nature of human and immortal existence.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 270,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/Twilight.jpg"
+      ]
+    },
+    {
+      "id": "112",
+      "title": "New Moon",
+      "author": "Stephenie Meyer",
+      "description": "After a devastating departure leaves Bella heartbroken and vulnerable, she finds solace in her deepening friendship with Jacob Black, a member of the Quileute tribe who harbors his own supernatural secret. As ancient tensions between vampires and werewolves escalate, Bella finds herself caught in a dangerous web of loyalty and love, leading her to confront her own mortality and the high price of immortality.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 275,
+      "stock_display": 22,
+      "stock_actual": 27,
+      "image_urls": [
+        "images/New Moon.jpg"
+      ]
+    },
+    {
+      "id": "113",
+      "title": "Eclipse",
+      "author": "Stephenie Meyer",
+      "description": "As a string of mysterious killings plagues Seattle, Bella is forced to choose between her love for Edward and her deep bond with Jacob, while facing a new, terrifying threat. An army of newborn vampires, created by an unknown enemy, looms, forcing an uneasy alliance between vampires and werewolves in a battle that will test their loyalties and demand unimaginable sacrifices.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 280,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Eclipse.jpg"
+      ]
+    },
+    {
+      "id": "114",
+      "title": "Breaking Dawn",
+      "author": "Stephenie Meyer",
+      "description": "The culmination of Bella and Edward's epic love story leads to profound, life-altering choices and devastating consequences. As they face marriage, parenthood, and the ultimate transformation, their lives are threatened by a new, formidable enemy who sees their unique family as an unforgivable offense, forcing them to unite all supernatural factions in a final, desperate stand.",
+      "categories": [
+        "Fantasy",
+        "Romance"
+      ],
+      "price": 285,
+      "stock_display": 18,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Breaking Dawn.jpg"
+      ]
+    },
+    {
+      "id": "115",
+      "title": "Eragon",
+      "author": "Christopher Paolini",
+      "description": "A young farm boy named Eragon discovers a mysterious blue stone that hatches into a dragon, Saphira, forever changing his life. Forced to flee his home after a tragic event, he is thrust into a world of magic and danger, guided by an old storyteller and embarking on a perilous journey to understand his destiny as a Dragon Rider and fight against the tyrannical King Galbatorix.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 320,
+      "stock_display": 20,
+      "stock_actual": 28,
+      "image_urls": [
+        "images/Eragon.jpg"
+      ]
+    },
+    {
+      "id": "116",
+      "title": "Eldest",
+      "author": "Christopher Paolini",
+      "description": "The epic journey continues as Eragon and Saphira travel to the Elven homeland to further their training in magic and swordsmanship. As they hone their skills, new challenges arise, old loyalties are tested, and the true extent of the empire's power is revealed, forcing Eragon to confront his burgeoning responsibilities as a leader in the burgeoning rebellion.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 330,
+      "stock_display": 18,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/Eldest.jpg"
+      ]
+    },
+    {
+      "id": "117",
+      "title": "Brisingr",
+      "author": "Christopher Paolini",
+      "description": "The flames of war consume Alagaësia as Eragon and Saphira find themselves at the forefront of the Varden's struggle against the Empire. This installment delves deeper into ancient prophecies, lost magic, and the true nature of power, forcing difficult choices and devastating battles as they fight for freedom and uncover the hidden truths of their world.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 340,
+      "stock_display": 16,
+      "stock_actual": 23,
+      "image_urls": [
+        "images/Brisingr.jpg"
+      ]
+    },
+    {
+      "id": "118",
+      "title": "Inheritance",
+      "author": "Christopher Paolini",
+      "description": "The final, climactic battle for Alagaësia arrives as Eragon and Saphira lead the forces of good against the overwhelming might of King Galbatorix. This thrilling conclusion brings together all the threads of prophecy, sacrifice, and destiny, as the fate of an entire world rests on their shoulders, demanding unimaginable courage and the ultimate test of their bond.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 350,
+      "stock_display": 15,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/Inheritance.jpg"
+      ]
+    },
+    {
+      "id": "119",
+      "title": "Dune Messiah",
+      "author": "Frank Herbert",
+      "description": "Twelve years after becoming Emperor, Paul Atreides faces the heavy burden of his prescient visions and the manipulation of powerful forces seeking to control him. This compelling sequel explores the complexities of prophecy, destiny, and the unforeseen consequences of absolute power, as Paul grapples with the terrifying future he foresaw for humanity.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 390,
+      "stock_display": 13,
+      "stock_actual": 18,
+      "image_urls": [
+        "images/Dune Messiah.jpg"
+      ]
+    },
+    {
+      "id": "120",
+      "title": "Children of Dune",
+      "author": "Frank Herbert",
+      "description": "The future of Arrakis and humanity rests on the shoulders of Paul Atreides' extraordinary children, Leto and Ghanima, who inherit their father's prescient abilities. As they come of age, they must navigate dangerous political intrigues, ancient conspiracies, and their own evolving, terrifying destinies, determining whether they will fulfill their father's legacy or forge their own path for humanity's survival.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 400,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/Children of Dune.jpg"
+      ]
+    },
+    {
+      "id": "121",
+      "title": "God Emperor of Dune",
+      "author": "Frank Herbert",
+      "description": "Witness the chilling reign of Leto Atreides II, who has transformed himself into a part-human, part-sandworm hybrid, ruling for thousands of years to guide humanity along his 'Golden Path.' This thought-provoking installment delves into themes of sacrifice, evolution, and the nature of tyranny, exploring the immense cost of immortality and the ultimate price of security.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 410,
+      "stock_display": 10,
+      "stock_actual": 15,
+      "image_urls": [
+        "images/God Emperor of Dune.jpg"
+      ]
+    },
+    {
+      "id": "122",
+      "title": "Heretics of Dune",
+      "author": "Frank Herbert",
+      "description": "Millennia after Leto II's reign, humanity has scattered across the galaxy, evolving in strange and dangerous ways. As new powers emerge, including the enigmatic Honored Matres, the remnants of the Bene Gesserit, and the Tleilaxu, find themselves locked in a desperate struggle for survival and control of the future, as the echoes of the past resonate through the vast expanse of space.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 420,
+      "stock_display": 9,
+      "stock_actual": 14,
+      "image_urls": [
+        "images/Heretics of Dune.jpg"
+      ]
+    },
+    {
+      "id": "123",
+      "title": "Chapterhouse: Dune",
+      "author": "Frank Herbert",
+      "description": "The final, epic chapter of the original Dune saga finds the Bene Gesserit desperately trying to rebuild their shattered order and preserve humanity's legacy in the face of the overwhelming threat posed by the Honored Matres. This concluding volume weaves together themes of memory, identity, and the relentless drive for freedom, culminating in a dramatic confrontation that will determine the ultimate fate of the universe.",
+      "categories": [
+        "Fiction",
+        "Fantasy"
+      ],
+      "price": 430,
+      "stock_display": 8,
+      "stock_actual": 13,
+      "image_urls": [
+        "images/Chapterhouse Dune.jpg"
+      ]
+    },
+    {
+      "id": "124",
+      "title": "A Study in Scarlet",
+      "author": "Arthur Conan Doyle",
+      "description": "Witness the very first appearance of the legendary detective Sherlock Holmes and his loyal companion Dr. John Watson, as they delve into a perplexing murder case in London. This gripping novel introduces Holmes's brilliant deductive methods and sets the stage for their iconic partnership against a backdrop of mystery and intrigue.",
+      "categories": [
+        "Mystery",
+        "Literature"
+      ],
+      "price": 250,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/A Study in Scarlet.jpg"
+      ]
+    },
+    {
+      "id": "125",
+      "title": "The Sign of the Four",
+      "author": "Arthur Conan Doyle",
+      "description": "Sherlock Holmes and Dr. Watson are drawn into a complex case involving a beautiful client, a missing father, a hidden treasure, and a mysterious one-legged man. This thrilling adventure takes them through the darker corners of London and beyond, revealing a tale of greed, revenge, and intricate puzzles.",
+      "categories": [
+        "Mystery",
+        "Literature"
+      ],
+      "price": 255,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/The Sign of the Four.jpg"
+      ]
+    },
+    {
+      "id": "126",
+      "title": "The Hound of the Baskervilles",
+      "author": "Arthur Conan Doyle",
+      "description": "Journey to the desolate and mysterious moors of Devonshire, where Sherlock Holmes investigates a chilling family curse involving a monstrous, spectral hound. This atmospheric and suspenseful novel is a masterful blend of gothic horror and detective fiction, challenging Holmes's rational mind against a seemingly supernatural threat.",
+      "categories": [
+        "Mystery",
+        "Literature",
+        "Horror"
+      ],
+      "price": 260,
+      "stock_display": 12,
+      "stock_actual": 17,
+      "image_urls": [
+        "images/The Hound of the Baskervilles.jpg"
+      ]
+    },
+    {
+      "id": "127",
+      "title": "A Game of Thrones",
+      "author": "George R.R. Martin",
+      "description": "Enter the brutal world of Westeros, where seasons can last for decades and a chilling threat lurks beyond the Wall. Noble families scheme for control of the Iron Throne, igniting a dangerous dance of power, betrayal, and war. Prepare for a gripping tale of political intrigue, epic battles, and unforgettable characters, where no one is safe.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 450,
+      "stock_display": 10,
+      "stock_actual": 15,
+      "image_urls": [
+        "images/A Game of Thrones.jpg"
+      ]
+    },
+    {
+      "id": "128",
+      "title": "A Clash of Kings",
+      "author": "George R.R. Martin",
+      "description": "The war for the Iron Throne intensifies as five kings lay claim to the coveted seat of power. Amidst the chaos, ancient magic stirs, and new alliances are forged and broken. This installment plunges deeper into the intricate web of deception and violence, as beloved and loathed characters navigate a world on the brink of collapse.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 460,
+      "stock_display": 9,
+      "stock_actual": 14,
+      "image_urls": [
+        "images/A Clash of Kings.jpg"
+      ]
+    },
+    {
+      "id": "129",
+      "title": "A Storm of Swords",
+      "author": "George R.R. Martin",
+      "description": "The conflict in Westeros reaches a fever pitch, with devastating betrayals, shocking deaths, and monumental battles. As the true nature of the threat from beyond the Wall becomes clearer, the fight for survival transcends mere political ambition, forcing unimaginable sacrifices and reshaping the destinies of all.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 470,
+      "stock_display": 8,
+      "stock_actual": 13,
+      "image_urls": [
+        "images/A Storm of Swords.jpg"
+      ]
+    },
+    {
+      "id": "130",
+      "title": "A Feast for Crows",
+      "author": "George R.R. Martin",
+      "description": "With the War of the Five Kings winding down, a new, more insidious struggle for power emerges. The focus shifts to the aftermath of war, exploring the fractured political landscape and the desperate measures taken by those left to pick up the pieces, while the shadows of a greater war loom.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 480,
+      "stock_display": 7,
+      "stock_actual": 12,
+      "image_urls": [
+        "images/A Feast for Crows.jpg"
+      ]
+    },
+    {
+      "id": "131",
+      "title": "A Dance with Dragons",
+      "author": "George R.R. Martin",
+      "description": "Across the narrow sea, Daenerys Targaryen struggles to rule her growing empire, while in Westeros, old enemies and new threats emerge. The storylines converge and diverge, weaving a complex tapestry of war, magic, and survival, as the characters face their greatest challenges yet and the ultimate winter approaches.",
+      "categories": [
+        "Fantasy",
+        "Fiction"
+      ],
+      "price": 490,
+      "stock_display": 6,
+      "stock_actual": 11,
+      "image_urls": [
+        "images/A Dance with Dragons.jpg"
+      ]
+    },
+    {
+      "id": "132",
+      "title": "The Perks of Being a Wallflower",
+      "author": "Stephen Chbosky",
+      "description": "Follow the poignant and often heartbreaking journey of Charlie, a shy and observant freshman, as he navigates the tumultuous waters of high school. Through a series of letters, Charlie shares his experiences with friendship, love, trauma, and self-discovery, painting a vivid and honest portrait of adolescence and the struggle to find one's place.",
+      "categories": [
+        "Fiction",
+        "Literature"
+      ],
+      "price": 270,
+      "stock_display": 20,
+      "stock_actual": 25,
+      "image_urls": [
+        "images/The Perks of Being a Wallflower.jpg"
+      ]
+    },
+    {
+      "id": "133",
+      "title": "The Last Wish",
+      "author": "Andrzej Sapkowski",
+      "description": "Delve into the dark and morally ambiguous world of Geralt of Rivia, a professional monster hunter known as a Witcher. This collection of short stories serves as an introduction to Geralt's character and the intricate lore of his world, revealing the often-grim reality of his profession and the complex nature of the 'monsters' he encounters.",
+      "categories": [
+        "Fantasy"
+      ],
+      "price": 300,
+      "stock_display": 18,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/The Last Wish.jpg"
+      ]
+    },
+    {
+      "id": "134",
+      "title": "Sword of Destiny",
+      "author": "Andrzej Sapkowski",
+      "description": "Continue to explore Geralt's adventures in this second collection of short stories, further developing the world of the Witcher and introducing key characters and concepts. These tales delve into destiny, choices, and the unpredictable nature of good and evil, laying crucial groundwork for the main saga.",
+      "categories": [
+        "Fantasy"
+      ],
+      "price": 305,
+      "stock_display": 17,
+      "stock_actual": 22,
+      "image_urls": [
+        "images/Sword of Destiny.jpg"
+      ]
+    },
+    {
+      "id": "135",
+      "title": "Blood of Elves",
+      "author": "Andrzej Sapkowski",
+      "description": "The main saga begins as Geralt's destiny intertwines with Ciri, a young princess with extraordinary powers. As war rages and ancient prophecies stir, Geralt finds himself caught in a web of political intrigue and magical threats, all while trying to protect Ciri from those who seek to exploit her abilities.",
+      "categories": [
+        "Fantasy"
+      ],
+      "price": 310,
+      "stock_display": 16,
+      "stock_actual": 21,
+      "image_urls": [
+        "images/Blood of Elves.jpg"
+      ]
+    },
+    {
+      "id": "136",
+      "title": "Time of Contempt",
+      "author": "Andrzej Sapkowski",
+      "description": "The political landscape of the Continent becomes increasingly perilous as Geralt and Ciri are forced to flee. This installment delves into a major coup, escalating conflicts, and the growing powers of Ciri, who must learn to control her abilities while evading those who hunt her.",
+      "categories": [
+        "Fantasy"
+      ],
+      "price": 315,
+      "stock_display": 15,
+      "stock_actual": 20,
+      "image_urls": [
+        "images/Time of Contempt.jpg"
+      ]
+    },
+    {
+      "id": "137",
+      "title": "Baptism of Fire",
+      "author": "Andrzej Sapkowski",
+      "description": "Separated from Ciri and recovering from serious injuries, Geralt embarks on a desperate quest to find her, gathering unlikely allies along the way. Meanwhile, Ciri faces her own trials and transformations, navigating treacherous new paths as the war consumes the Continent.",
+      "categories": [
+        "Fantasy"
+      ],
+      "price": 320,
+      "stock_display": 14,
+      "stock_actual": 19,
+      "image_urls": [
+        "images/Baptism of Fire.jpg"
+      ]
+    },
+    {
+      "id": "6",
+      "title": "Harry Potter and the Sorcerer's Stone",
+      "author": "J.K. Rowling",
+      "description": "Discover the magical world of Hogwarts with Harry Potter, an orphaned boy who learns on his eleventh birthday that he is a wizard. He begins his education at Hogwarts School of Witchcraft and Wizardry, where he uncovers a dark secret.",
+      "categories": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "price": 300,
+      "stock_display": 25,
+      "stock_actual": 30,
+      "image_urls": [
+        "images/Harry Potter and the Sorcerer's Stone.jpg"
+      ]
+    }
+  ],
+  "books_by_category": [
+    {
+      "id": "6",
+      "category": "newly launched",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "7",
+      "category": "newly launched",
+      "no_of_books_sold": 35
+    },
+    {
+      "id": "8",
+      "category": "newly launched",
+      "no_of_books_sold": 39
+    },
+    {
+      "id": "10",
+      "category": "newly launched",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "15",
+      "category": "newly launched",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "32",
+      "category": "newly launched",
+      "no_of_books_sold": 27
+    },
+    {
+      "id": "40",
+      "category": "newly launched",
+      "no_of_books_sold": 31
+    },
+    {
+      "id": "55",
+      "category": "newly launched",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "58",
+      "category": "newly launched",
+      "no_of_books_sold": 36
+    },
+    {
+      "id": "62",
+      "category": "newly launched",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "66",
+      "category": "newly launched",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "70",
+      "category": "newly launched",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "74",
+      "category": "newly launched",
+      "no_of_books_sold": 24
+    },
+    {
+      "id": "80",
+      "category": "newly launched",
+      "no_of_books_sold": 37
+    },
+    {
+      "id": "83",
+      "category": "newly launched",
+      "no_of_books_sold": 19
+    },
+    {
+      "id": "87",
+      "category": "newly launched",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "91",
+      "category": "newly launched",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "95",
+      "category": "newly launched",
+      "no_of_books_sold": 25
+    },
+    {
+      "id": "4",
+      "category": "highly rated",
+      "no_of_books_sold": 39
+    },
+    {
+      "id": "11",
+      "category": "highly rated",
+      "no_of_books_sold": 34
+    },
+    {
+      "id": "12",
+      "category": "highly rated",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "13",
+      "category": "highly rated",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "16",
+      "category": "highly rated",
+      "no_of_books_sold": 31
+    },
+    {
+      "id": "18",
+      "category": "highly rated",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "28",
+      "category": "highly rated",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "33",
+      "category": "highly rated",
+      "no_of_books_sold": 24
+    },
+    {
+      "id": "46",
+      "category": "highly rated",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "49",
+      "category": "highly rated",
+      "no_of_books_sold": 35
+    },
+    {
+      "id": "57",
+      "category": "highly rated",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "61",
+      "category": "highly rated",
+      "no_of_books_sold": 21
+    },
+    {
+      "id": "65",
+      "category": "highly rated",
+      "no_of_books_sold": 34
+    },
+    {
+      "id": "69",
+      "category": "highly rated",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "73",
+      "category": "highly rated",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "5",
+      "category": "special offers",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "9",
+      "category": "special offers",
+      "no_of_books_sold": 19
+    },
+    {
+      "id": "14",
+      "category": "special offers",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "19",
+      "category": "special offers",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "21",
+      "category": "special offers",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "22",
+      "category": "special offers",
+      "no_of_books_sold": 19
+    },
+    {
+      "id": "25",
+      "category": "special offers",
+      "no_of_books_sold": 24
+    },
+    {
+      "id": "31",
+      "category": "special offers",
+      "no_of_books_sold": 21
+    },
+    {
+      "id": "41",
+      "category": "special offers",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "47",
+      "category": "special offers",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "56",
+      "category": "special offers",
+      "no_of_books_sold": 27
+    },
+    {
+      "id": "60",
+      "category": "special offers",
+      "no_of_books_sold": 33
+    },
+    {
+      "id": "64",
+      "category": "special offers",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "68",
+      "category": "special offers",
+      "no_of_books_sold": 31
+    },
+    {
+      "id": "72",
+      "category": "special offers",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "76",
+      "category": "special offers",
+      "no_of_books_sold": 23
+    },
+    {
+      "id": "81",
+      "category": "special offers",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "85",
+      "category": "special offers",
+      "no_of_books_sold": 25
+    },
+    {
+      "id": "89",
+      "category": "special offers",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "93",
+      "category": "special offers",
+      "no_of_books_sold": 19
+    },
+    {
+      "id": "97",
+      "category": "special offers",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "101",
+      "category": "special offers",
+      "no_of_books_sold": 16
+    },
+    {
+      "id": "105",
+      "category": "special offers",
+      "no_of_books_sold": 14
+    },
+    {
+      "id": "109",
+      "category": "special offers",
+      "no_of_books_sold": 13
+    },
+    {
+      "id": "113",
+      "category": "special offers",
+      "no_of_books_sold": 12
+    },
+    {
+      "id": "117",
+      "category": "special offers",
+      "no_of_books_sold": 11
+    },
+    {
+      "id": "121",
+      "category": "special offers",
+      "no_of_books_sold": 10
+    },
+    {
+      "id": "125",
+      "category": "special offers",
+      "no_of_books_sold": 9
+    },
+    {
+      "id": "129",
+      "category": "special offers",
+      "no_of_books_sold": 8
+    },
+    {
+      "id": "133",
+      "category": "special offers",
+      "no_of_books_sold": 8
+    },
+    {
+      "id": "1",
+      "category": "normal",
+      "no_of_books_sold": 27
+    },
+    {
+      "id": "17",
+      "category": "normal",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "20",
+      "category": "normal",
+      "no_of_books_sold": 34
+    },
+    {
+      "id": "23",
+      "category": "normal",
+      "no_of_books_sold": 12
+    },
+    {
+      "id": "24",
+      "category": "normal",
+      "no_of_books_sold": 15
+    },
+    {
+      "id": "26",
+      "category": "normal",
+      "no_of_books_sold": 18
+    },
+    {
+      "id": "27",
+      "category": "normal",
+      "no_of_books_sold": 21
+    },
+    {
+      "id": "29",
+      "category": "normal",
+      "no_of_books_sold": 24
+    },
+    {
+      "id": "30",
+      "category": "normal",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "34",
+      "category": "normal",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "35",
+      "category": "normal",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "36",
+      "category": "normal",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "37",
+      "category": "normal",
+      "no_of_books_sold": 35
+    },
+    {
+      "id": "38",
+      "category": "normal",
+      "no_of_books_sold": 37
+    },
+    {
+      "id": "39",
+      "category": "normal",
+      "no_of_books_sold": 39
+    },
+    {
+      "id": "42",
+      "category": "normal",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "43",
+      "category": "normal",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "44",
+      "category": "normal",
+      "no_of_books_sold": 15
+    },
+    {
+      "id": "45",
+      "category": "normal",
+      "no_of_books_sold": 13
+    },
+    {
+      "id": "48",
+      "category": "normal",
+      "no_of_books_sold": 11
+    },
+    {
+      "id": "50",
+      "category": "normal",
+      "no_of_books_sold": 9
+    },
+    {
+      "id": "51",
+      "category": "normal",
+      "no_of_books_sold": 7
+    },
+    {
+      "id": "52",
+      "category": "normal",
+      "no_of_books_sold": 6
+    },
+    {
+      "id": "53",
+      "category": "normal",
+      "no_of_books_sold": 5
+    },
+    {
+      "id": "59",
+      "category": "normal",
+      "no_of_books_sold": 10
+    },
+    {
+      "id": "63",
+      "category": "normal",
+      "no_of_books_sold": 12
+    },
+    {
+      "id": "67",
+      "category": "normal",
+      "no_of_books_sold": 14
+    },
+    {
+      "id": "71",
+      "category": "normal",
+      "no_of_books_sold": 16
+    },
+    {
+      "id": "75",
+      "category": "normal",
+      "no_of_books_sold": 18
+    },
+    {
+      "id": "78",
+      "category": "normal",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "79",
+      "category": "normal",
+      "no_of_books_sold": 22
+    },
+    {
+      "id": "82",
+      "category": "normal",
+      "no_of_books_sold": 24
+    },
+    {
+      "id": "84",
+      "category": "normal",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "86",
+      "category": "normal",
+      "no_of_books_sold": 28
+    },
+    {
+      "id": "88",
+      "category": "normal",
+      "no_of_books_sold": 30
+    },
+    {
+      "id": "90",
+      "category": "normal",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "92",
+      "category": "normal",
+      "no_of_books_sold": 34
+    },
+    {
+      "id": "94",
+      "category": "normal",
+      "no_of_books_sold": 36
+    },
+    {
+      "id": "96",
+      "category": "normal",
+      "no_of_books_sold": 38
+    },
+    {
+      "id": "98",
+      "category": "normal",
+      "no_of_books_sold": 40
+    },
+    {
+      "id": "99",
+      "category": "normal",
+      "no_of_books_sold": 5
+    },
+    {
+      "id": "100",
+      "category": "normal",
+      "no_of_books_sold": 8
+    },
+    {
+      "id": "102",
+      "category": "normal",
+      "no_of_books_sold": 11
+    },
+    {
+      "id": "103",
+      "category": "normal",
+      "no_of_books_sold": 14
+    },
+    {
+      "id": "104",
+      "category": "normal",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "106",
+      "category": "normal",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "107",
+      "category": "normal",
+      "no_of_books_sold": 23
+    },
+    {
+      "id": "108",
+      "category": "normal",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "110",
+      "category": "normal",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "111",
+      "category": "normal",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "112",
+      "category": "normal",
+      "no_of_books_sold": 35
+    },
+    {
+      "id": "114",
+      "category": "normal",
+      "no_of_books_sold": 38
+    },
+    {
+      "id": "115",
+      "category": "normal",
+      "no_of_books_sold": 5
+    },
+    {
+      "id": "116",
+      "category": "normal",
+      "no_of_books_sold": 8
+    },
+    {
+      "id": "118",
+      "category": "normal",
+      "no_of_books_sold": 11
+    },
+    {
+      "id": "119",
+      "category": "normal",
+      "no_of_books_sold": 14
+    },
+    {
+      "id": "120",
+      "category": "normal",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "122",
+      "category": "normal",
+      "no_of_books_sold": 20
+    },
+    {
+      "id": "123",
+      "category": "normal",
+      "no_of_books_sold": 23
+    },
+    {
+      "id": "124",
+      "category": "normal",
+      "no_of_books_sold": 26
+    },
+    {
+      "id": "126",
+      "category": "normal",
+      "no_of_books_sold": 29
+    },
+    {
+      "id": "127",
+      "category": "normal",
+      "no_of_books_sold": 32
+    },
+    {
+      "id": "128",
+      "category": "normal",
+      "no_of_books_sold": 35
+    },
+    {
+      "id": "130",
+      "category": "normal",
+      "no_of_books_sold": 38
+    },
+    {
+      "id": "131",
+      "category": "normal",
+      "no_of_books_sold": 5
+    },
+    {
+      "id": "132",
+      "category": "normal",
+      "no_of_books_sold": 8
+    },
+    {
+      "id": "134",
+      "category": "normal",
+      "no_of_books_sold": 11
+    },
+    {
+      "id": "135",
+      "category": "normal",
+      "no_of_books_sold": 14
+    },
+    {
+      "id": "136",
+      "category": "normal",
+      "no_of_books_sold": 17
+    },
+    {
+      "id": "2",
+      "category": "newly launched",
+      "no_of_books_sold": 2
+    }
+  ],
+  "adminUsers": [
+    {
+      "id": "3b58",
+      "username": "Shashank",
+      "email": "gandeshashank@gmail.com",
+      "passwordHash": "Minato765@"
+    },
+    {
+      "id": "112",
+      "username": "Sayan",
+      "email": "sayan.nath@thebookstore.com",
+      "passwordHash": "Sayan@123"
+    },
+    {
+      "id": "030ff6dd-5e83-4251-80b9-2a1d57c7a4cc",
+      "username": "Lewis Hamilton",
+      "email": "lh44@gmail.com",
+      "passwordHash": "hammerTime@44"
+    }
+  ]
+}

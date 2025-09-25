@@ -1,0 +1,42 @@
+# Configuration specific to User Authentication Service
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-authentication-service
+  datasource:
+    # MySQL Configuration for production
+    url: jdbc:mysql://localhost:3306/bookstore_auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+# Service-specific JWT Configuration
+jwt:
+  secret: userAuthSecretKey123456789012345678901234567890
+  expiration: 86400000  # 24 hours
+  refresh-expiration: 604800000  # 7 days
+
+# Security Configuration
+spring:
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN

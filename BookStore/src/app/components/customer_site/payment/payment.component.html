@@ -1,0 +1,305 @@
+<div class="main-content-container">
+  <!-- Header -->
+  <div class="payment-header card card-elevated fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="m-0 font-semibold">Complete Payment</h2>
+      <div class="security-badge">
+        <span class="material-icons">security</span>
+        <span class="badge badge-success">100% Secure</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row gap-4">
+    <!-- Left Panel - Payment Methods -->
+    <div class="col-lg-4">
+      <div class="payment-methods-card card card-elevated">
+        <div class="card-header">
+          <h5 class="mb-0">Payment Options</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="payment-method-list">
+            <div *ngFor="let method of paymentMethods" 
+                 class="payment-method-item"
+                 [class.active]="selectedPaymentMethod === method.id"
+                 [class.disabled]="!isPaymentMethodEnabled(method.id)"
+                 (click)="isPaymentMethodEnabled(method.id) && selectPaymentMethod(method.id)">
+              
+              <div class="method-content">
+                <div class="method-icon">
+                  <span class="material-icons">{{ method.icon }}</span>
+                </div>
+                <div class="method-info">
+                  <h6 class="method-name">{{ method.name }}</h6>
+                  <small class="method-description">{{ method.description }}</small>
+                  <small *ngIf="!isPaymentMethodEnabled(method.id)" class="text-error">
+                    {{ getPaymentMethodDisabledReason(method.id) }}
+                  </small>
+                </div>
+              </div>
+              
+              <div class="method-radio">
+                <span class="material-icons" *ngIf="selectedPaymentMethod === method.id">radio_button_checked</span>
+                <span class="material-icons" *ngIf="selectedPaymentMethod !== method.id">radio_button_unchecked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Panel - Payment Details -->
+    <div class="col-lg-4">
+      <div class="payment-details-card card card-elevated">
+        <div class="card-header">
+          <h5 class="mb-0">Payment Details</h5>
+        </div>
+        <div class="card-body">
+          <!-- UPI Payment -->
+          <div *ngIf="selectedPaymentMethod === 'UPI'" class="payment-form slide-in-up">
+            <div class="form-group">
+              <label for="upiId" class="form-label">UPI ID *</label>
+              <div class="input-with-validation">
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [class.border-error]="hasError('upiId')"
+                  [class.border-success]="upiValidation?.isValid"
+                  id="upiId" 
+                  [(ngModel)]="upiId" 
+                  (input)="onUpiIdChange()"
+                  placeholder="yourname@bank"
+                  autocomplete="off">
+                
+                <div class="validation-indicator">
+                  <span *ngIf="isValidatingUPI" class="spinner"></span>
+                  <span *ngIf="!isValidatingUPI && upiValidation?.isValid" class="material-icons text-success">check_circle</span>
+                  <span *ngIf="!isValidatingUPI && upiValidation && !upiValidation.isValid" class="material-icons text-error">error</span>
+                </div>
+              </div>
+              
+              <div *ngIf="hasError('upiId')" class="error-message">{{ getError('upiId') }}</div>
+              <div *ngIf="upiValidation?.message" class="validation-message" 
+                   [class.text-success]="upiValidation?.isValid === true"
+                   [class.text-error]="upiValidation?.isValid === false">
+                {{ upiValidation?.message }}
+              </div>
+              
+              <div class="help-text">
+                <a href="#" class="help-link">How to find your UPI ID?</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Payment -->
+          <div *ngIf="selectedPaymentMethod === 'CARD'" class="payment-form slide-in-up">
+            <div class="form-group">
+              <label for="cardNumber" class="form-label">Card Number *</label>
+              <div class="card-input-container">
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [class.border-error]="hasError('cardNumber')"
+                  id="cardNumber" 
+                  [(ngModel)]="cardNumber" 
+                  (input)="onCardNumberChange()"
+                  placeholder="1234 5678 9012 3456" 
+                  maxlength="19">
+                <div class="card-type" *ngIf="getCardType()">{{ getCardType() }}</div>
+              </div>
+              <div *ngIf="hasError('cardNumber')" class="error-message">{{ getError('cardNumber') }}</div>
+            </div>
+
+            <div class="form-group">
+              <label for="cardName" class="form-label">Cardholder Name *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [class.border-error]="hasError('cardName')"
+                id="cardName" 
+                [(ngModel)]="cardName" 
+                placeholder="Name as on card">
+              <div *ngIf="hasError('cardName')" class="error-message">{{ getError('cardName') }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="cardExpiry" class="form-label">Expiry Date *</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [class.border-error]="hasError('cardExpiry')"
+                    id="cardExpiry" 
+                    [(ngModel)]="cardExpiry" 
+                    (input)="onCardExpiryChange()"
+                    placeholder="MM/YY" 
+                    maxlength="5">
+                  <div *ngIf="hasError('cardExpiry')" class="error-message">{{ getError('cardExpiry') }}</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="cardCvv" class="form-label">CVV *</label>
+                  <input 
+                    type="password" 
+                    class="form-control" 
+                    [class.border-error]="hasError('cardCvv')"
+                    id="cardCvv" 
+                    [(ngModel)]="cardCvv" 
+                    placeholder="123" 
+                    maxlength="4">
+                  <div *ngIf="hasError('cardCvv')" class="error-message">{{ getError('cardCvv') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Banking -->
+          <div *ngIf="selectedPaymentMethod === 'NETBANKING'" class="payment-form slide-in-up">
+            <div class="form-group">
+              <label for="bank" class="form-label">Select Bank *</label>
+              <select 
+                class="form-control" 
+                [class.border-error]="hasError('netBankingBank')"
+                id="bank" 
+                [(ngModel)]="netBankingBank">
+                <option value="">--Select Bank--</option>
+                <option *ngFor="let bank of banks" [value]="bank">{{ bank }}</option>
+              </select>
+              <div *ngIf="hasError('netBankingBank')" class="error-message">{{ getError('netBankingBank') }}</div>
+            </div>
+          </div>
+
+          <!-- Wallet Payment -->
+          <div *ngIf="selectedPaymentMethod === 'WALLET'" class="payment-form slide-in-up">
+            <div class="wallet-options">
+              <div class="wallet-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span>Paytm Wallet</span>
+              </div>
+              <div class="wallet-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span>PhonePe</span>
+              </div>
+              <div class="wallet-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span>Google Pay</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cash on Delivery -->
+          <div *ngIf="selectedPaymentMethod === 'COD'" class="payment-form slide-in-up">
+            <div class="cod-info">
+              <div class="info-item">
+                <span class="material-icons text-warning">info</span>
+                <div>
+                  <strong>Cash on Delivery</strong>
+                  <p class="text-muted">Pay when you receive your order. Additional charges may apply.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Button -->
+          <div class="payment-button-container">
+            <button 
+              class="btn btn-primary btn-lg w-100" 
+              [disabled]="isProcessing || isLoadingOrderSummary"
+              (click)="processPayment()">
+              
+              <span *ngIf="isProcessing" class="spinner me-2"></span>
+              <span class="material-icons" *ngIf="!isProcessing">payment</span>
+              
+              <span *ngIf="!isProcessing && orderSummary">
+                Pay ₹{{ orderSummary.totalPayable | number:'1.2-2' }}
+              </span>
+              <span *ngIf="isProcessing">Processing Payment...</span>
+              <span *ngIf="!orderSummary && !isProcessing">Loading...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Order Summary -->
+    <div class="col-lg-4">
+      <!-- Order Summary -->
+      <div class="order-summary-card card card-elevated">
+        <div class="card-header">
+          <h5 class="mb-0">Order Summary</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="orderSummary && !isLoadingOrderSummary; else loadingSummary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+                                <span>₹{{ orderSummary.totalAmount | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Taxes (GST)</span>
+                                <span>₹{{ orderSummary.taxes | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span *ngIf="orderSummary.shippingFee === 0" class="text-success">FREE</span>
+              <span *ngIf="orderSummary.shippingFee > 0">₹{{ orderSummary.shippingFee | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row total">
+              <strong>Total Amount</strong>
+              <strong class="text-primary">₹{{ orderSummary.totalPayable | number:'1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <ng-template #loadingSummary>
+            <div class="loading-container">
+              <div class="spinner"></div>
+              <span class="loading-text">Loading summary...</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Delivery Address -->
+      <div class="delivery-address-card card mt-3" *ngIf="deliveryAddress && !isLoadingAddress">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <span class="material-icons me-2">local_shipping</span>
+            Delivery Address
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="address-details">
+            <div class="address-name">{{ deliveryAddress.name }}</div>
+            <div class="address-phone">{{ deliveryAddress.phone }}</div>
+            <div class="address-text">
+              {{ deliveryAddress.address }}, {{ deliveryAddress.locality }}<br>
+              {{ deliveryAddress.city }}, {{ deliveryAddress.state }} - {{ deliveryAddress.pincode }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Address -->
+      <div class="card mt-3" *ngIf="isLoadingAddress">
+        <div class="card-body">
+          <div class="loading-container">
+            <div class="spinner"></div>
+            <span class="loading-text">Loading address...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <button class="btn btn-secondary" (click)="goBack()">
+        <span class="material-icons">arrow_back</span>
+        Back to Checkout
+      </button>
+    </div>
+  </div>
+</div>
+  

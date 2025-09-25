@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  
+  /* --- Glassmorphism Effect --- */
+  /* 1. Use a semi-transparent white for the background */
+  background: rgba(255, 255, 255, 0.25);
+  
+  /* 2. Add the blur effect */
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
+  backdrop-filter: blur(10px);
+  
+  /* 3. Define a subtle border to catch the light */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] :host {
+  /* 1. Use a semi-transparent dark color for the background */
+  background: rgba(44, 44, 76, 0.25);
+  
+  /* 3. Update the border for dark mode */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Style the title to fit nicely within the new container */
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  /* Make the border semi-transparent to match the theme */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .section-title {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* The horizontal scroller itself */
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1.5rem;
+  padding: 0.5rem;
+  margin: 0 -0.5rem;
+
+  /* Hides the scrollbar for a cleaner look */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}

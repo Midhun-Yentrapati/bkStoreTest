@@ -1,0 +1,10 @@
+/* category-nav.component.css */
+.category-nav-container {
+  background-color: var(--bg-secondary);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px var(--shadow-color);
+  padding: 1rem;
+}
+
+/* For your HTML, you will need to add this class to the main div */
+/* <div class="d-flex flex-wrap ... category-nav-container"> */

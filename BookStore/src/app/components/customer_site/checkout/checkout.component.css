@@ -1,0 +1,408 @@
+/* Checkout Component Styles */
+
+/* Progress Steps */
+.checkout-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border-color);
+  z-index: 1;
+}
+
+.step-completed::after {
+  background: var(--primary-accent) !important;
+}
+
+.step-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-right: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.step-pending .step-number {
+  background: var(--bg-accent);
+  color: var(--text-muted);
+  border: 2px solid var(--border-color);
+}
+
+.step-active .step-number {
+  background: var(--primary-accent);
+  color: white;
+  border: 2px solid var(--primary-accent);
+}
+
+.step-completed .step-number {
+  background: var(--success-color);
+  color: white;
+  border: 2px solid var(--success-color);
+}
+
+.step-title {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.step-pending .step-title {
+  color: var(--text-muted);
+}
+
+.step-active .step-title {
+  color: var(--primary-accent);
+}
+
+.step-completed .step-title {
+  color: var(--success-color);
+}
+
+/* Login Section */
+.login-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.login-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-badge {
+  background: var(--success-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-xs);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Address Section */
+.address-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.address-header {
+  background: var(--primary-accent);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  margin: 0;
+  font-weight: 600;
+}
+
+.address-content {
+  padding: 1.5rem;
+}
+
+.address-card {
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all var(--transition-speed);
+  cursor: pointer;
+}
+
+.address-card:hover {
+  border-color: var(--primary-accent);
+  background: var(--primary-accent-light);
+}
+
+.address-card.selected {
+  border-color: var(--primary-accent);
+  background: var(--primary-accent-light);
+}
+
+.address-radio {
+  margin-right: 0.75rem;
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.address-type-badge {
+  background: var(--secondary-accent);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--border-radius-xs);
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.address-phone {
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.address-details {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.address-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.address-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.empty-state .material-icons {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Loading States */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.loading-text {
+  margin-left: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Order Summary */
+.order-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.summary-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.summary-content {
+  padding: 1.5rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-title {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.item-author {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.item-pricing {
+  text-align: right;
+}
+
+.item-quantity {
+  background: var(--bg-accent);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--border-radius-xs);
+  font-size: 0.75rem;
+  margin-right: 0.5rem;
+}
+
+.item-price {
+  font-weight: 600;
+}
+
+/* Price Details */
+.price-details {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  position: sticky;
+  top: 1rem;
+}
+
+.price-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.price-content {
+  padding: 1.5rem;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.price-row.total {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.price-savings {
+  color: var(--success-color);
+}
+
+/* Security Badge */
+.security-info {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: var(--border-radius-md);
+  margin: 1rem 0;
+}
+
+.security-info .material-icons {
+  color: var(--success-color);
+  margin-right: 0.5rem;
+}
+
+.security-text {
+  font-size: 0.875rem;
+  color: var(--success-color);
+}
+
+/* Terms */
+.terms-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 1rem;
+}
+
+.terms-text a {
+  color: var(--primary-accent);
+  text-decoration: none;
+}
+
+.terms-text a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .checkout-steps {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .step:not(:last-child)::after {
+    display: none;
+  }
+  
+  .step-number {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .address-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .address-actions {
+    margin-top: 0.75rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .item-pricing {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .price-details {
+    position: static;
+    margin-top: 1rem;
+  }
+}

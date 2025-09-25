@@ -1,0 +1,26 @@
+<div class="star-rating" [ngClass]="'size-' + size">
+  <button
+    *ngFor="let star of stars"
+    type="button"
+    class="star-button"
+    [ngClass]="{
+      'filled': getStarState(star) === 'filled',
+      'half': getStarState(star) === 'half',
+      'empty': getStarState(star) === 'empty',
+      'interactive': interactive
+    }"
+    (click)="onStarClick(star)"
+    (mouseenter)="onStarHover(star)"
+    (mouseleave)="onStarLeave()"
+    [disabled]="!interactive"
+    [attr.aria-label]="'Rate ' + star + ' star' + (star === 1 ? '' : 's')"
+  >
+    <span class="material-icons">
+      {{ getStarState(star) === 'filled' ? 'star' : getStarState(star) === 'half' ? 'star_half' : 'star_border' }}
+    </span>
+  </button>
+  
+  <span class="rating-text" *ngIf="rating > 0">
+    {{ rating.toFixed(1) }}
+  </span>
+</div> 

@@ -1,0 +1,389 @@
+/* Modern Admin Dashboard Styles */
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome-section h1.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(45deg, #fff, #e0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-text {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.header-stats {
+  text-align: right;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Main Dashboard Content */
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.welcome-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  pointer-events: none;
+}
+
+.welcome-header h1 {
+  font-size: 2.25rem; /* Larger title */
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.welcome-header p {
+  font-size: 1.125rem; /* Larger subtitle */
+  opacity: 0.9;
+  margin-top: 0.75rem;
+}
+
+/* Main Content Styling (keep if this file is responsible for overall page layout) */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  background-color: var(--bg-color);
+  margin: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+}
+
+/* Dashboard Page Container (if used for overall page content) */
+.dashboard-page-container {
+  
+   /* Add padding if this is the main content area */
+  margin: 1.5rem; /* Add margin */
+  background-color: var(--bg-color); /* Apply background from theme */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+
+h2 {
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 2.2rem;
+  color: var(--text-color);
+  margin-top: 0;
+}
+.dashboard-error {
+  background-color: #ffe0e0;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Section for Quick Insights or any grid of cards */
+.dashboard-widgets-section {
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-widgets-section h3, .book-lists-section h3 { /* Apply consistent heading style */
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.dashboard-widgets-grid { /* This will apply the grid layout to both card sections */
+  display: grid;
+  padding: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Reverted to original */
+  gap: 1.5rem;
+}
+
+/* Book Lists Section - Now using dashboard-widgets-grid */
+.book-lists-section {
+  margin-top: 2rem;
+}
+
+/* New style for charts container to display charts side by side */
+.charts-container {
+  @apply grid gap-4 justify-center mt-4 mb-4;
+}
+
+@media (max-width: 768px) {
+  .dashboard-page-container { /* Adjust padding/margin for smaller screens */
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-widgets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-container {
+    grid-template-columns: 1fr; /* Stack charts on small screens */
+  }
+}
+/* src/app/admin-dashboard-main/admin-dashboard-main.component.css */
+
+.admin-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Light background */
+  transition: background-color 0.3s ease;
+}
+
+.admin-dashboard-container.dark-theme {
+  background-color: #1a202c; /* Dark background */
+}
+
+.book-category-options {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem; /* space-x-4 in Tailwind */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #ffffff; /* bg-white */
+  border-radius: 0.5rem; /* rounded-lg */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+}
+
+.admin-dashboard-container.dark-theme .book-category-options {
+  background-color: #2d3748; /* dark:bg-gray-800 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.card-option {
+  flex: 1; /* Allows cards to grow and shrink */
+  max-width: 300px; /* Max width for individual cards */
+  background-color: #e2e8f0; /* bg-gray-200 */
+  padding: 1.5rem;
+  border-radius: 0.75rem; /* rounded-xl */
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
+  border: 2px solid transparent; /* For active state border */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-dashboard-container.dark-theme .card-option {
+  background-color: #4a5568; /* dark:bg-gray-700 */
+  color: #e2e8f0; /* text-gray-200 */
+}
+
+.card-option:hover {
+  transform: translateY(-5px) scale(1.02); /* Slight lift and scale on hover */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-dashboard-container.dark-theme .card-option:hover {
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.card-option h3 {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 600; /* font-semibold */
+  margin-bottom: 0.5rem;
+  color: #2d3748; /* text-gray-800 */
+}
+
+.admin-dashboard-container.dark-theme .card-option h3 {
+  color: #f7fafc; /* text-white */
+}
+
+.card-option p {
+  font-size: 0.875rem; /* text-sm */
+  color: #4a5568; /* text-gray-700 */
+}
+
+.admin-dashboard-container.dark-theme .card-option p {
+  color: #cbd5e0; /* text-gray-400 */
+}
+
+/* Active Card Styling */
+.card-option.active-card {
+  transform: scale(1.05); /* Persistent scale effect */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: #4299e1; /* Blue border for active */
+  background-color: #bfdbfe; /* Light blue background */
+}
+
+.admin-dashboard-container.dark-theme .card-option.active-card {
+  border-color: #63b3ed; /* Lighter blue border for active in dark theme */
+  background-color: #2a4365; /* Darker blue background */
+}
+
+/* Footer Styles (from your original code, ensuring responsiveness) */
+.footer {
+  background-color: #2d3748; /* Dark background for footer */
+  color: #e2e8f0; /* Light text color */
+  padding: 2rem 1rem;
+  margin-top: auto; /* Pushes footer to the bottom */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 1.5rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-dashboard-container.dark-theme .footer {
+  background-color: #1a202c; /* Even darker in dark theme */
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.footer-section h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #63b3ed; /* Blue accent for headings */
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-link {
+  color: #e2e8f0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #a0aec0; /* Lighter gray on hover */
+}
+
+.social-links {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: #4a5568; /* Darker gray for icons */
+  color: #e2e8f0;
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.social-icon:hover {
+  background-color: #63b3ed; /* Blue on hover */
+  transform: translateY(-2px);
+}
+
+.footer-bottom {
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #4a5568; /* Separator line */
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.footer-bottom p {
+  margin: 0.25rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .book-category-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-option {
+    max-width: 90%; /* Allow cards to take more width on smaller screens */
+    margin-bottom: 1rem; /* Add space between stacked cards */
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-section {
+    max-width: 90%;
+    margin-bottom: 1.5rem;
+  }
+}

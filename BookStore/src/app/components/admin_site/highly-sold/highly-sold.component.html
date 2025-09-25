@@ -1,0 +1,20 @@
+<div class="chart-container">
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+  <div *ngIf="isLoading" class="loading-message">
+    <p>Loading highly sold books data...</p>
+  </div>
+  <div *ngIf="hasChartData" class="modern-chart-wrapper">
+    <app-modern-pie-chart 
+      [data]="chartData"
+      [size]="260"
+      centerTitle="Books"
+      [colors]="['#ff8a80', '#b39ddb', '#81c784', '#ffb74d', '#64b5f6', '#f48fb1']">
+    </app-modern-pie-chart>
+  </div>
+  <div *ngIf="!isLoading && !errorMessage && !hasChartData" class="no-data-message">
+    <p>No highly sold books data available to display.</p>
+    <p>Please check your JSON server data for 'books' and 'books_by_category' and ensure it has sales data.</p>
+  </div>
+</div>

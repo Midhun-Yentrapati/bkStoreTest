@@ -1,0 +1,79 @@
+.coupon-section {
+  transition: all 0.3s ease;
+}
+
+.applied-coupon {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coupon-card {
+  transition: all 0.2s ease;
+}
+
+.coupon-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.coupon-card.opacity-50 {
+  cursor: not-allowed;
+}
+
+.coupon-card.opacity-50:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.coupon-input input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.available-coupons {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .coupon-section {
+    padding: 12px;
+  }
+  
+  .coupon-card {
+    padding: 12px;
+  }
+  
+  .applied-coupon {
+    padding: 12px;
+  }
+}
+
+/* Loading state */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

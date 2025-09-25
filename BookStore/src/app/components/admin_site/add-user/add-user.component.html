@@ -1,0 +1,260 @@
+<div class="add-user-form">
+  <!-- Header Section with Back Button -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1 class="page-title">👤 Add New Admin User</h1>
+        <p class="page-subtitle">Create a new admin user account</p>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Users
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-800">{{ successMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-800">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="addUser()" class="bg-white rounded-lg border border-gray-200 p-6">
+    <div class="space-y-6">
+      <!-- Username Field -->
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter username" />
+        <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('username')?.errors?.['required']">Username is required.</div>
+          <div *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters.</div>
+          <div *ngIf="userForm.get('username')?.errors?.['maxlength']">Username cannot exceed 30 characters.</div>
+          <div *ngIf="userForm.get('username')?.errors?.['pattern']">Username can only contain letters, numbers, and underscores.</div>
+        </div>
+      </div>
+
+      <!-- Full Name Field -->
+      <div>
+        <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+        <input 
+          type="text" 
+          id="fullName" 
+          formControlName="fullName"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter full name" />
+        <div *ngIf="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('fullName')?.errors?.['required']">Full name is required.</div>
+          <div *ngIf="userForm.get('fullName')?.errors?.['minlength']">Full name must be at least 2 characters.</div>
+          <div *ngIf="userForm.get('fullName')?.errors?.['maxlength']">Full name cannot exceed 100 characters.</div>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter email address" />
+        <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="mt-1 text-sm text-red-600">
+          <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</span>
+          <span *ngIf="userForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
+        </div>
+      </div>
+
+      <!-- Employee ID Field -->
+      <div>
+        <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-2">Employee ID *</label>
+        <input 
+          type="text" 
+          id="employeeId" 
+          formControlName="employeeId"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="e.g., EMP-001" />
+        <div *ngIf="userForm.get('employeeId')?.invalid && userForm.get('employeeId')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('employeeId')?.errors?.['required']">Employee ID is required.</div>
+          <div *ngIf="userForm.get('employeeId')?.errors?.['minlength']">Employee ID must be at least 3 characters.</div>
+          <div *ngIf="userForm.get('employeeId')?.errors?.['maxlength']">Employee ID cannot exceed 50 characters.</div>
+        </div>
+      </div>
+
+      <!-- Department Field -->
+      <div>
+        <label for="department" class="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+        <select 
+          id="department" 
+          formControlName="department"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+          <option value="Administration">Administration</option>
+          <option value="IT">IT</option>
+          <option value="HR">Human Resources</option>
+          <option value="Finance">Finance</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Operations">Operations</option>
+          <option value="Customer Service">Customer Service</option>
+        </select>
+        <div *ngIf="userForm.get('department')?.invalid && userForm.get('department')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('department')?.errors?.['required']">Department is required.</div>
+        </div>
+      </div>
+
+      <!-- Mobile Number Field (Optional) -->
+      <div>
+        <label for="mobileNumber" class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+        <input 
+          type="tel" 
+          id="mobileNumber" 
+          formControlName="mobileNumber"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="+1234567890" />
+        <div *ngIf="userForm.get('mobileNumber')?.invalid && userForm.get('mobileNumber')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('mobileNumber')?.errors?.['pattern']">Please provide a valid mobile number.</div>
+        </div>
+      </div>
+
+      <!-- Date of Birth Field (Optional) -->
+      <div>
+        <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+        <input 
+          type="date" 
+          id="dateOfBirth" 
+          formControlName="dateOfBirth"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+      </div>
+
+      <!-- Hire Date Field (Optional) -->
+      <div>
+        <label for="hireDate" class="block text-sm font-medium text-gray-700 mb-2">Hire Date</label>
+        <input 
+          type="date" 
+          id="hireDate" 
+          formControlName="hireDate"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+      </div>
+
+      <!-- Salary Field (Optional) -->
+      <div>
+        <label for="salary" class="block text-sm font-medium text-gray-700 mb-2">Salary</label>
+        <input 
+          type="number" 
+          id="salary" 
+          formControlName="salary"
+          min="0"
+          step="0.01"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="0.00" />
+        <div *ngIf="userForm.get('salary')?.invalid && userForm.get('salary')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('salary')?.errors?.['min']">Salary must be positive.</div>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter password" />
+        <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('password')?.errors?.['required']">Password is required.</div>
+          <div *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters long.</div>
+          <div *ngIf="userForm.get('password')?.errors?.['pattern']">
+            Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).
+          </div>
+        </div>
+        <div class="mt-2 text-sm text-gray-600">
+          <p class="font-medium">Password requirements:</p>
+          <ul class="list-disc list-inside space-y-1 mt-1">
+            <li [class.text-green-600]="userForm.get('password')?.value?.length >= 8" [class.text-gray-400]="!userForm.get('password')?.value || userForm.get('password')?.value?.length < 8">
+              At least 8 characters
+            </li>
+            <li [class.text-green-600]="hasUppercase()" [class.text-gray-400]="!hasUppercase()">
+              One uppercase letter
+            </li>
+            <li [class.text-green-600]="hasLowercase()" [class.text-gray-400]="!hasLowercase()">
+              One lowercase letter
+            </li>
+            <li [class.text-green-600]="hasNumber()" [class.text-gray-400]="!hasNumber()">
+              One number
+            </li>
+            <li [class.text-green-600]="hasSpecialChar()" [class.text-gray-400]="!hasSpecialChar()">
+              One special character
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          formControlName="confirmPassword"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Confirm password" />
+        <div *ngIf="userForm.get('confirmPassword')?.invalid && userForm.get('confirmPassword')?.touched" class="mt-1 text-sm text-red-600">
+          <div *ngIf="userForm.get('confirmPassword')?.errors?.['required']">Please confirm your password.</div>
+          <div *ngIf="userForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match.</div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <button 
+          type="button"
+          (click)="goBack()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+          Cancel
+        </button>
+        <button 
+          type="submit"
+          [disabled]="isLoading || userForm.invalid"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? 'Creating...' : 'Create Admin User' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

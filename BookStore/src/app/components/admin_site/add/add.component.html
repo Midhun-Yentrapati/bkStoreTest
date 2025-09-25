@@ -1,0 +1,726 @@
+<div class="add-book-container p-6 max-w-6xl mx-auto bg-neutral-900 border border-neutral-700 rounded-lg">
+  <!-- Header Section -->
+  <div class="page-header mb-6">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-white mb-2">Add New Book</h1>
+        <p class="text-gray-300">Create a comprehensive book entry with categories and images</p>
+      </div>
+      <button
+        type="button"
+        (click)="goBack()"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator mb-8">
+    <div class="flex items-center justify-between">
+      <div *ngFor="let step of [1,2,3,4]; let i = index" class="flex items-center">
+        <div 
+          class="step-circle w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300"
+          [class.active]="currentStep === step"
+          [class.completed]="currentStep > step"
+          [class.pending]="currentStep < step">
+          <span *ngIf="currentStep > step" class="text-green-500">✓</span>
+          <span *ngIf="currentStep <= step">{{ step }}</span>
+        </div>
+        <div class="ml-3 text-sm">
+          <div class="font-medium text-white">{{ getStepTitle(step) }}</div>
+          <div class="text-gray-400">Step {{ step }} of {{ totalSteps }}</div>
+        </div>
+        <div *ngIf="i < 3" class="flex-1 h-0.5 bg-gray-600 mx-8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-800">{{ successMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-800">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Content -->
+  <form [formGroup]="bookForm">
+    <!-- Step 1: Basic Information -->
+    <div *ngIf="currentStep === 1" class="form-step">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="block text-sm font-medium text-white mb-2">Title *</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('title')?.invalid && bookForm.get('title')?.touched"
+            [class.border-green-500]="bookForm.get('title')?.valid && bookForm.get('title')?.touched"
+            placeholder="Enter book title">
+          <div *ngIf="getFieldError('title')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
+
+        <!-- Author -->
+        <div class="form-group">
+          <label for="author" class="block text-sm font-medium text-white mb-2">Author *</label>
+          <input
+            type="text"
+            id="author"
+            formControlName="author"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('author')?.invalid && bookForm.get('author')?.touched"
+            [class.border-green-500]="bookForm.get('author')?.valid && bookForm.get('author')?.touched"
+            placeholder="Enter author name">
+          <div *ngIf="getFieldError('author')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('author') }}
+          </div>
+        </div>
+
+        <!-- ISBN -->
+        <div class="form-group">
+          <label for="isbn" class="block text-sm font-medium text-white mb-2">ISBN</label>
+          <input
+            type="text"
+            id="isbn"
+            formControlName="isbn"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('isbn')?.invalid && bookForm.get('isbn')?.touched"
+            [class.border-green-500]="bookForm.get('isbn')?.valid && bookForm.get('isbn')?.touched"
+            placeholder="Enter ISBN-10 or ISBN-13">
+          <div *ngIf="getFieldError('isbn')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('isbn') }}
+          </div>
+          <div class="text-gray-400 text-xs mt-1">
+            Optional. Enter a valid ISBN-10 (10 digits) or ISBN-13 (13 digits)
+          </div>
+        </div>
+
+        <!-- Publisher -->
+        <div class="form-group">
+          <label for="publisher" class="block text-sm font-medium text-white mb-2">Publisher</label>
+          <input
+            type="text"
+            id="publisher"
+            formControlName="publisher"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('publisher')?.invalid && bookForm.get('publisher')?.touched"
+            [class.border-green-500]="bookForm.get('publisher')?.valid && bookForm.get('publisher')?.touched"
+            placeholder="Enter publisher name">
+          <div *ngIf="getFieldError('publisher')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('publisher') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group mt-6">
+        <label for="description" class="block text-sm font-medium text-white mb-2">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [class.border-red-500]="bookForm.get('description')?.invalid && bookForm.get('description')?.touched"
+          [class.border-green-500]="bookForm.get('description')?.valid && bookForm.get('description')?.touched"
+          placeholder="Enter book description (minimum 10 characters)"></textarea>
+        <div *ngIf="getFieldError('description')" class="text-red-500 text-sm mt-1">
+          {{ getFieldError('description') }}
+        </div>
+        <div class="text-gray-400 text-xs mt-1">
+          {{ bookForm.get('description')?.value?.length || 0 }}/2000 characters
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Additional Details -->
+    <div *ngIf="currentStep === 2" class="form-step">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Price -->
+        <div class="form-group">
+          <label for="price" class="block text-sm font-medium text-white mb-2">Price *</label>
+          <input
+            type="number"
+            id="price"
+            formControlName="price"
+            min="0"
+            step="0.01"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('price')?.invalid && bookForm.get('price')?.touched"
+            [class.border-green-500]="bookForm.get('price')?.valid && bookForm.get('price')?.touched"
+            placeholder="0.00">
+          <div *ngIf="getFieldError('price')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('price') }}
+          </div>
+        </div>
+
+        <!-- MRP -->
+        <div class="form-group">
+          <label for="mrp" class="block text-sm font-medium text-white mb-2">MRP</label>
+          <input
+            type="number"
+            id="mrp"
+            formControlName="mrp"
+            min="0"
+            step="0.01"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('mrp')?.invalid && bookForm.get('mrp')?.touched"
+            [class.border-green-500]="bookForm.get('mrp')?.valid && bookForm.get('mrp')?.touched"
+            placeholder="0.00">
+          <div *ngIf="getFieldError('mrp')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('mrp') }}
+          </div>
+        </div>
+
+        <!-- Sales Category -->
+        <div class="form-group">
+          <label for="salesCategory" class="block text-sm font-medium text-white mb-2">Sales Category *</label>
+          <select
+            id="salesCategory"
+            formControlName="salesCategory"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('salesCategory')?.invalid && bookForm.get('salesCategory')?.touched"
+            [class.border-green-500]="bookForm.get('salesCategory')?.valid && bookForm.get('salesCategory')?.touched">
+            <option value="" disabled>Select sales category</option>
+            <option value="BEST_SELLING">Best Selling</option>
+            <option value="NEWLY_LAUNCHED">Newly Launched</option>
+            <option value="SPECIAL_OFFERS">Special Offers</option>
+          </select>
+          <div *ngIf="getFieldError('salesCategory')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('salesCategory') }}
+          </div>
+        </div>
+
+        <!-- Stock Display -->
+        <div class="form-group">
+          <label for="stockDisplay" class="block text-sm font-medium text-white mb-2">Display Stock *</label>
+          <input
+            type="number"
+            id="stockDisplay"
+            formControlName="stockDisplay"
+            min="0"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('stockDisplay')?.invalid && bookForm.get('stockDisplay')?.touched"
+            [class.border-green-500]="bookForm.get('stockDisplay')?.valid && bookForm.get('stockDisplay')?.touched"
+            placeholder="0">
+          <div *ngIf="getFieldError('stockDisplay')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('stockDisplay') }}
+          </div>
+        </div>
+
+        <!-- Stock Actual -->
+        <div class="form-group">
+          <label for="stockActual" class="block text-sm font-medium text-white mb-2">Actual Stock *</label>
+          <input
+            type="number"
+            id="stockActual"
+            formControlName="stockActual"
+            min="0"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('stockActual')?.invalid && bookForm.get('stockActual')?.touched"
+            [class.border-green-500]="bookForm.get('stockActual')?.valid && bookForm.get('stockActual')?.touched"
+            placeholder="0">
+          <div *ngIf="getFieldError('stockActual')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('stockActual') }}
+          </div>
+        </div>
+
+        <!-- Pages -->
+        <div class="form-group">
+          <label for="pages" class="block text-sm font-medium text-white mb-2">Pages</label>
+          <input
+            type="number"
+            id="pages"
+            formControlName="pages"
+            min="0"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('pages')?.invalid && bookForm.get('pages')?.touched"
+            [class.border-green-500]="bookForm.get('pages')?.valid && bookForm.get('pages')?.touched"
+            placeholder="0">
+          <div *ngIf="getFieldError('pages')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('pages') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional fields -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <!-- Language -->
+        <div class="form-group">
+          <label for="language" class="block text-sm font-medium text-white mb-2">Language</label>
+          <input
+            type="text"
+            id="language"
+            formControlName="language"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('language')?.invalid && bookForm.get('language')?.touched"
+            [class.border-green-500]="bookForm.get('language')?.valid && bookForm.get('language')?.touched"
+            placeholder="e.g., English, Spanish">
+          <div *ngIf="getFieldError('language')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('language') }}
+          </div>
+        </div>
+
+        <!-- Format -->
+        <div class="form-group">
+          <label for="format" class="block text-sm font-medium text-white mb-2">Format</label>
+          <select
+            id="format"
+            formControlName="format"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('format')?.invalid && bookForm.get('format')?.touched"
+            [class.border-green-500]="bookForm.get('format')?.valid && bookForm.get('format')?.touched">
+            <option value="">Select format</option>
+            <option value="Hardcover">Hardcover</option>
+            <option value="Paperback">Paperback</option>
+            <option value="Ebook">Ebook</option>
+            <option value="Audiobook">Audiobook</option>
+          </select>
+          <div *ngIf="getFieldError('format')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('format') }}
+          </div>
+        </div>
+
+        <!-- Edition -->
+        <div class="form-group">
+          <label for="edition" class="block text-sm font-medium text-white mb-2">Edition</label>
+          <input
+            type="text"
+            id="edition"
+            formControlName="edition"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('edition')?.invalid && bookForm.get('edition')?.touched"
+            [class.border-green-500]="bookForm.get('edition')?.valid && bookForm.get('edition')?.touched"
+            placeholder="e.g., 1st Edition, 2nd Edition">
+          <div *ngIf="getFieldError('edition')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('edition') }}
+          </div>
+        </div>
+
+        <!-- Publication Date -->
+        <div class="form-group">
+          <label for="publicationDate" class="block text-sm font-medium text-white mb-2">Publication Date</label>
+          <input
+            type="date"
+            id="publicationDate"
+            formControlName="publicationDate"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('publicationDate')?.invalid && bookForm.get('publicationDate')?.touched"
+            [class.border-green-500]="bookForm.get('publicationDate')?.valid && bookForm.get('publicationDate')?.touched">
+          <div *ngIf="getFieldError('publicationDate')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('publicationDate') }}
+          </div>
+        </div>
+
+        <!-- Weight -->
+        <div class="form-group">
+          <label for="weight" class="block text-sm font-medium text-white mb-2">Weight (kg)</label>
+          <input
+            type="number"
+            id="weight"
+            formControlName="weight"
+            min="0"
+            step="0.01"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('weight')?.invalid && bookForm.get('weight')?.touched"
+            [class.border-green-500]="bookForm.get('weight')?.valid && bookForm.get('weight')?.touched"
+            placeholder="0.50">
+          <div *ngIf="getFieldError('weight')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('weight') }}
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="form-group">
+          <label for="dimensions" class="block text-sm font-medium text-white mb-2">Dimensions</label>
+          <input
+            type="text"
+            id="dimensions"
+            formControlName="dimensions"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="bookForm.get('dimensions')?.invalid && bookForm.get('dimensions')?.touched"
+            [class.border-green-500]="bookForm.get('dimensions')?.valid && bookForm.get('dimensions')?.touched"
+            placeholder="e.g., 15.2 x 22.9 x 2.5 cm">
+          <div *ngIf="getFieldError('dimensions')" class="text-red-500 text-sm mt-1">
+            {{ getFieldError('dimensions') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Status toggles -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div class="form-group">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              formControlName="isActive"
+              class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <span class="ml-2 text-sm text-white">Active</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              formControlName="isFeatured"
+              class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <span class="ml-2 text-sm text-white">Featured</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Category Selection -->
+    <div *ngIf="currentStep === 3" class="form-step">
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Category Selection</h3>
+        
+        <!-- Category Search -->
+        <div class="mb-4">
+          <label for="categorySearch" class="block text-sm font-medium text-white mb-2">Search Categories</label>
+          <input
+            type="text"
+            id="categorySearch"
+            [(ngModel)]="categorySearchQuery"
+            [ngModelOptions]="{standalone: true}"
+            (input)="filterCategories()"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Type to search categories...">
+        </div>
+
+        <!-- Selected Categories -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-white mb-3">Selected Categories</h4>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span *ngFor="let category of selectedCategories" 
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-600 text-white">
+              {{ category.name }}
+              <button type="button" 
+                      (click)="removeCategory(category)" 
+                      class="ml-2 text-red-300 hover:text-red-100">
+                ×
+              </button>
+            </span>
+          </div>
+          <div *ngIf="selectedCategories.length === 0" class="text-gray-400 text-sm">
+            No categories selected. Please select at least one category.
+          </div>
+        </div>
+
+        <!-- Available Categories -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-white mb-3">Available Categories</h4>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto">
+            <button *ngFor="let category of filteredCategories" 
+                    type="button"
+                    (click)="selectCategory(category)"
+                                         [disabled]="isCategorySelected(category)"
+                    class="p-3 text-left border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
+              <div class="font-medium">{{ category.name }}</div>
+              <div *ngIf="category.description" class="text-sm text-gray-600 mt-1">{{ category.description }}</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Add New Category -->
+        <div class="border-t border-gray-600 pt-6">
+          <button type="button" 
+                  (click)="showCategoryForm = !showCategoryForm"
+                  class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add New Category
+          </button>
+
+          <!-- New Category Form -->
+          <div *ngIf="showCategoryForm" class="mt-4 p-4 border border-gray-600 rounded-lg bg-neutral-800">
+            <h5 class="text-lg font-medium text-white mb-3">Create New Category</h5>
+            <form [formGroup]="categoryForm" (ngSubmit)="createCategory()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="categoryName" class="block text-sm font-medium text-white mb-2">Category Name *</label>
+                  <input
+                    type="text"
+                    id="categoryName"
+                    formControlName="name"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    [class.border-red-500]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+                    [class.border-green-500]="categoryForm.get('name')?.valid && categoryForm.get('name')?.touched"
+                    placeholder="Enter category name">
+                  <div *ngIf="getFieldError('name', categoryForm)" class="text-red-500 text-sm mt-1">
+                    {{ getFieldError('name', categoryForm) }}
+                  </div>
+                </div>
+                <div>
+                  <label for="categorySlug" class="block text-sm font-medium text-white mb-2">Slug</label>
+                  <input
+                    type="text"
+                    id="categorySlug"
+                    formControlName="slug"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    [class.border-red-500]="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched"
+                    [class.border-green-500]="categoryForm.get('slug')?.valid && categoryForm.get('slug')?.touched"
+                    placeholder="category-slug">
+                  <div *ngIf="getFieldError('slug', categoryForm)" class="text-red-500 text-sm mt-1">
+                    {{ getFieldError('slug', categoryForm) }}
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4">
+                <label for="categoryDescription" class="block text-sm font-medium text-white mb-2">Description</label>
+                <textarea
+                  id="categoryDescription"
+                  formControlName="description"
+                  rows="3"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.border-red-500]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
+                  [class.border-green-500]="categoryForm.get('description')?.valid && categoryForm.get('description')?.touched"
+                  placeholder="Enter category description"></textarea>
+                <div *ngIf="getFieldError('description', categoryForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('description', categoryForm) }}
+                </div>
+              </div>
+              <div class="flex gap-3 mt-4">
+                <button type="submit" 
+                        [disabled]="categoryForm.invalid"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50">
+                  Create Category
+                </button>
+                <button type="button" 
+                        (click)="showCategoryForm = false"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Image Management -->
+    <div *ngIf="currentStep === 4" class="form-step">
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Image Management</h3>
+        
+        <!-- Selected Images -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-white mb-3">Selected Images</h4>
+          <div *ngIf="selectedImages.length === 0" class="text-gray-400 text-sm mb-4">
+            No images added yet. Add some images to showcase your book.
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div *ngFor="let image of selectedImages; let i = index" 
+                 class="relative border border-gray-300 rounded-lg p-3 bg-white">
+              <img [src]="image.imageUrl" 
+                   [alt]="image.altText || 'Book image'" 
+                   class="w-full h-32 object-cover rounded-lg mb-2"
+                   (error)="onImageError($event)"
+                   title="{{ image.altText || 'Book image' }}">
+              <div class="text-sm">
+                <div class="font-medium truncate">{{ image.altText || 'No alt text' }}</div>
+                <div class="text-gray-600">Order: {{ image.displayOrder }}</div>
+                <label class="flex items-center mt-2">
+                  <input type="radio" 
+                         [checked]="image.isPrimary" 
+                         (change)="setPrimaryImage(i)"
+                         class="mr-2">
+                  <span class="text-xs">Primary</span>
+                </label>
+              </div>
+              <button type="button" 
+                      (click)="removeImage(i)"
+                      class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700">
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Image -->
+        <div class="border-t border-gray-600 pt-6">
+          <h4 class="text-md font-medium text-white mb-3">Add New Image</h4>
+          
+          <!-- Image Input Type Selection -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-white mb-2">Image Input Method</label>
+            <div class="flex gap-4">
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  value="url"
+                  [(ngModel)]="imageInputType"
+                  [ngModelOptions]="{standalone: true}"
+                  (change)="onImageInputTypeChange()"
+                  class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                <span class="ml-2 text-sm text-white">Image URL</span>
+              </label>
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  value="filepath"
+                  [(ngModel)]="imageInputType"
+                  [ngModelOptions]="{standalone: true}"
+                  (change)="onImageInputTypeChange()"
+                  class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                <span class="ml-2 text-sm text-white">File Path</span>
+              </label>
+            </div>
+          </div>
+
+          <form [formGroup]="imageForm" (ngSubmit)="addImage()">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- URL Input -->
+              <div *ngIf="imageInputType === 'url'">
+                <label for="imageUrl" class="block text-sm font-medium text-white mb-2">Image URL *</label>
+                <input
+                  type="url"
+                  id="imageUrl"
+                  formControlName="imageUrl"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.border-red-500]="imageForm.get('imageUrl')?.invalid && imageForm.get('imageUrl')?.touched"
+                  [class.border-green-500]="imageForm.get('imageUrl')?.valid && imageForm.get('imageUrl')?.touched"
+                  placeholder="https://example.com/image.jpg">
+                <div *ngIf="getFieldError('imageUrl', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('imageUrl', imageForm) }}
+                </div>
+              </div>
+
+              <!-- File Path Input -->
+              <div *ngIf="imageInputType === 'filepath'">
+                <label for="filePath" class="block text-sm font-medium text-white mb-2">File Path *</label>
+                <input
+                  type="text"
+                  id="filePath"
+                  formControlName="filePath"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.border-red-500]="imageForm.get('filePath')?.invalid && imageForm.get('filePath')?.touched"
+                  [class.border-green-500]="imageForm.get('filePath')?.valid && imageForm.get('filePath')?.touched"
+                  placeholder="images/book-cover.jpg">
+                <div *ngIf="getFieldError('filePath', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('filePath', imageForm) }}
+                </div>
+                <div class="text-xs text-gray-400 mt-1">
+                  Enter the path to image in public folder (e.g., images/1984.jpg)
+                </div>
+              </div>
+              <div>
+                <label for="altText" class="block text-sm font-medium text-white mb-2">Alt Text</label>
+                <input
+                  type="text"
+                  id="altText"
+                  formControlName="altText"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.border-red-500]="imageForm.get('altText')?.invalid && imageForm.get('altText')?.touched"
+                  [class.border-green-500]="imageForm.get('altText')?.valid && imageForm.get('altText')?.touched"
+                  placeholder="Describe the image">
+                <div *ngIf="getFieldError('altText', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('altText', imageForm) }}
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label for="displayOrder" class="block text-sm font-medium text-white mb-2">Display Order</label>
+                <input
+                  type="number"
+                  id="displayOrder"
+                  formControlName="displayOrder"
+                  min="0"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.border-red-500]="imageForm.get('displayOrder')?.invalid && imageForm.get('displayOrder')?.touched"
+                  [class.border-green-500]="imageForm.get('displayOrder')?.valid && imageForm.get('displayOrder')?.touched"
+                  placeholder="0">
+                <div *ngIf="getFieldError('displayOrder', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('displayOrder', imageForm) }}
+                </div>
+              </div>
+              <div class="flex items-end">
+                <label class="flex items-center">
+                  <input
+                    type="checkbox"
+                    formControlName="isPrimary"
+                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                  <span class="ml-2 text-sm text-white">Set as Primary Image</span>
+                </label>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="submit" 
+                      [disabled]="imageForm.invalid"
+                      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                Add Image
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Navigation Buttons -->
+  <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-600">
+    <button type="button" 
+            (click)="previousStep()" 
+            [disabled]="currentStep === 1"
+            class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Previous
+    </button>
+
+    <div class="flex gap-3">
+      <button type="button" 
+              (click)="nextStep()" 
+              [disabled]="currentStep === totalSteps || !isStepValid(currentStep)"
+              *ngIf="currentStep < totalSteps"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        Next
+        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <button type="button" 
+              (click)="submitBook()" 
+              [disabled]="isSubmitting || !bookForm.valid || selectedCategories.length === 0"
+              *ngIf="currentStep === totalSteps"
+              class="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        {{ isSubmitting ? 'Creating Book...' : 'Create Book' }}
+      </button>
+    </div>
+  </div>
+</div>

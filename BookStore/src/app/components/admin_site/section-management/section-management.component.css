@@ -1,0 +1,82 @@
+/* Section Management Component Styles */
+
+.container {
+  max-width: 1200px;
+}
+
+/* Tab Navigation */
+nav button {
+  transition: all 0.2s ease-in-out;
+}
+
+nav button:hover {
+  transform: translateY(-1px);
+}
+
+/* Book Cards */
+.book-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Add/Remove Buttons */
+button svg {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover svg {
+  transform: scale(1.1);
+}
+
+/* Loading States */
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .container {
+    padding: 1rem;
+  }
+}
+
+/* Message Animations */
+.message-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.message-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Section Tabs */
+.section-tab {
+  position: relative;
+}
+
+.section-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: transparent;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.section-tab.active::after {
+  background-color: #3b82f6;
+} 

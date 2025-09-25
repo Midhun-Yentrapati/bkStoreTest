@@ -1,0 +1,11 @@
+/* Main content container styling */
+.main-content-container {
+  min-height: calc(100vh - 140px); /* Adjust for header/footer when visible */
+}
+
+/* Admin mode - full height when header/footer are hidden */
+.main-content-container.admin-mode {
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}

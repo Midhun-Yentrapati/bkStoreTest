@@ -1,0 +1,173 @@
+<div class="admin-notifications-container">
+  <!-- Notification Bell Icon with Badge -->
+  <div class="relative">
+    <button 
+      (click)="toggleNotifications()"
+      class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+      title="Notifications"
+    >
+      <span class="material-icons notification-icon">notifications</span>
+      
+      <!-- Unread Count Badge -->
+      <span 
+        *ngIf="unreadCount > 0"
+        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium"
+      >
+        {{ unreadCount > 99 ? '99+' : unreadCount }}
+      </span>
+    </button>
+
+    <!-- Notifications Dropdown -->
+    <div 
+      *ngIf="showNotifications"
+      class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Notifications</h3>
+        <div class="flex items-center space-x-2">
+          <button 
+            *ngIf="unreadCount > 0"
+            (click)="markAllAsRead()"
+            class="text-sm text-blue-600 hover:text-blue-800 font-medium mark-all-read-button"
+          >
+            Mark all read
+          </button>
+          <button 
+            (click)="closeNotifications()"
+            class="text-gray-400 hover:text-gray-600"
+            title="Close notifications"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="p-4 border-b border-gray-200 bg-gray-50">
+        <div class="flex flex-col space-y-2">
+          <!-- Search -->
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery"
+            placeholder="Search notifications..."
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+          
+          <!-- Type and Priority Filters -->
+          <div class="flex space-x-2">
+            <select 
+              [(ngModel)]="typeFilter"
+              class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              title="Filter notifications by type"
+            >
+              <option value="all">All Types ({{ getNotificationCountByType('all') }})</option>
+              <option value="order">Orders ({{ getNotificationCountByType('order') }})</option>
+              <option value="low_stock">Low Stock ({{ getNotificationCountByType('low_stock') }})</option>
+              <option value="system">System ({{ getNotificationCountByType('system') }})</option>
+            </select>
+            
+            <select 
+              [(ngModel)]="priorityFilter"
+              class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              title="Filter notifications by priority"
+            >
+              <option value="all">All Priorities ({{ getNotificationCountByPriority('all') }})</option>
+              <option value="high">High ({{ getNotificationCountByPriority('high') }})</option>
+              <option value="medium">Medium ({{ getNotificationCountByPriority('medium') }})</option>
+              <option value="low">Low ({{ getNotificationCountByPriority('low') }})</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications List -->
+      <div class="max-h-64 overflow-y-auto">
+        <div *ngIf="isLoading" class="p-4 text-center">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+          <p class="text-sm text-gray-600 mt-2">Loading notifications...</p>
+        </div>
+
+        <div *ngIf="!isLoading && getFilteredNotifications().length === 0" class="p-4 text-center">
+          <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <p class="text-sm text-gray-600">No notifications found</p>
+        </div>
+
+        <div *ngFor="let notification of getFilteredNotifications()" 
+             class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+             [class.bg-blue-50]="!notification.isRead">
+          
+          <!-- Notification Header -->
+          <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-3">
+              <!-- Type Icon -->
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ getTypeColor(notification.type) }}">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getTypeIcon(notification.type)"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center space-x-2 mb-1">
+                  <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ getPriorityBadgeClass(notification.priority) }}">
+                    {{ notification.priority }}
+                  </span>
+                  <span *ngIf="!notification.isRead" class="inline-flex w-2 h-2 bg-blue-500 rounded-full"></span>
+                </div>
+                <p class="text-sm text-gray-600 mb-2">{{ notification.message }}</p>
+                <p class="text-xs text-gray-500">{{ formatDate(notification.createdAt) }}</p>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center space-x-1">
+              <button 
+                *ngIf="!notification.isRead"
+                (click)="markAsRead(notification.id)"
+                class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                title="Mark as read"
+              >
+                Mark read
+              </button>
+              <button 
+                (click)="deleteNotification(notification.id)"
+                class="text-xs text-red-600 hover:text-red-800 font-medium"
+                title="Delete notification"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">{{ getFilteredNotifications().length }} notification{{ getFilteredNotifications().length !== 1 ? 's' : '' }}</span>
+          <button 
+            (click)="clearAllNotifications()"
+            class="text-sm text-blue-600 hover:text-blue-800 font-medium clear-all-button"
+          >
+            Clear all
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Click Outside to Close -->
+  <div 
+    *ngIf="showNotifications"
+    (click)="closeNotifications()"
+    class="fixed inset-0 z-40"
+  ></div>
+</div> 
