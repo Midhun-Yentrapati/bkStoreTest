@@ -224,8 +224,8 @@
             <td class="px-4 py-4 text-sm">
               <div class="flex flex-wrap gap-1 max-w-[150px]">
                 <span *ngFor="let category of book.categories" 
-                      [class]="getCategoryBadgeClasses(category.name)">
-                  {{ category.name }}
+                      [class]="getCategoryBadgeClasses(category)">
+                  {{ getCategoryDisplayName(category) }}
                 </span>
               </div>
             </td>
@@ -236,15 +236,15 @@
             <!-- Display Stock -->
             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
-                    [class]="book.stockDisplay > 10 ? 'bg-green-100 text-green-800' : book.stockDisplay > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
-                {{ book.stockDisplay }}
+                    [class]="book.stock_display > 10 ? 'bg-green-100 text-green-800' : book.stock_display > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
+                {{ book.stock_display }}
               </span>
             </td>
             <!-- Actual Stock -->
             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
-                    [class]="book.stockActual > 10 ? 'bg-green-100 text-green-800' : book.stockActual > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
-                {{ book.stockActual }}
+                    [class]="book.stock_actual > 10 ? 'bg-green-100 text-green-800' : book.stock_actual > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'">
+                {{ book.stock_actual }}
               </span>
             </td>
             <!-- Actions -->

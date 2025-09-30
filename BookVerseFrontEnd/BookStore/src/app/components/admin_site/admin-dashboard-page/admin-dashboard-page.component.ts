@@ -1,18 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BookModel } from '../../../models/book.model';
-
-interface ChartData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    backgroundColor?: string[];
-    borderColor?: string;
-    borderWidth?: number;
-  }[];
-}
+import { Book, ChartData } from '../../../models/book';
 import { HighlySoldComponent } from '../highly-sold/highly-sold.component';
 import { LeastSoldComponent } from '../least-sold/least-sold.component';
 import { YearlySalesChartComponent } from '../yearly-sales-chart/yearly-sales-chart.component';
@@ -21,7 +10,10 @@ import { BookService } from '../../../services/book.service';
 import { OrderService } from '../../../services/order.service';
 import { AuthService } from '../../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { AnalyticsService } from '../../../services/analytics.service';
+
+import { forkJoin, of, Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { UserModel } from '../../../models/user.model';
 import {
   Chart,
@@ -51,8 +43,8 @@ import {
 })
 export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() username: string = '';
-  @Input() highlyRatedBooks: BookModel[] = [];
-  @Input() inventory: BookModel[] = [];
+  @Input() highlyRatedBooks: Book[] = [];
+  @Input() inventory: Book[] = [];
   @Input() error: string | null = null;
 
   // Dashboard statistics
@@ -86,7 +78,8 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     private bookService: BookService,
     private orderService: OrderService,
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private analyticsService: AnalyticsService
   ) {
     // Register Chart.js components for sales trends chart
     Chart.register(
@@ -106,6 +99,8 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     console.log('AdminDashboardPageComponent initialized.');
     this.updateBookListCards();
     this.loadDashboardData();
+    // Log dashboard access
+    this.analyticsService.logAdminAction('VIEW', 'Admin dashboard accessed');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -147,9 +142,9 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
   private checkLowInventory(): void {
     this.bookService.getAllBooks().subscribe({
       next: (books) => {
-        const lowInventoryBooks = books.filter(book => book.stockActual < 10);
+        const lowInventoryBooks = books.filter(book => book.stock_actual < 10);
         if (lowInventoryBooks.length > 0) {
-          const bookList = lowInventoryBooks.map(book => `- ID: ${book.id}, Title: "${book.title}", Quantity: ${book.stockActual}`).join('\n');
+          const bookList = lowInventoryBooks.map(book => `- ID: ${book.id}, Title: "${book.title}", Quantity: ${book.stock_actual}`).join('\n');
           const message = `The following books have a quantity less than 10 and need to be restocked:\n\n${bookList}`;
           const shouldNavigate = confirm(message + '\n\nDo you want to go to the inventory page to restock them?');
 
@@ -226,17 +221,22 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     this.router.navigate(['/admin/section-management']);
   }
 
+  navigateToAnalytics(): void {
+    this.analyticsService.logAdminAction('NAVIGATE', 'Navigated to analytics dashboard');
+    this.router.navigate(['/admin/analytics']);
+  }
+
   private loadDashboardData(): void {
-    // Load all dashboard data simultaneously
+    // Load all dashboard data simultaneously using services
     forkJoin({
       orders: this.orderService.getAllOrders(),
       books: this.bookService.getAllBooks(),
-      users: this.http.get<UserModel[]>('http://localhost:3000/users')
+      totalUsers: this.getTotalUsersCount() // Real API call to get total users
     }).subscribe({
       next: (data) => {
         this.totalOrders = data.orders.length;
         this.totalBooks = data.books.length;
-        this.totalUsers = data.users.length;
+        this.totalUsers = data.totalUsers;
         this.allOrders = data.orders; // Store all orders for revenue calculation
         this.calculateLowStockCount(data.books);
         this.calculateRevenue(); // Calculate initial revenue
@@ -264,6 +264,59 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     this.lowStockCount = books.filter(book => 
       book.stock_actual < 10
     ).length;
+  }
+
+  /**
+   * Fetches total count of all users (both admin and customer users)
+   * @returns Observable<number> Total count of users
+   */
+  private getTotalUsersCount(): Observable<number> {
+    const apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
+    const token = this.authService.getToken();
+    
+    if (!token) {
+      console.warn('No authentication token found for user count request');
+      return of(0);
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+
+    // Fetch both admin and customer users simultaneously
+    return forkJoin({
+      adminUsers: this.http.get<any>(`${apiBaseUrl}/users/admin/admins`, { headers }).pipe(
+        catchError(error => {
+          console.error('Error fetching admin users:', error);
+          return of({ content: [] }); // Return empty array on error
+        })
+      ),
+      customerUsers: this.http.get<any>(`${apiBaseUrl}/users/admin/customers`, { headers }).pipe(
+        catchError(error => {
+          console.error('Error fetching customer users:', error);
+          return of({ content: [] }); // Return empty array on error
+        })
+      )
+    }).pipe(
+      map(data => {
+        const adminCount = data.adminUsers.content ? data.adminUsers.content.length : 0;
+        const customerCount = data.customerUsers.content ? data.customerUsers.content.length : 0;
+        const totalCount = adminCount + customerCount;
+        
+        console.log('📊 User count breakdown:', {
+          adminUsers: adminCount,
+          customerUsers: customerCount,
+          totalUsers: totalCount
+        });
+        
+        return totalCount;
+      }),
+      catchError(error => {
+        console.error('Error calculating total users count:', error);
+        return of(0); // Return 0 on any error
+      })
+    );
   }
 
   getCurrentDate(): string {

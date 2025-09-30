@@ -66,13 +66,4 @@ export class OrderTrackingComponent implements OnInit {
   getPaymentStatusText = OrderUtils.getPaymentStatusText;
   formatOrderDate = OrderUtils.formatOrderDate;
   calculateOrderTotals = OrderUtils.calculateOrderTotals;
-
-    getItemImage(item: any): string {
-    if (item.images && item.images.length > 0) {
-      const primaryImage = item.images.find((img: any) => img.isPrimary) || item.images[0];
-      return primaryImage.imageUrl;
-    }
-    return 'https://placehold.co/200x300?text=No+Image';
-  }
-
 }

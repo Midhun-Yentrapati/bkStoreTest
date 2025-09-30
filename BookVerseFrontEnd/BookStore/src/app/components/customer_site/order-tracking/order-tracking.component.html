@@ -17,20 +17,20 @@
             </div>
             <div class="col-md-6 text-md-end">
               <strong>Order Status:</strong>
-                              <span class="badge ms-2" [ngClass]="getStatusBadgeClass(order.orderStatus)">
-                  {{ getOrderStatusText(order.orderStatus) }}
+                              <span class="badge ms-2" [ngClass]="getStatusBadgeClass(order.orderStatus || '')">
+                  {{ getOrderStatusText(order.orderStatus || '') }}
                 </span>
             </div>
           </div>
   
           <div class="row mb-3">
             <div class="col-md-6">
-              <strong>Payment Method:</strong> {{ order.paymentMethod }}
+              <strong>Payment Method:</strong> {{ order.paymentMethod || 'N/A' }}
             </div>
             <div class="col-md-6 text-md-end">
               <strong>Payment Status:</strong>
-              <span class="badge ms-2" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus)">
-                {{ order.paymentStatus }}
+              <span class="badge ms-2" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus || '')">
+                {{ order.paymentStatus || 'N/A' }}
               </span>
             </div>
           </div>
@@ -38,12 +38,12 @@
           <div class="row mb-3">
             <div class="col-12">
               <strong>Delivery Address:</strong>
-              <p class="mb-1">{{ order.shippingAddress.name }} - {{ order.shippingAddress.phone }}</p>
+              <p class="mb-1">{{ order.shippingAddress?.name || 'N/A' }} - {{ order.shippingAddress?.phone || 'N/A' }}</p>
               <p class="mb-0 text-muted">
-                {{ order.shippingAddress.address }}, {{ order.shippingAddress.locality }}, {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} - {{ order.shippingAddress.pincode }}
+                {{ order.shippingAddress?.addressLine1 || 'N/A' }}{{ order.shippingAddress?.addressLine2 ? ', ' + order.shippingAddress?.addressLine2 : '' }}, {{ order.shippingAddress?.locality || 'N/A' }}, {{ order.shippingAddress?.city || 'N/A' }}, {{ order.shippingAddress?.state || 'N/A' }} - {{ order.shippingAddress?.pincode || 'N/A' }}
               </p>
-                              <p class="mb-0 text-muted" *ngIf="order.shippingAddress.landmark">
-                  Landmark: {{ order.shippingAddress.landmark }}
+                              <p class="mb-0 text-muted" *ngIf="order.shippingAddress?.landmark">
+                  Landmark: {{ order.shippingAddress?.landmark }}
                 </p>
             </div>
           </div>
@@ -52,7 +52,7 @@
           <ul class="list-group list-group-flush mb-4">
             <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let item of order.items">
               <div class="d-flex align-items-center">
-                <img [src]="getItemImage(item)" alt="{{ item.title }}" class="img-fluid order-item-img me-2 rounded">
+                <img [src]="item.image_urls?.[0]" alt="{{ item.title }}" class="img-fluid order-item-img me-2 rounded">
                 <div>
                   <strong>{{ item.title }}</strong>
                   <small class="text-muted d-block">by {{ item.author }}</small>
@@ -79,7 +79,7 @@
           <div class="row">
             <div class="col-12">
               <h4 class="d-flex justify-content-between align-items-center mb-4">
-                Total Payable: <span class="text-primary fw-bold">₹{{ (order.totalAmount + order.platformFee) | number:'1.2-2' }}</span>
+                Total Payable: <span class="text-primary fw-bold">₹{{ ((order.totalAmount || 0) + (order.platformFee || 0)) | number:'1.2-2' }}</span>
               </h4>
             </div>
           </div>

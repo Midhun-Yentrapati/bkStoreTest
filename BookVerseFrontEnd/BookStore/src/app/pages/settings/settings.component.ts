@@ -160,18 +160,32 @@ export class SettingsComponent implements OnInit {
       this.isSubmittingPassword = true;
       this.clearMessages();
 
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Password changed:', this.passwordForm.value);
-        this.successMessage = 'Password changed successfully!';
-        this.isSubmittingPassword = false;
-        this.passwordForm.reset();
-        
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          this.successMessage = '';
-        }, 3000);
-      }, 1000);
+      const formData = this.passwordForm.value;
+      
+      // Call real AuthService changePassword method
+      this.authService.changePassword(formData.currentPassword, formData.newPassword).subscribe({
+        next: (response) => {
+          console.log('Password changed successfully:', response);
+          this.successMessage = 'Password changed successfully!';
+          this.isSubmittingPassword = false;
+          this.passwordForm.reset();
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (error) => {
+          console.error('Password change failed:', error);
+          this.errorMessage = error.message || 'Password change failed. Please try again.';
+          this.isSubmittingPassword = false;
+          
+          // Clear error message after 5 seconds
+          setTimeout(() => {
+            this.errorMessage = '';
+          }, 5000);
+        }
+      });
     } else {
       // Show error message when form is invalid
       this.errorMessage = 'Please fix the form errors before submitting.';

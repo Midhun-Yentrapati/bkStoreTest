@@ -15,8 +15,9 @@ public class JwtProperties {
     
     /**
      * JWT secret key for signing tokens
+     * This will be injected from the centralized config server
      */
-    private String secret = "mySecretKey123456789012345678901234567890";
+    private String secret;
     
     /**
      * Access token expiration time in milliseconds (default: 24 hours)

@@ -121,11 +121,11 @@ public interface UserSessionRepository extends JpaRepository<UserSession, String
     // Cleanup Queries
     @Modifying
     @Query("DELETE FROM UserSession s WHERE s.expiresAt <= :cutoffDate AND s.isActive = false")
-    void deleteExpiredSessions(@Param("cutoffDate") LocalDateTime cutoffDate);
+    int deleteExpiredSessions(@Param("cutoffDate") LocalDateTime cutoffDate);
     
     @Modifying
     @Query("DELETE FROM UserSession s WHERE s.createdAt <= :cutoffDate AND s.isActive = false")
-    void deleteOldInactiveSessions(@Param("cutoffDate") LocalDateTime cutoffDate);
+    int deleteOldInactiveSessions(@Param("cutoffDate") LocalDateTime cutoffDate);
     
     // Security Queries
     @Query("SELECT s FROM UserSession s WHERE s.ipAddress = :ipAddress AND s.createdAt >= :since")

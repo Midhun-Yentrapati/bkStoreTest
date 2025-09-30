@@ -64,6 +64,7 @@ public interface UserService {
     AddressDTO setDefaultAddress(String userId, String addressId);
     Optional<AddressDTO> getDefaultAddress(String userId);
     
+    
     // User Statistics and Analytics
     long getTotalUserCount();
     long getCustomerCount();

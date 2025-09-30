@@ -91,18 +91,21 @@ public class GatewayDashboardController {
         Map<String, String> services = new HashMap<>();
         services.put("User Authentication", "http://localhost:8081");
         services.put("Book Catalogue", "http://localhost:8082");
+        services.put("Cart Order Management", "http://localhost:8083");
         services.put("Admin BackOffice", "http://localhost:8084");
         
         // Swagger UIs
         Map<String, String> swagger = new HashMap<>();
         swagger.put("User Auth API", "http://localhost:8081/swagger-ui/index.html");
         swagger.put("Book Catalogue API", "http://localhost:8082/swagger-ui/index.html");
+        swagger.put("Cart Order API", "http://localhost:8083/swagger-ui/index.html");
         swagger.put("Admin BackOffice API", "http://localhost:8084/swagger-ui/index.html");
         
         // Health Checks
         Map<String, String> health = new HashMap<>();
         health.put("User Auth Health", "http://localhost:8081/api/test/health");
         health.put("Book Catalogue Health", "http://localhost:8082/api/books/health");
+        health.put("Cart Order Health", "http://localhost:8083/actuator/health");
         health.put("Admin BackOffice Health", "http://localhost:8084/api/test/health");
         
         endpoints.put("infrastructure", infrastructure);

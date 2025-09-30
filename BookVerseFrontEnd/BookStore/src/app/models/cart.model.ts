@@ -1,20 +1,24 @@
+import { BookModel } from './book.model';
+
 export interface CartItem {
   id: string;
   userId: string;
   bookId: string;
   quantity: number;
-  addedAt: string;
-  updatedAt: string;
+  priceWhenAdded: number; // BigDecimal from backend
+  createdAt: string; // LocalDateTime from backend
+  updatedAt: string; // LocalDateTime from backend
+}
+
+export interface CartItemDto {
+  id?: string;
+  userId: string;
+  bookId: string;
+  quantity: number;
+  priceWhenAdded: number;
 }
 
 export interface CartItemWithDetails extends CartItem {
-  book: {
-    id: string;
-    title: string;
-    author: string;
-    price: number;
-    image_urls: string[];
-    stock_display: number;
-  };
+  book: BookModel; // Full book details fetched separately
   subtotal: number;
 }

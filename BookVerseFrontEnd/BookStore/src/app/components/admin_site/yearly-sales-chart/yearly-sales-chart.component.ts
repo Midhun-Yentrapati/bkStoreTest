@@ -114,12 +114,14 @@ export class YearlySalesChartComponent implements OnInit, AfterViewInit, OnDestr
     const yearlyData: { [year: number]: number } = {};
     
     this.orders.forEach(order => {
-      const orderYear = new Date(order.orderDate).getFullYear();
-      if (yearsToShow.includes(orderYear)) {
-        if (!yearlyData[orderYear]) {
-          yearlyData[orderYear] = 0;
+      if (order.orderDate) {
+        const orderYear = new Date(order.orderDate).getFullYear();
+        if (yearsToShow.includes(orderYear)) {
+          if (!yearlyData[orderYear]) {
+            yearlyData[orderYear] = 0;
+          }
+          yearlyData[orderYear] += order.finalAmount || order.totalAmount || 0;
         }
-        yearlyData[orderYear] += order.finalAmount || order.totalAmount || 0;
       }
     });
     

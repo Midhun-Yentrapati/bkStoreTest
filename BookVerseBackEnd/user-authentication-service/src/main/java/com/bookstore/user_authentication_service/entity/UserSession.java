@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -105,9 +106,38 @@ public class UserSession {
         this.lastAccessedAt = LocalDateTime.now();
     }
     
+    /**
+     * Logout the session by setting it as inactive and recording logout time
+     */
     public void logout() {
         this.isActive = false;
         this.loggedOutAt = LocalDateTime.now();
+    }
+
+    /**
+     * Extend the session by updating the expiration time
+     * @param newExpirationTime the new expiration time for the session
+     */
+    public void extendSession(LocalDateTime newExpirationTime) {
+        if (newExpirationTime == null) {
+            throw new IllegalArgumentException("New expiration time cannot be null");
+        }
+        if (newExpirationTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("New expiration time cannot be in the past");
+        }
+        this.expiresAt = newExpirationTime;
+        this.lastAccessedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Extend the session by a specific duration from now
+     * @param duration the duration to extend the session by
+     */
+    public void extendSession(Duration duration) {
+        if (duration == null || duration.isNegative()) {
+            throw new IllegalArgumentException("Duration must be positive");
+        }
+        extendSession(LocalDateTime.now().plus(duration));
     }
     
     public long getSessionDurationMinutes() {

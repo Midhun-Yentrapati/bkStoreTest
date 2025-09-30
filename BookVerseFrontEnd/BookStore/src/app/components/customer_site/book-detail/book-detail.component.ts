@@ -1,23 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { BookModel } from '../../../models/book.model';
+import { CommonModule } from '@angular/common';
+import { BookModel, BookUtils } from '../../../models/book.model';
 import { BookService } from '../../../services/book.service';
 import { CartService } from '../../../services/cart.service';
 import { WishlistService } from '../../../services/wishlist.service';
 import { NotificationService } from '../../../services/notification.service';
-import { ReviewService, ReviewResponse, ReviewStats } from '../../../services/review.service';
-import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { ReviewFormComponent } from '../review-form/review-form.component';
 import { ReviewListComponent } from '../review-list/review-list.component';
+import { ReviewFormComponent } from '../review-form/review-form.component';
+import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { ShareModalComponent } from '../share-modal/share-modal.component';
-import { BookCardComponent } from '../book-card/book-card.component';
 
 @Component({
   selector: 'app-book-detail',
-  imports: [CommonModule, RouterModule, ReviewFormComponent, ReviewListComponent, ShareModalComponent, BookCardComponent, NgIf],
+  imports: [CommonModule, ReviewListComponent, ReviewFormComponent, ShareModalComponent],
   templateUrl: './book-detail.component.html',
   styleUrl: './book-detail.component.css'
 })
@@ -30,14 +27,6 @@ export class BookDetailComponent implements OnInit {
   addingToCart = false;
   addingToWishlist = false;
   loadingSimilarBooks = false;
-  loading = true;
-
-  // Review properties
-  reviews: ReviewResponse[] = [];
-  userReview: ReviewResponse | null = null;
-  reviewStats: ReviewStats | null = null;
-  loadingReviews = false;
-  canUserReview = false;
 
   // Image gallery properties
   selectedImageIndex = 0;
@@ -51,204 +40,33 @@ export class BookDetailComponent implements OnInit {
     private cartService: CartService,
     private wishlistService: WishlistService,
     private notificationService: NotificationService,
-    private reviewService: ReviewService,
-    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
    ) { }
 
    ngOnInit(): void {
     this.id = String(this.route.snapshot.paramMap.get('id'));
-    console.log('BookDetailComponent: Loading book with ID:', this.id);
-    
-    // Use getBookWithRelations to get complete book data including categories and images
-    this.bookService.getBookWithRelations(this.id).subscribe({
-      next: (book) => {
-        console.log('BookDetailComponent: Book loaded successfully:', book);
-        if (book) {
-          this.book = book;
-          this.loading = false;
-          this.isInWishlist$ = this.wishlistService.isInWishlist(this.book.id);
-          this.loadSimilarBooks();
-          this.loadReviews();
-          // Reset image selection when book changes
-          this.selectedImageIndex = 0;
-        } else {
-          console.error('Book not found');
-          this.loading = false;
-          this.router.navigate(['/']);
-        }
-      },
-      error: (error) => {
-        console.error('BookDetailComponent: Error fetching book:', error);
-        this.loading = false;
-        if (error.status === 404) {
-          // Book not found - redirect to home page
-          console.log('BookDetailComponent: Book not found (404), redirecting to home');
-          this.router.navigate(['/']);
-        } else {
-          // Handle other errors - redirect to home page
-          console.error('Failed to load book details');
-          this.router.navigate(['/']);
-        }
-      }
-    });
-   }
-
-  // Utility methods for new features
-  getDiscountPercentage(): number {
-    if (this.book?.mrp && this.book?.price && this.book.mrp > this.book.price) {
-      return Math.round(((this.book.mrp - this.book.price) / this.book.mrp) * 100);
-    }
-    return 0;
-  }
-
-  formatDate(dateString: string | undefined): string {
-    if (!dateString) return '';
-    
-    try {
-      // Handle different date formats
-      let date: Date;
-      
-      // If it's already a valid date string, parse it
-      if (typeof dateString === 'string') {
-        // Handle ISO date strings and other formats
-        date = new Date(dateString);
-        
-        // If parsing failed, try to handle YYYY-MM-DD format specifically
-        if (isNaN(date.getTime()) && dateString.includes('-')) {
-          const parts = dateString.split('-');
-          if (parts.length === 3) {
-            date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-          }
-        }
-      } else {
-        date = new Date(dateString);
-      }
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date string:', dateString);
-        return 'Invalid Date';
-      }
-      
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (error) {
-      console.error('Error formatting date:', error, dateString);
-      return dateString || 'Invalid Date';
-    }
-  }
-
-  formatSalesCategory(category: string): string {
-    if (!category) return '';
-    return category
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  }
-
-   // Review methods
-   private loadReviews(): void {
-     if (!this.book) return;
-
-     this.loadingReviews = true;
-     const bookId = parseInt(this.book.id);
-
-     // Load reviews
-     this.reviewService.getBookReviews(bookId).subscribe({
-       next: (reviews) => {
-         this.reviews = reviews;
-         this.loadingReviews = false;
-       },
-       error: (error) => {
-         console.error('Failed to load reviews:', error);
-         this.loadingReviews = false;
-       }
-     });
-
-     // Load review stats
-     this.reviewService.getReviewStatistics(bookId).subscribe({
-       next: (stats) => {
-         this.reviewStats = stats;
-       },
-       error: (error) => {
-         console.error('Failed to load review stats:', error);
-       }
-     });
-
-     // Load user's review if logged in
-     if (this.authService.isLoggedIn()) {
-       this.reviewService.getUserReview(bookId).subscribe({
-         next: (userReview) => {
-           this.userReview = userReview;
-         },
-         error: (error) => {
-           console.error('Failed to load user review:', error);
-         }
-       });
-
-       // Check if user can review
-       this.reviewService.canUserReview(bookId).subscribe({
-         next: (canReview) => {
-           this.canUserReview = canReview;
-         },
-         error: (error) => {
-           console.error('Failed to check if user can review:', error);
-         }
-       });
-     }
-   }
-
-   onReviewSubmitted(review: ReviewResponse): void {
-     this.userReview = review;
-     this.canUserReview = false;
-     this.loadReviews(); // Refresh reviews list
-     this.notificationService.success('Review Submitted', 'Your review has been submitted successfully!');
-   }
-
-   onReviewUpdated(review: ReviewResponse): void {
-     this.userReview = review;
-     this.loadReviews(); // Refresh reviews list
-     this.notificationService.success('Review Updated', 'Your review has been updated successfully!');
-   }
-
-   onReviewDeleted(): void {
-     this.userReview = null;
-     this.canUserReview = true;
-     this.loadReviews(); // Refresh reviews list
-     this.notificationService.success('Review Deleted', 'Your review has been deleted successfully!');
-   }
-
-   get isLoggedIn(): boolean {
-     return this.authService.isLoggedIn();
-   }
-
-   getBookIdAsNumber(): number {
-     return parseInt(this.book.id);
+    this.loadBookData();
    }
 
    // Image gallery methods
    selectImage(index: number): void {
-     if (this.book && this.book.images && index >= 0 && index < this.book.images.length) {
+     if (this.book && this.book.image_urls && index >= 0 && index < this.book.image_urls.length) {
        this.selectedImageIndex = index;
      }
    }
 
    nextImage(): void {
-         if (this.book && this.book.images) {
-      const nextIndex = (this.selectedImageIndex + 1) % this.book.images.length;
+     if (this.book && this.book.image_urls) {
+       const nextIndex = (this.selectedImageIndex + 1) % this.book.image_urls.length;
        this.selectImage(nextIndex);
      }
    }
 
    previousImage(): void {
-         if (this.book && this.book.images) {
-      const prevIndex = this.selectedImageIndex === 0 
-        ? this.book.images.length - 1 
+     if (this.book && this.book.image_urls) {
+       const prevIndex = this.selectedImageIndex === 0 
+         ? this.book.image_urls.length - 1 
          : this.selectedImageIndex - 1;
        this.selectImage(prevIndex);
      }
@@ -263,30 +81,12 @@ export class BookDetailComponent implements OnInit {
    }
 
    getCurrentImage(): string {
-     if (this.book?.images && this.book.images.length > 0) {
-      const selectedImage = this.book.images[this.selectedImageIndex] || this.book.images[0];
-      return selectedImage.imageUrl;
-    }
-    return '';
+     return this.book?.image_urls?.[this.selectedImageIndex] || this.book?.image_urls?.[0] || '';
    }
 
    hasMultipleImages(): boolean {
-     return this.book?.images?.length > 1;
+     return (this.book?.image_urls?.length || 0) > 1;
    }
-
-  getSimilarBookImage(book: BookModel): string {
-    if (book.images && book.images.length > 0) {
-      if (book.images.length > 1) {
-        // If multiple images, get the primary image or fallback to first
-        const primaryImage = book.images.find(img => img.isPrimary) || book.images[0];
-        return primaryImage.imageUrl;
-      } else {
-        // If only one image, use it regardless of isPrimary status
-        return book.images[0].imageUrl;
-      }
-    }
-    return 'https://placehold.co/200x300?text=No+Image';
-  }
 
   loadSimilarBooks(): void {
     if (!this.book || !this.book.id) {
@@ -365,12 +165,13 @@ export class BookDetailComponent implements OnInit {
     });
      }
 
-  navigateToBook(bookId: string): void {
+  navigateToBook(bookId: string | number): void {
+    const stringId = bookId.toString();
     // Update the URL without refreshing the page
-    this.router.navigate(['/book', bookId], { replaceUrl: true });
+    this.router.navigate(['/book', stringId], { replaceUrl: true });
     
     // Update the current book ID and reload all data
-    this.id = bookId;
+    this.id = stringId;
     this.loadBookData();
     
     // Scroll to top
@@ -380,7 +181,7 @@ export class BookDetailComponent implements OnInit {
   private loadBookData(): void {
     console.log('Loading book data for ID:', this.id);
     
-    // Use getBookWithRelations to get complete book data
+    // Use getBookWithRelations to get complete book data including categories and images
     this.bookService.getBookWithRelations(this.id).subscribe({
       next: (book) => {
         console.log('Book loaded successfully:', book);
@@ -388,7 +189,6 @@ export class BookDetailComponent implements OnInit {
           this.book = book;
           this.isInWishlist$ = this.wishlistService.isInWishlist(this.book.id);
           this.loadSimilarBooks();
-          this.loadReviews(); // Reload reviews when book changes
           // Reset image selection when book changes
           this.selectedImageIndex = 0;
         } else {
@@ -438,8 +238,48 @@ export class BookDetailComponent implements OnInit {
     this.closeShareModal();
   }
 
-  onImageError(event: any): void {
-    console.log('Image failed to load for similar book. URL:', event.target.src);
-    event.target.src = 'https://placehold.co/200x300?text=No+Image';
+  // New utility methods for enhanced book details
+  getCategoryNames(): string[] {
+    return BookUtils.getCategoryNames(this.book);
+  }
+
+  formatSalesCategory(category: string): string {
+    switch(category) {
+      case 'BEST_SELLING': return 'Best Seller';
+      case 'NEWLY_LAUNCHED': return 'New Launch';
+      case 'SPECIAL_OFFERS': return 'Special Offer';
+      default: return category;
+    }
+  }
+
+  getStarArray(rating: number): number[] {
+    return Array(5).fill(0).map((_, i) => i + 1);
+  }
+
+  getDiscountPercentage(): number {
+    if (!this.book.mrp || !this.book.price) return 0;
+    return Math.round(((this.book.mrp - this.book.price) / this.book.mrp) * 100);
+  }
+
+  formatDate(dateString: string): string {
+    try {
+      // Handle different date formats from backend
+      let date: Date;
+      if (Array.isArray(dateString)) {
+        // Handle LocalDateTime array format [year, month, day, hour, minute, second]
+        const [year, month, day] = dateString as any;
+        date = new Date(year, month - 1, day);
+      } else {
+        date = new Date(dateString);
+      }
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      return dateString.toString();
+    }
   }
 }

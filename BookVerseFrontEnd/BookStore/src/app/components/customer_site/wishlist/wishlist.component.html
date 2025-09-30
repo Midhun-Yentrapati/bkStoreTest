@@ -39,24 +39,24 @@
             <div class="card-header">
               
               <div class="stock-status" [ngClass]="{
-                'in-stock': item.book.stockActual > 5,
-                'low-stock': item.book.stockActual > 0 && item.book.stockActual <= 5,
-                'out-of-stock': item.book.stockActual <= 0
+                'in-stock': item.book.stock_actual > 5,
+                'low-stock': item.book.stock_actual > 0 && item.book.stock_actual <= 5,
+                'out-of-stock': item.book.stock_actual <= 0
               }">
-                                  <i class="bi" [ngClass]="{
-                    'bi-check-circle-fill': item.book.stockActual > 5,
-                    'bi-exclamation-triangle-fill': item.book.stockActual > 0 && item.book.stockActual <= 5,
-                    'bi-x-circle-fill': item.book.stockActual <= 0
+                <i class="bi" [ngClass]="{
+                  'bi-check-circle-fill': item.book.stock_actual > 5,
+                  'bi-exclamation-triangle-fill': item.book.stock_actual > 0 && item.book.stock_actual <= 5,
+                  'bi-x-circle-fill': item.book.stock_actual <= 0
                 }"></i>
-                                  <span *ngIf="item.book.stockActual > 5">In Stock</span>
-                  <span *ngIf="item.book.stockActual > 0 && item.book.stockActual <= 5">{{ item.book.stockActual }} left</span>
-                  <span *ngIf="item.book.stockActual <= 0">Out of Stock</span>
+                <span *ngIf="item.book.stock_actual > 5">In Stock</span>
+                <span *ngIf="item.book.stock_actual > 0 && item.book.stock_actual <= 5">{{ item.book.stock_actual }} left</span>
+                <span *ngIf="item.book.stock_actual <= 0">Out of Stock</span>
               </div>
             </div>
 
             <!-- Book Image -->
             <div class="book-image-wrapper" (click)="navigateToBook(item.book.id)">
-              <img [src]="getBookImage(item.book)" [alt]="item.book.title" [title]="item.book.title" class="book-image">
+              <img [src]="item.book.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" [alt]="item.book.title" class="book-image">
               <div class="image-overlay">
                 <i class="bi bi-eye-fill"></i>
                 <span>View Details</span>
@@ -66,9 +66,9 @@
             <!-- Book Details -->
             <div class="book-details">
               <!-- Categories -->
-                              <div class="book-categories">
-                  <span class="category-tag" *ngFor="let category of item.book.categories.slice(0, 2)">
-                    {{ category.name }}
+              <div class="book-categories">
+                <span class="category-tag" *ngFor="let category of item.book.categories?.slice(0, 2)">
+                  {{ typeof category === 'string' ? category : category.name }}
                 </span>
               </div>
               
@@ -87,9 +87,9 @@
               <button 
                 class="btn btn-primary btn-move-cart" 
                 (click)="moveToCart(item)"
-                [disabled]="item.book.stockActual <= 0">
+                [disabled]="item.book.stock_actual <= 0">
                 <i class="bi bi-cart-plus me-2"></i>
-                                  <span>{{ item.book.stockActual <= 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
+                <span>{{ item.book.stock_actual <= 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
               </button>
               <button 
                 class="btn btn-remove" 

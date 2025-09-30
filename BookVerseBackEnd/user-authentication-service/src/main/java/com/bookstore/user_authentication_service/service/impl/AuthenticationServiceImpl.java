@@ -469,4 +469,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override public void disableTwoFactorAuth(String userId) { }
     @Override public String generateTwoFactorSecret(String userId) { return null; }
     @Override public boolean verifyTwoFactorCode(String userId, String code) { return false; }
+    
+    // Availability Validation
+    @Override
+    public void validateUsernameAvailability(String username) {
+        log.info("Validating username availability: {}", username);
+        
+        if (userRepository.existsByUsername(username)) {
+            throw ValidationException.usernameAlreadyExists(username);
+        }
+        
+        log.info("Username is available: {}", username);
+    }
+    
+    @Override
+    public void validateEmailAvailability(String email) {
+        log.info("Validating email availability: {}", email);
+        
+        if (userRepository.existsByEmail(email)) {
+            throw ValidationException.emailAlreadyExists(email);
+        }
+        
+        log.info("Email is available: {}", email);
+    }
 }

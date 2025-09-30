@@ -1,7 +1,6 @@
 import { NgFor } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { CategoryModel } from '../../../models/category.model';
 
 @Component({
   selector: 'app-category-nav',
@@ -11,13 +10,13 @@ import { CategoryModel } from '../../../models/category.model';
 })
 export class CategoryNavComponent {
 
-  @Input() categories: CategoryModel[] = [];
+  @Input() categories: any[] = [];
   @Output() categorySelected = new EventEmitter<string>();
 
   selectedCategory: string = 'All';
 
-  selectCategory(categoryName: string): void {
-    this.selectedCategory = categoryName;
-    this.categorySelected.emit(categoryName);
+  selectCategory(category: string): void {
+    this.selectedCategory = category;
+    this.categorySelected.emit(category);
   }
 }

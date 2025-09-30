@@ -3,6 +3,11 @@ server:
   port: 8081
 
 spring:
+  security:
+    user:
+    name: admin
+    password: admin123
+    roles: ADMIN
   application:
     name: user-authentication-service
   datasource:
@@ -17,11 +22,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  security:                                                        		# Security Configuration
-    user:
-      name: admin
-      password: admin123 
-      roles: ADMIN
 
 # Eureka Configuration
 eureka:
@@ -32,10 +32,16 @@ eureka:
     prefer-ip-address: true
     hostname: localhost
 
-# Service-specific JWT Configuration
-jwt:
-  secret: userAuthSecretKey123456789012345678901234567890
-  expiration: 86400000  # 24 hours
-  refresh-expiration: 604800000  # 7 days
+# Auto-create Super Admin on startup
+app:
+  admin:
+    auto-create: true
+    username: IronMan
+    email: ironman@bookstore.com
+    password: I@amIronMan25
+    full-name: Tony Stark
+    employee-id: EMP-IRONMAN-001
+    department: IT Administration
 
+# Security Configuration
 

@@ -1,29 +1,18 @@
 import { Injectable, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError, forkJoin } from 'rxjs';
-import { tap, map, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, forkJoin, of, throwError } from 'rxjs';
+import { tap, map, catchError, switchMap } from 'rxjs/operators';
 import { BookModel } from '../models/book.model';
+import { WishlistItem, WishlistItemDto, WishlistItemWithDetails } from '../models/wishlist.model';
 import { BookService } from './book.service';
 import { AuthService } from './auth.service';
-
-// Simplified WishlistItem interface - only storing IDs and essential data
-export interface WishlistItem {
-  id: string; // Wishlist item ID
-  bookId: string; // Reference to book
-  userId: string; // Reference to user
-  addedAt: string; // ISO timestamp
-}
-
-// Extended interface for UI display (with book details)
-export interface WishlistItemWithDetails extends WishlistItem {
-  book: BookModel; // Full book details fetched separately
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = 'http://localhost:3000/wishlist';
+  private apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
+  private apiUrl = `${this.apiBaseUrl}/wishlist`;
   private wishlistItemsSubject = new BehaviorSubject<WishlistItem[]>([]);
   private wishlistItemsWithDetailsSubject = new BehaviorSubject<WishlistItemWithDetails[]>([]);
   
@@ -53,14 +42,23 @@ export class WishlistService {
     });
   }
 
-  /**
-   * Loads wishlist items for a specific user from the JSON Server API and updates the BehaviorSubject.
-   */
   private loadUserWishlistItems(userId: string): void {
-    this.http.get<WishlistItem[]>(`${this.apiUrl}?userId=${userId}`).subscribe({
-      next: items => this.wishlistItemsSubject.next(items),
+    // Use the backend endpoint: /api/wishlist/user/{userId}
+    this.http.get<WishlistItem[]>(`${this.apiUrl}/user/${userId}`).subscribe({
+      next: items => {
+        console.log('Wishlist items loaded:', items);
+        this.wishlistItemsSubject.next(items || []);
+      },
       error: error => {
         console.error('Error loading wishlist items:', error);
+        // Handle different types of errors
+        if (error.status === 0) {
+          console.error('Network error - wishlist service may be unavailable');
+        } else if (error.status === 403) {
+          console.error('Authentication required for wishlist operations');
+        } else if (error.status === 503) {
+          console.error('Wishlist service temporarily unavailable');
+        }
         this.wishlistItemsSubject.next([]);
       }
     });
@@ -97,32 +95,30 @@ export class WishlistService {
     });
   }
 
-  /**
-   * Adds a book to the wishlist. Prevents adding duplicates.
-   */
   addToWishlist(book: BookModel): Observable<WishlistItem> {
-    const user = this.authService.getCurrentCustomer();
-    if (!user) {
+    const currentUser = this.authService.getCurrentCustomer();
+    if (!currentUser) {
       return throwError(() => new Error('User must be logged in to add items to wishlist'));
     }
 
+    // Check if item already exists in wishlist
     const currentItems = this.wishlistItemsSubject.getValue();
-    const existingItem = currentItems.find(item => item.bookId === book.id && item.userId === user.id);
+    const existingItem = currentItems.find(item => item.bookId === book.id.toString() && item.userId === currentUser.id);
 
     if (existingItem) {
-      return throwError(() => new Error('Book is already in your wishlist'));
+      return throwError(() => new Error('Book is already in wishlist'));
     }
 
-    const newItem: WishlistItem = {
-      id: crypto.randomUUID(),
-      bookId: book.id,
-      userId: user.id,
-      addedAt: new Date().toISOString()
+    // Create new wishlist item using backend DTO structure
+    const wishlistItemDto: WishlistItemDto = {
+      userId: currentUser.id,
+      bookId: book.id.toString(),
+      priceWhenAdded: book.price,
+      notifyOnSale: false
     };
 
-    return this.http.post<WishlistItem>(this.apiUrl, newItem).pipe(
-      tap(() => this.loadUserWishlistItems(user.id)),
-      map(() => newItem),
+    return this.http.post<WishlistItem>(this.apiUrl, wishlistItemDto).pipe(
+      tap(() => this.loadUserWishlistItems(currentUser.id)),
       catchError(error => {
         console.error('Error adding wishlist item:', error);
         throw error;
@@ -130,9 +126,6 @@ export class WishlistService {
     );
   }
 
-  /**
-   * Removes a book from the wishlist by its wishlist item ID.
-   */
   removeFromWishlist(wishlistItemId: string): Observable<void> {
     const currentUser = this.authService.getCurrentCustomer();
     if (!currentUser) {
@@ -140,95 +133,56 @@ export class WishlistService {
     }
 
     return this.http.delete<void>(`${this.apiUrl}/${wishlistItemId}`).pipe(
-      // Use tap for side effect (reloading wishlist)
       tap(() => this.loadUserWishlistItems(currentUser.id)),
       catchError(error => {
-        console.error('Error removing book from wishlist:', error);
+        console.error('Error removing wishlist item:', error);
         throw error;
       })
     );
   }
 
-  /**
-   * Removes a book from wishlist by book ID (for backward compatibility)
-   */
-  removeBookFromWishlist(bookId: string): Observable<void> {
+  getWishlistItemCount(): Observable<number> {
+    return this.wishlistItems$.pipe(
+      map(items => items.length)
+    );
+  }
+
+  // Alias for template compatibility
+  getWishlistCount(): Observable<number> {
+    return this.getWishlistItemCount();
+  }
+
+  // Helper method to check if a book is in wishlist
+  isInWishlist(bookId: string | number): Observable<boolean> {
+    const stringId = typeof bookId === 'number' ? bookId.toString() : bookId;
+    return this.wishlistItems$.pipe(
+      map(items => items.some(item => item.bookId === stringId))
+    );
+  }
+
+  // Get wishlist item by book ID
+  getWishlistItemByBookId(bookId: string | number): Observable<WishlistItem | null> {
+    const stringId = typeof bookId === 'number' ? bookId.toString() : bookId;
+    return this.wishlistItems$.pipe(
+      map(items => items.find(item => item.bookId === stringId) || null)
+    );
+  }
+
+  // Remove from wishlist by book ID (for template compatibility)
+  removeBookFromWishlist(bookId: string | number): Observable<void> {
     const currentUser = this.authService.getCurrentCustomer();
     if (!currentUser) {
       return throwError(() => new Error('User must be logged in to remove items from wishlist'));
     }
 
+    const stringId = typeof bookId === 'number' ? bookId.toString() : bookId;
     const currentItems = this.wishlistItemsSubject.getValue();
-    const itemToRemove = currentItems.find(item => item.bookId === bookId && item.userId === currentUser.id);
+    const itemToRemove = currentItems.find(item => item.bookId === stringId && item.userId === currentUser.id);
     
     if (!itemToRemove) {
       return throwError(() => new Error('Item not found in wishlist'));
     }
 
     return this.removeFromWishlist(itemToRemove.id);
-  }
-
-  /**
-   * Checks if a book is in the current user's wishlist
-   */
-  isInWishlist(bookId: string): Observable<boolean> {
-    return this.wishlistItems$.pipe(
-      map(items => items.some(item => item.bookId === bookId))
-    );
-  }
-
-  /**
-   * Gets the wishlist item count for the current user
-   */
-  getWishlistCount(): Observable<number> {
-    return this.wishlistItems$.pipe(
-      map(items => items.length)
-    );
-  }
-
-  /**
-   * Clears all items from the current user's wishlist
-   */
-  clearWishlist(): Observable<any> {
-    const currentUser = this.authService.getCurrentCustomer();
-    if (!currentUser) {
-      return throwError(() => new Error('User must be logged in to clear wishlist'));
-    }
-
-    const currentItems = this.wishlistItemsSubject.getValue();
-    const userItems = currentItems.filter(item => item.userId === currentUser.id);
-
-    if (userItems.length === 0) {
-      return of(null);
-    }
-
-    const deleteRequests = userItems.map(item =>
-      this.http.delete(`${this.apiUrl}/${item.id}`).pipe(
-        catchError(error => {
-          console.error(`Failed to delete wishlist item ${item.id}:`, error);
-          return of(null);
-        })
-      )
-    );
-
-    return forkJoin(deleteRequests).pipe(
-      tap(() => {
-        this.wishlistItemsSubject.next([]);
-        this.wishlistItemsWithDetailsSubject.next([]);
-      }),
-      catchError(error => {
-        console.error('Error clearing wishlist:', error);
-        throw error;
-      })
-    );
-  }
-
-  /**
-   * Get wishlist item by book ID
-   */
-  getWishlistItemByBookId(bookId: string): Observable<WishlistItem | null> {
-    return this.wishlistItems$.pipe(
-      map(items => items.find(item => item.bookId === bookId) || null)
-    );
   }
 } 

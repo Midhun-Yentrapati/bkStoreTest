@@ -49,7 +49,7 @@ export class BookCardComponent implements OnInit {
       return;
     }
 
-    if (!this.book || this.addingToCart || this.book.stockActual <= 0) return;
+    if (!this.book || this.addingToCart || this.book.stock_actual <= 0) return;
     
     this.addingToCart = true;
     this.cartService.addToCart(this.book).subscribe({
@@ -137,48 +137,29 @@ export class BookCardComponent implements OnInit {
     });
   }
 
+  // Utility methods for template
+  getBookIdAsString(): string {
+    return typeof this.book.id === 'number' ? this.book.id.toString() : this.book.id;
+  }
+
+  getFirstImageUrl(): string {
+    return this.book.image_urls?.[0] || this.book.images?.[0]?.imageUrl || 'https://placehold.co/150x200?text=No+Image';
+  }
+
+  getCategoryNames(): string[] {
+    if (!this.book.categories) return [];
+    return this.book.categories.map(cat => 
+      typeof cat === 'string' ? cat : cat.name
+    );
+  }
+
   getStockStatus(): string {
-    if (this.book.stockActual <= 0) return 'out-of-stock';
-    if (this.book.stockActual <= 5) return 'low-stock';
+    if (this.book.stock_actual <= 0) return 'out-of-stock';
+    if (this.book.stock_actual <= 5) return 'low-stock';
     return 'in-stock';
   }
 
   isOutOfStock(): boolean {
-    return this.book.stockActual <= 0;
-  }
-
-  getBookImage(): string {
-    // Debug: Log book data only once per book
-    if (!(this.book as any)._imageLogged) {
-      console.log('Book:', this.book.title, 'Images:', this.book.images);
-      (this.book as any)._imageLogged = true;
-    }
-    
-    if (this.book.images && this.book.images.length > 0) {
-      let imageUrl: string;
-      
-      if (this.book.images.length > 1) {
-        // If multiple images, get the primary image or fallback to first
-        const primaryImage = this.book.images.find(img => img.isPrimary) || this.book.images[0];
-        imageUrl = primaryImage.imageUrl;
-      } else {
-        // If only one image, use it regardless of isPrimary status
-        imageUrl = this.book.images[0].imageUrl;
-      }
-      
-      // Ensure the image URL is properly formatted
-      if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
-        imageUrl = `/${imageUrl}`;
-      }
-      
-      return imageUrl || 'https://placehold.co/200x300?text=No+Image';
-    }
-    
-    return 'https://placehold.co/200x300?text=No+Image';
-  }
-
-  onImageError(event: any): void {
-    console.log('Image failed to load for book:', this.book.title, 'URL:', event.target.src);
-    event.target.src = 'https://placehold.co/200x300?text=No+Image';
+    return this.book.stock_actual <= 0;
   }
 }

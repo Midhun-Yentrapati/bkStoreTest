@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AddressDTO {
     
@@ -69,6 +69,12 @@ public class AddressDTO {
     
     private Boolean isDefault;
     private Boolean isActive;
+    
+    @Size(max = 500, message = "Instructions cannot exceed 500 characters")
+    private String instructions;
+    
+    @Size(max = 20, message = "Access code cannot exceed 20 characters")
+    private String accessCode;
     
     // Audit Fields
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

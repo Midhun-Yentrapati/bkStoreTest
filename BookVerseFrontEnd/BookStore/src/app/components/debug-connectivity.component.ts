@@ -1,4 +1,4 @@
-﻿import { Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
@@ -65,35 +65,35 @@ export class DebugConnectivityComponent {
   }
 
   testEurekaServer() {
-    this.addLog(' Testing Eureka Server...');
+    this.addLog('🔍 Testing Eureka Server...');
     // Mock implementation - TODO: Use proper service
     setTimeout(() => {
-      this.addLog(' Eureka Server is UP (mock): {"status":"UP","components":{"eureka":{"status":"UP"}}}');
+      this.addLog('✅ Eureka Server is UP (mock): {"status":"UP","components":{"eureka":{"status":"UP"}}}');
     }, 1000);
   }
 
   testApiGateway() {
-    this.addLog(' Testing API Gateway...');
+    this.addLog('🔍 Testing API Gateway...');
     // Mock implementation - TODO: Use proper service
     setTimeout(() => {
-      this.addLog(' API Gateway is UP (mock): {"status":"UP"}');
-      this.addLog(' Gateway Routes (mock): [{"route_id":"user-auth","uri":"http://localhost:8081"},{"route_id":"admin-service","uri":"http://localhost:8084"}]');
+      this.addLog('✅ API Gateway is UP (mock): {"status":"UP"}');
+      this.addLog('📋 Gateway Routes (mock): [{"route_id":"user-auth","uri":"http://localhost:8081"},{"route_id":"admin-service","uri":"http://localhost:8084"}]');
     }, 1000);
   }
 
   testAuthService() {
-    this.addLog(' Testing Auth Service via API Gateway...');
+    this.addLog('🔍 Testing Auth Service via API Gateway...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addLog(' Auth Service via Gateway is UP (mock): {"status":"UP","service":"user-authentication-service"}');
+      this.addLog('✅ Auth Service via Gateway is UP (mock): {"status":"UP","service":"user-authentication-service"}');
     }, 1000);
   }
 
   testDirectAuthService() {
-    this.addLog(' Testing Auth Service directly...');
+    this.addLog('🔍 Testing Auth Service directly...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addLog(' Auth Service direct is UP (mock): {"status":"UP","port":8081}');
+      this.addLog('✅ Auth Service direct is UP (mock): {"status":"UP","port":8081}');
     }, 1000);
   }
 }

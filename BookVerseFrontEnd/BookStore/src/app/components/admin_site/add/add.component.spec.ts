@@ -4,12 +4,15 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AddComponent } from './add.component';
 import { BookService } from '../../../services/book.service';
+import { CategoryService } from '../../../services/category.service';
 import { BookModel } from '../../../models/book.model';
+import { CategoryModel } from '../../../models/category.model';
 
 describe('AddComponent', () => {
   let component: AddComponent;
   let fixture: ComponentFixture<AddComponent>;
   let mockBookService: jasmine.SpyObj<BookService>;
+  let mockCategoryService: jasmine.SpyObj<CategoryService>;
   let mockRouter: jasmine.SpyObj<Router>;
 
   const mockBook: BookModel = {
@@ -17,21 +20,33 @@ describe('AddComponent', () => {
     title: 'Test Book',
     author: 'Test Author',
     description: 'Test Description',
-    categories: ['Fiction'],
+    categories: [{
+      id: 1,
+      name: 'Fiction',
+      slug: 'fiction',
+      isActive: true
+    }],
     price: 29.99,
     stock_display: 10,
     stock_actual: 10,
+    stockDisplay: 10,
+    stockActual: 10,
     image_urls: ['https://example.com/image.jpg']
   };
 
   beforeEach(async () => {
-    mockBookService = jasmine.createSpyObj('BookService', ['createBook']);
+    mockBookService = jasmine.createSpyObj('BookService', ['createBookWithRelations']);
+    mockCategoryService = jasmine.createSpyObj('CategoryService', ['getAllCategories', 'createCategory']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
+    // Set up default return values
+    mockCategoryService.getAllCategories.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [AddComponent, ReactiveFormsModule],
       providers: [
         { provide: BookService, useValue: mockBookService },
+        { provide: CategoryService, useValue: mockCategoryService },
         { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
@@ -53,78 +68,85 @@ describe('AddComponent', () => {
 
   it('should not add book if form is invalid', () => {
     component.bookForm.patchValue({ title: '' });
-    component.addBook();
-    expect(mockBookService.createBook).not.toHaveBeenCalled();
-    expect(component.addedBooks.length).toBe(0);
+    component.submitBook();
+    expect(mockBookService.createBookWithRelations).not.toHaveBeenCalled();
+    expect(component.errorMessage).toBe('Please fix all validation errors before submitting.');
   });
 
   it('should add book if form is valid', () => {
-    mockBookService.createBook.and.returnValue(of(mockBook));
+    mockBookService.createBookWithRelations.and.returnValue(of(mockBook));
     
     component.bookForm.patchValue({
-      id: '1',
       title: 'Test Book',
       author: 'Test Author',
       description: 'Test Description',
-      categories: 'Fiction',
-      sales_category: 'newly launched',
       price: 29.99,
-      stock_display: 10,
-      stock_actual: 10,
-      image_urls: 'https://example.com/image.jpg'
+      stockDisplay: 10,
+      stockActual: 10,
+      salesCategory: 'BEST_SELLING',
+      isActive: true,
+      isFeatured: false
     });
     
-    component.addBook();
+    // Add required category
+    component.selectedCategories = [{ id: 1, name: 'Fiction', slug: 'fiction' }];
     
-    expect(mockBookService.createBook).toHaveBeenCalled();
-    expect(component.addedBooks.length).toBe(1);
+    component.submitBook();
+    
+    expect(mockBookService.createBookWithRelations).toHaveBeenCalled();
+    expect(component.successMessage).toBe('Book created successfully!');
   });
 
   it('should handle error from createBook', () => {
-    mockBookService.createBook.and.returnValue(throwError(() => new Error('Failed')));
+    mockBookService.createBookWithRelations.and.returnValue(throwError(() => ({ error: { message: 'Error adding book' } })));
     
     component.bookForm.patchValue({
-      id: '1',
       title: 'Test Book',
       author: 'Test Author',
       description: 'Test Description',
-      categories: 'Fiction',
-      sales_category: 'newly launched',
       price: 29.99,
-      stock_display: 10,
-      stock_actual: 10,
-      image_urls: 'https://example.com/image.jpg'
+      stockDisplay: 10,
+      stockActual: 10,
+      salesCategory: 'BEST_SELLING',
+      isActive: true,
+      isFeatured: false
     });
     
-    component.addBook();
+    // Add required category
+    component.selectedCategories = [{ id: 1, name: 'Fiction', slug: 'fiction' }];
     
-    expect(component.errorMessage).toBe('Failed to add book. Please try again.');
+    component.submitBook();
+    
+    expect(component.errorMessage).toBe('Failed to create book: Error adding book');
   });
 
   it('should reset form after adding book', () => {
-    mockBookService.createBook.and.returnValue(of(mockBook));
+    mockBookService.createBookWithRelations.and.returnValue(of(mockBook));
     
+    // Set up valid form data
     component.bookForm.patchValue({
-      id: '1',
       title: 'Test Book',
       author: 'Test Author',
       description: 'Test Description',
-      categories: 'Fiction',
-      sales_category: 'newly launched',
       price: 29.99,
-      stock_display: 10,
-      stock_actual: 10,
-      image_urls: 'https://example.com/image.jpg'
+      stockDisplay: 10,
+      stockActual: 10,
+      salesCategory: 'BEST_SELLING',
+      isActive: true,
+      isFeatured: false
     });
     
-    component.addBook();
+    // Add at least one category (required)
+    component.selectedCategories = [{ id: 1, name: 'Fiction', slug: 'fiction' }];
     
-    expect(component.bookForm.get('id')?.value).toBe('');
+    component.submitBook();
+    
+    expect(component.bookForm.get('title')?.value).toBe('');
     expect(component.bookForm.get('price')?.value).toBe(0);
   });
 
   it('should navigate back when goBack is called', () => {
     component.goBack();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin/inventory']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin/dashboard']);
   });
 });

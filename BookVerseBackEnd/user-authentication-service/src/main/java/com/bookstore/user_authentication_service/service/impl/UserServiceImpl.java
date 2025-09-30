@@ -101,6 +101,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UserDTO> getUserById(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new ValidationException("User ID cannot be null or empty");
+        }
         return userRepository.findById(userId)
                 .filter(user -> user.getDeletedAt() == null)
                 .map(this::convertToDTO);
@@ -527,7 +530,19 @@ public class UserServiceImpl implements UserService {
     @Override public List<String> getIncompleteProfileFields(String userId) { return Collections.emptyList(); }
     @Override public void incrementFailedLoginAttempts(String userId) { }
     @Override public void resetFailedLoginAttempts(String userId) { }
-    @Override public void updateLastLogin(String userId, String ipAddress) { }
+    @Override 
+    public void updateLastLogin(String userId, String ipAddress) {
+        log.info("Updating last login for user: {} from IP: {}", userId, ipAddress);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        
+        user.setLastLoginAt(LocalDateTime.now());
+        user.setLastLoginIp(ipAddress);
+        
+        userRepository.save(user);
+        log.info("Last login updated successfully for user: {}", userId);
+    }
     @Override public List<UserDTO> getLockedUsers(Pageable pageable) { return Collections.emptyList(); }
     @Override public List<UserDTO> getUnverifiedUsers(Pageable pageable) { return Collections.emptyList(); }
 }

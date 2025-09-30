@@ -5,9 +5,9 @@ import com.bookverse.bookCatalog.Service.BookCategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Remove @CrossOrigin - CORS handled by API Gateway
 @RestController
 @RequestMapping("/api/book-categories")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 
 public class BookCategoryController {
 

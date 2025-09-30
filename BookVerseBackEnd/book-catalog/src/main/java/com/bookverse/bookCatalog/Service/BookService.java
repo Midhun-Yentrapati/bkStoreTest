@@ -4,6 +4,7 @@ import com.bookverse.bookCatalog.Models.Books;
 import com.bookverse.bookCatalog.Models.Category;
 import com.bookverse.bookCatalog.DTO.BookCreateRequest;
 import com.bookverse.bookCatalog.DTO.BookWithRelations;
+import com.bookverse.bookCatalog.DTO.BookImageRequest;
 import com.bookverse.bookCatalog.Models.BookCategory;
 import com.bookverse.bookCatalog.Models.BookImage;
 import com.bookverse.bookCatalog.Repository.BookRepository;
@@ -325,7 +326,7 @@ public class BookService {
      * This method handles both actual and display stock.
      */
     @Transactional
-    public void decreaseStock(Long bookId, int quantity) {
+    public Books decreaseStock(Long bookId, int quantity) {
         if (bookId == null || bookId <= 0) {
             throw new ValidationException("Book ID must be a positive number");
         }
@@ -344,7 +345,7 @@ public class BookService {
             book.setStockDisplay(Math.max(0, book.getStockDisplay() - quantity));
             book.setNoOfBooksSold(book.getNoOfBooksSold() + quantity);
             book.setTotalRevenue(book.getTotalRevenue() + (book.getPrice() * quantity));
-            bookRepository.save(book);
+            return bookRepository.save(book);
         } catch (Exception e) {
             throw new BusinessLogicException("Failed to decrease stock: " + e.getMessage(), e);
         }
@@ -512,5 +513,82 @@ public class BookService {
         return findSimilarBooks(bookId).stream()
                 .map(this::convertToBookWithRelations)
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * Updates the categories associated with a book.
+     */
+    @Transactional
+    public Books updateBookCategories(Long bookId, List<Long> categoryIds) {
+        if (bookId == null || bookId <= 0) {
+            throw new ValidationException("Book ID must be a positive number");
+        }
+        
+        Books book = getBookByIdOrThrow(bookId);
+        
+        // Clear existing categories
+        book.getBookCategories().clear();
+        
+        // Add new categories if provided
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            for (Long categoryId : categoryIds) {
+                if (categoryId == null || categoryId <= 0) {
+                    throw new ValidationException("Category ID must be a positive number");
+                }
+                
+                Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                
+                BookCategory bookCategory = new BookCategory();
+                bookCategory.setBook(book);
+                bookCategory.setCategory(category);
+                book.getBookCategories().add(bookCategory);
+            }
+        }
+        
+        try {
+            return bookRepository.save(book);
+        } catch (Exception e) {
+            throw new BusinessLogicException("Failed to update book categories: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Updates the images associated with a book.
+     */
+    @Transactional
+    public Books updateBookImages(Long bookId, List<BookImageRequest> imageRequests) {
+        if (bookId == null || bookId <= 0) {
+            throw new ValidationException("Book ID must be a positive number");
+        }
+        
+        Books book = getBookByIdOrThrow(bookId);
+        
+        // Clear existing images
+        book.getBookImages().clear();
+        
+        // Add new images if provided
+        if (imageRequests != null && !imageRequests.isEmpty()) {
+            for (BookImageRequest imageRequest : imageRequests) {
+                if (imageRequest.getImageUrl() == null || imageRequest.getImageUrl().trim().isEmpty()) {
+                    throw new ValidationException("Image URL is required");
+                }
+                
+                BookImage bookImage = new BookImage();
+                bookImage.setBook(book);
+                bookImage.setImage(imageRequest.getImageUrl().trim());
+                bookImage.setPrimary(imageRequest.getIsPrimary() != null ? imageRequest.getIsPrimary() : false);
+                bookImage.setAltText(imageRequest.getAltText());
+                bookImage.setDisplayOrder(imageRequest.getDisplayOrder() != null ? imageRequest.getDisplayOrder() : 0);
+                
+                book.getBookImages().add(bookImage);
+            }
+        }
+        
+        try {
+            return bookRepository.save(book);
+        } catch (Exception e) {
+            throw new BusinessLogicException("Failed to update book images: " + e.getMessage(), e);
+        }
     }
 }

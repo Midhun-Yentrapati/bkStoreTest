@@ -383,7 +383,7 @@ export class AddComponent implements OnInit {
         salesCategory: this.bookForm.value.salesCategory as 'BEST_SELLING' | 'SPECIAL_OFFERS' | 'NEWLY_LAUNCHED',
         isActive: Boolean(this.bookForm.value.isActive),
         isFeatured: Boolean(this.bookForm.value.isFeatured),
-        categoryIds: this.selectedCategories.map(cat => parseInt(cat.id)),
+        categoryIds: this.selectedCategories.map(cat => cat.id), // All category IDs are numbers
         images: this.selectedImages.map(img => ({
           imageUrl: img.imageUrl,
           isPrimary: img.isPrimary,

@@ -169,10 +169,10 @@ export class ViewAllComponent implements OnInit {
           comparison = a.price - b.price;
           break;
         case 'stock_display':
-          comparison = a.stockDisplay - b.stockDisplay;
+          comparison = a.stock_display - b.stock_display;
           break;
         case 'stock_actual':
-          comparison = a.stockActual - b.stockActual;
+          comparison = a.stock_actual - b.stock_actual;
           break;
         case 'title':
           comparison = a.title.localeCompare(b.title);
@@ -290,8 +290,8 @@ export class ViewAllComponent implements OnInit {
   }
 
   // Action button handlers
-  goToEditPage(bookId: string): void {
-    this.router.navigate(['/admin/edit-book', bookId]);
+  goToEditPage(bookId: string | number): void {
+    this.router.navigate(['/admin/edit-book', bookId.toString()]);
   }
 
   showAddPage(): void {
@@ -304,11 +304,21 @@ export class ViewAllComponent implements OnInit {
 
   // TrackBy function for better performance
   trackByBookId(index: number, book: BookModel): string {
-    return book.id;
+    return book.id.toString();
   }
   
   // Get category badge classes using the CategoryColorService
-  getCategoryBadgeClasses(category: string): string {
-    return this.categoryColorService.getCategoryBadgeClasses(category);
+  getCategoryBadgeClasses(category: string | any): string {
+    const categoryName = typeof category === 'string' ? category : category.name;
+    return this.categoryColorService.getCategoryBadgeClasses(categoryName);
+  }
+  
+  // Get category display name - handles both string and object categories
+  getCategoryDisplayName(category: string | any): string {
+    if (typeof category === 'string') {
+      return category;
+    }
+    // If it's an object, try to get the name property
+    return category?.name || category?.categoryName || 'Unknown Category';
   }
 }

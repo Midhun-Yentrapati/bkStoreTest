@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BookService } from '../../../services/book.service';
 import { CategoryService } from '../../../services/category.service';
-import { BookModel, BookCreateRequest, BookImageRequest } from '../../../models/book.model';
+import { BookModel, BookCreateRequest, BookImageRequest, CategoryInfo } from '../../../models/book.model';
 import { CategoryModel } from '../../../models/category.model';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
@@ -170,6 +170,33 @@ export class EditPageComponent implements OnInit, OnDestroy {
     return labels[fieldName] || fieldName;
   }
 
+  private handleUpdateSuccess(response: any, customMessage?: string): void {
+    console.group('🎉 UPDATE SUCCESS HANDLER');
+    console.log('✅ Final Update Status: SUCCESS');
+    console.log('📦 Final Response:', response);
+    console.log('💬 Custom Message:', customMessage);
+    console.groupEnd();
+    
+    this.isLoading = false;
+    this.successMessage = customMessage || 'Book updated successfully!';
+    this.isEditMode = false;
+    
+    // Update the original state
+    this.originalBookState = { ...response };
+    this.originalSalesCategoryState = this.selectedSalesCategory;
+    
+    // Update the current book data
+    this.editableBook = { ...response };
+    
+    // Clear any error messages
+    this.errorMessage = '';
+    
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      this.successMessage = '';
+    }, 5000);
+  }
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
@@ -182,7 +209,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
       this.bookService.getBookWithRelations(bookId).subscribe({
         next: (book) => {
           this.editableBook = { ...book };
-          this.selectedCategories = [...book.categories];
+          this.selectedCategories = [...(book.categories || [])];
           this.selectedSalesCategory = book.salesCategory as 'BEST_SELLING' | 'SPECIAL_OFFERS' | 'NEWLY_LAUNCHED';
           this.originalBookState = { ...book };
           this.originalSalesCategoryState = book.salesCategory as 'BEST_SELLING' | 'SPECIAL_OFFERS' | 'NEWLY_LAUNCHED';
@@ -254,25 +281,84 @@ export class EditPageComponent implements OnInit, OnDestroy {
       salesCategory: this.selectedSalesCategory
     };
 
+    // 🔍 DEBUG: Log the data being sent to backend
+    console.group('📤 FRONTEND → BACKEND: Book Update Request');
+    console.log('🎯 Book ID:', updatedBook.id);
+    console.log('📝 Original Book Data:', this.editableBook);
+    console.log('📋 Form Values:', formValue);
+    console.log('🏷️ Selected Categories:', this.selectedCategories);
+    console.log('🏪 Sales Category:', this.selectedSalesCategory);
+    console.log('📦 Final Update Payload:', updatedBook);
+    console.log('🔧 Using PUT method (backend doesn\'t support PATCH)');
+    console.groupEnd();
+
+    // Use PUT method since backend doesn't support PATCH
     this.subscription.add(
       this.bookService.updateBook(updatedBook.id, updatedBook).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          this.successMessage = 'Book updated successfully!';
-          this.isEditMode = false;
+        next: (basicUpdateResponse) => {
+          console.group('📥 BACKEND → FRONTEND: Basic Book Update Response');
+          console.log('✅ Basic Update Status: SUCCESS');
+          console.log('📦 Backend Response:', basicUpdateResponse);
+          console.groupEnd();
           
-          // Update the original state
-          this.originalBookState = { ...updatedBook };
-          this.originalSalesCategoryState = this.selectedSalesCategory;
-          
-          // Update editableBook with the response
-          this.editableBook = { ...response };
-          
-          setTimeout(() => {
-            this.successMessage = null;
-          }, 3000);
+          // Now update categories separately if they exist
+          if (this.selectedCategories && this.selectedCategories.length > 0) {
+            const categoryIds = this.selectedCategories.map(cat => cat.id);
+            this.bookService.updateBookCategories(updatedBook.id, categoryIds).subscribe({
+              next: (categoryResponse) => {
+                console.log('✅ Categories updated successfully:', categoryResponse);
+                
+                // Update images separately if they exist
+                if (updatedBook.images && updatedBook.images.length > 0) {
+                  this.bookService.updateBookImages(updatedBook.id, updatedBook.images).subscribe({
+                    next: (imageResponse) => {
+                      console.log('✅ Images updated successfully:', imageResponse);
+                      this.handleUpdateSuccess(imageResponse);
+                    },
+                    error: (imageError) => {
+                      console.error('❌ Image update failed:', imageError);
+                      // Still show success for basic update + categories
+                      this.handleUpdateSuccess(categoryResponse, 'Book updated successfully, but image update failed.');
+                    }
+                  });
+                } else {
+                  this.handleUpdateSuccess(categoryResponse);
+                }
+              },
+              error: (categoryError) => {
+                console.error('❌ Category update failed:', categoryError);
+                // Still show success for basic update
+                this.handleUpdateSuccess(basicUpdateResponse, 'Book updated successfully, but category update failed.');
+              }
+            });
+          } else if (updatedBook.images && updatedBook.images.length > 0) {
+            // Only update images if no categories
+            this.bookService.updateBookImages(updatedBook.id, updatedBook.images).subscribe({
+              next: (imageResponse) => {
+                console.log('✅ Images updated successfully:', imageResponse);
+                this.handleUpdateSuccess(imageResponse);
+              },
+              error: (imageError) => {
+                console.error('❌ Image update failed:', imageError);
+                this.handleUpdateSuccess(basicUpdateResponse, 'Book updated successfully, but image update failed.');
+              }
+            });
+          } else {
+            // No categories or images to update
+            this.handleUpdateSuccess(basicUpdateResponse);
+          }
         },
         error: (error) => {
+          // 🔍 DEBUG: Log error details
+          console.group('❌ BACKEND → FRONTEND: Book Update Error');
+          console.error('💥 Update Status: FAILED');
+          console.error('🚨 Error Object:', error);
+          console.error('📄 Error Message:', error.message);
+          console.error('🔢 Error Status:', error.status);
+          console.error('📊 Error Details:', error.error);
+          console.error('🌐 Request URL:', error.url);
+          console.groupEnd();
+          
           this.isLoading = false;
           this.errorMessage = `Failed to update book: ${error.message}`;
           console.error('EditBookPage: Update error:', error);
@@ -308,7 +394,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
     if (this.originalBookState) {
       // Reset form to original values
       this.bookForm.patchValue(this.originalBookState);
-      this.selectedCategories = [...this.originalBookState.categories];
+      this.selectedCategories = [...(this.originalBookState.categories || [])];
       this.selectedSalesCategory = this.originalSalesCategoryState;
       this.editableBook = { ...this.originalBookState };
     }
@@ -354,7 +440,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
   // Removed file upload functionality - now using image path selection
 
   onImageUrlChange(): void {
-    if (this.editableBook && this.editableBook.images.length > 0) {
+    if (this.editableBook && this.editableBook.images && this.editableBook.images.length > 0) {
       this.imagePreviewUrl = this.editableBook.images[0].imageUrl;
       this.imageUrlError = false;
     }
@@ -386,8 +472,34 @@ export class EditPageComponent implements OnInit, OnDestroy {
     return 'px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800';
   }
 
-  getCategoriesDisplay(categories: CategoryModel[]): string {
+  getCategoriesDisplay(categories: CategoryModel[] | CategoryInfo[] | undefined): string {
+    if (!categories || categories.length === 0) {
+      return 'No categories';
+    }
     return categories.map(cat => cat.name).join(', ');
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) {
+      return 'Not specified';
+    }
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      // Format as DD/MM/YYYY
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
   }
 
   setCategoriesFromInput(event: Event): void {
@@ -409,10 +521,10 @@ export class EditPageComponent implements OnInit, OnDestroy {
     } else if (this.editableBook) {
       // Create new image if none exists
       this.editableBook.images = [{
+        id: 0, // Temporary ID for new image
         imageUrl: url,
         isPrimary: true,
-        altText: this.editableBook.title,
-        displayOrder: 0
+        altText: this.editableBook.title
       }];
     }
   }
@@ -422,45 +534,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
     this.imagePreviewUrl = url;
   }
 
-  formatDate(dateString: string | undefined): string {
-    if (!dateString) return '';
-    
-    try {
-      // Handle different date formats
-      let date: Date;
-      
-      // If it's already a valid date string, parse it
-      if (typeof dateString === 'string') {
-        // Handle ISO date strings and other formats
-        date = new Date(dateString);
-        
-        // If parsing failed, try to handle YYYY-MM-DD format specifically
-        if (isNaN(date.getTime()) && dateString.includes('-')) {
-          const parts = dateString.split('-');
-          if (parts.length === 3) {
-            date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-          }
-        }
-      } else {
-        date = new Date(dateString);
-      }
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date string:', dateString);
-        return 'Invalid Date';
-      }
-      
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (error) {
-      console.error('Error formatting date:', error, dateString);
-      return dateString || 'Invalid Date';
-    }
-  }
+
 
   // Removed file upload methods - now using image path selection
 

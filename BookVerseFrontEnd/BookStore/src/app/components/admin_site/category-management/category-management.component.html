@@ -1,260 +1,89 @@
 <div class="category-management-container">
-  <div class="header-section">
-    <button class="back-button" (click)="goBack()">
-      <span class="material-symbols-outlined">arrow_back</span> Back to Dashboard
-    </button>
-    <h1>Category Management</h1>
-    <p class="subtitle">Manage book categories for your store</p>
-  </div>
-
-  <div class="content-wrapper">
-    <!-- Add New Category Section -->
-    <div class="add-category-section">
-      <h3>Add New Category</h3>
-      <div class="category-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="categoryName">Category Name *</label>
-            <input
-              id="categoryName"
-              type="text"
-              [(ngModel)]="newCategory.name"
-              placeholder="Enter category name"
-              (keyup.enter)="onAddCategory()"
-              [ngClass]="{'error': categoryInputError, 'success': !categoryInputError && newCategory.name && newCategory.name.length >= 2}"
-              class="form-input"
-              maxlength="50" />
-            <small class="field-note">Slug will be auto-generated from the name</small>
-          </div>
-          
-          <div class="form-group">
-            <label for="categoryDisplayOrder">Display Order</label>
-            <input
-              id="categoryDisplayOrder"
-              type="number"
-              [(ngModel)]="newCategory.displayOrder"
-              placeholder="Enter display order"
-              class="form-input"
-              min="0" />
-            <small class="field-note">Order in which category appears in navigation</small>
-          </div>
+  <div class="content-card">
+    
+    <!-- Header Section with Back Button -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1 class="page-title">Category Management</h1>
+          <p class="page-subtitle">Manage book categories and classifications</p>
         </div>
-
-        <div class="form-group">
-          <label for="categoryDescription">Description</label>
-          <textarea
-            id="categoryDescription"
-            [(ngModel)]="newCategory.description"
-            placeholder="Enter category description (optional)"
-            class="form-textarea"
-            maxlength="500"
-            rows="3"></textarea>
-        </div>
-
-        <!-- Image field (disabled as requested) -->
-        <div class="form-group">
-          <label for="categoryImage">Image URL</label>
-          <input
-            id="categoryImage"
-            type="url"
-            [(ngModel)]="newCategory.image"
-            placeholder="Enter image URL (disabled for now)"
-            class="form-input disabled"
-            disabled />
-          <small class="field-note">Image functionality is currently disabled</small>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="newCategory.isActive"
-              class="form-checkbox" />
-            <span class="checkmark"></span>
-            Active (will appear in navigation)
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button 
-            class="action-button save-button" 
-            (click)="onAddCategory()"
-            [disabled]="!newCategory.name || newCategory.name.length < 2 || isLoading">
-            <span class="material-symbols-outlined button-icon">add</span> 
-            {{ isLoading ? 'Adding...' : 'Add Category' }}
+        <div class="header-actions">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
           </button>
-          
-          <button 
-            class="action-button cancel-button" 
-            (click)="resetNewCategoryForm()"
-            type="button">
-            <span class="material-symbols-outlined button-icon">refresh</span> Reset Form
-          </button>
-        </div>
-
-        <div *ngIf="categoryInputError" class="validation-message error">
-          Category name must be at least 2 characters long.
-        </div>
-        <div *ngIf="newCategory.name && newCategory.name.length >= 2" class="validation-message success">
-          Category name looks good!
         </div>
       </div>
     </div>
 
-    <!-- Existing Categories Section -->
+    <div class="add-category-section">
+      <h3>Add New Category</h3>
+      <div class="add-input-group">
+        <input
+          type="text"
+          [(ngModel)]="newCategoryName"
+          placeholder="Category Name"
+          (keyup.enter)="onAddCategory()"
+          [ngClass]="{'border-red-500': categoryInputError, 'border-green-500': !categoryInputError && newCategoryName && newCategoryName.length >= 2}"
+          class="category-input"
+          maxlength="50" />
+        <button 
+          class="action-button save-button" 
+          (click)="onAddCategory()"
+          [disabled]="!newCategoryName || newCategoryName.length < 2">
+          <span class="material-symbols-outlined button-icon">add</span> Add Category
+        </button>
+      </div>
+      <div *ngIf="categoryInputError" class="text-red-500 text-sm mt-1">
+        Category name must be at least 2 characters long.
+      </div>
+      <div *ngIf="newCategoryName && newCategoryName.length >= 2" class="text-green-500 text-sm mt-1">
+        Category name looks good!
+      </div>
+    </div>
+
     <div class="categories-list-section">
-      <h3>Existing Categories ({{ categories.length }})</h3>
-      
-      <div *ngIf="isLoading && categories.length === 0" class="state-container">
-        <div class="loading-spinner"></div>
+      <h3>Existing Categories</h3>
+      <div *ngIf="isLoading" class="state-container">
         <p>Loading categories...</p>
       </div>
 
       <div *ngIf="!isLoading && categories.length === 0" class="state-container">
-        <span class="material-symbols-outlined empty-icon">category</span>
         <p>No categories found.</p>
-        <p class="empty-subtitle">Add your first category above to get started.</p>
       </div>
 
-      <div *ngIf="categories.length > 0" class="categories-table-container">
-        <table class="categories-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Slug</th>
-              <th>Description</th>
-              <th>Display Order</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let category of categories" 
-                [ngClass]="{'editing-row': editingCategory?.id === category.id}">
-              
-              <!-- Non-editing mode -->
-              <ng-container *ngIf="editingCategory?.id !== category.id">
-                <td class="id-cell">{{ category.id }}</td>
-                <td class="name-cell">
-                  <strong>{{ category.name }}</strong>
-                </td>
-                <td class="slug-cell">
-                  <code>{{ category.slug || 'auto-generated' }}</code>
-                </td>
-                <td class="description-cell">
-                  <span [title]="category.description">
-                    {{ (category.description && category.description.length > 50) ? 
-                       (category.description | slice:0:50) + '...' : 
-                       (category.description || 'No description') }}
-                  </span>
-                </td>
-                <td class="order-cell">{{ category.displayOrder || 0 }}</td>
-                <td class="status-cell">
-                  <span class="status-badge" 
-                        [ngClass]="{'active': category.isActive, 'inactive': !category.isActive}">
-                    {{ category.isActive ? 'Active' : 'Hidden' }}
-                  </span>
-                </td>
-                <td class="actions-cell">
-                  <div class="action-buttons">
-                    <button class="action-button edit-button" 
-                            (click)="onEdit(category)"
-                            [disabled]="isLoading"
-                            title="Edit Category">
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    
-                    <button class="action-button toggle-button" 
-                            [ngClass]="{'activate': !category.isActive, 'deactivate': category.isActive}"
-                            (click)="onToggleActive(category)"
-                            [disabled]="isLoading"
-                            [title]="category.isActive ? 'Hide from Navigation' : 'Show in Navigation'">
-                      <span class="material-symbols-outlined">
-                        {{ category.isActive ? 'visibility_off' : 'visibility' }}
-                      </span>
-                    </button>
-                    
-                    <button class="action-button delete-button" 
-                            (click)="onDelete(category)"
-                            [disabled]="isLoading"
-                            title="Delete Category">
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-
-              <!-- Editing mode -->
-              <ng-container *ngIf="editingCategory?.id === category.id">
-                <td class="id-cell">{{ category.id }}</td>
-                <td class="name-cell">
-                  <input type="text" 
-                         [(ngModel)]="editForm.name" 
-                         class="inline-edit-input"
-                         placeholder="Category name"
-                         maxlength="50" />
-                </td>
-                <td class="slug-cell">
-                  <code class="auto-generated">auto-updated</code>
-                </td>
-                <td class="description-cell">
-                  <textarea [(ngModel)]="editForm.description" 
-                            class="inline-edit-textarea"
-                            placeholder="Description"
-                            maxlength="500"
-                            rows="2"></textarea>
-                </td>
-                <td class="order-cell">
-                  <input type="number" 
-                         [(ngModel)]="editForm.displayOrder" 
-                         class="inline-edit-input number-input"
-                         min="0" 
-                         title="Display order"
-                         placeholder="Order" />
-                </td>
-                <td class="status-cell">
-                  <label class="inline-checkbox-label">
-                                         <input type="checkbox" 
-                            [(ngModel)]="editForm.isActive" 
-                            class="inline-checkbox"
-                            title="Toggle category active status" />
-                    <span class="inline-checkmark"></span>
-                    {{ editForm.isActive ? 'Active' : 'Hidden' }}
-                  </label>
-                </td>
-                <td class="actions-cell">
-                  <div class="edit-actions">
-                    <button class="action-button save-button" 
-                            (click)="onSaveEdit()"
-                            [disabled]="isLoading || !editForm.name || editForm.name.length < 2"
-                            title="Save Changes">
-                      <span class="material-symbols-outlined">save</span>
-                    </button>
-                    
-                    <button class="action-button cancel-button" 
-                            (click)="cancelEdit()"
-                            [disabled]="isLoading"
-                            title="Cancel Edit">
-                      <span class="material-symbols-outlined">cancel</span>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table *ngIf="!isLoading && categories.length > 0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories">
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td class="action-buttons-cell">
+              <button class="action-button delete-button" (click)="onDelete(category.id)">
+                <span class="material-symbols-outlined button-icon">delete</span> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Messages -->
-    <div *ngIf="errorMessage" class="message-banner error-banner">
-      <span class="material-symbols-outlined">error</span>
+    <div *ngIf="errorMessage" class="banner error-banner">
       {{ errorMessage }}
     </div>
-    
-    <div *ngIf="successMessage" class="message-banner success-banner">
-      <span class="material-symbols-outlined">check_circle</span>
+    <div *ngIf="successMessage" class="banner success-banner">
       {{ successMessage }}
     </div>
   </div>

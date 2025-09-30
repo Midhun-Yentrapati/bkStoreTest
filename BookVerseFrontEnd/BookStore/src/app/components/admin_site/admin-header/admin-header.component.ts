@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { AdminNotificationsComponent } from '../admin-notifications/admin-notifications.component';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-header',
@@ -17,6 +18,8 @@ export class AdminHeaderComponent {
 
   showUsername: boolean = true;
   showBackIcon: boolean = false;
+
+  private authService = inject(AuthService);
 
   constructor(private router: Router) {
     this.router.events.subscribe(event => {
@@ -37,20 +40,21 @@ export class AdminHeaderComponent {
     }
   }
 
+  navigateToAdminDashboard(): void {
+    console.log('Navigating to admin dashboard');
+    this.router.navigate(['/admin-main']);
+  }
+
 
 
   onLogoutClick(): void {
-    // Clear session and local storage
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('loggedInUsername');
-      sessionStorage.clear();
-    }
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('bookverse_user');
-    }
+    console.log('Admin logout clicked');
     
-    // Redirect to admin login page
-    this.router.navigate(['/admin/login']);
+    // Emit logout event for parent components
+    this.logoutClicked.emit();
+    
+    // Use AuthService for proper logout with backend session termination
+    this.authService.logoutAdmin();
   }
 }
 

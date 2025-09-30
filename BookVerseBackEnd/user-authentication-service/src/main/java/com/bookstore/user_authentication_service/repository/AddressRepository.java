@@ -16,6 +16,7 @@ import java.util.Optional;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, String> {
     
+	Optional<Address> findByIdAndUserId(String addressId, String userId);
     // Basic User Address Queries
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.isActive = true ORDER BY a.isDefault DESC, a.createdAt DESC")
     List<Address> findByUserId(@Param("userId") String userId);
@@ -23,11 +24,19 @@ public interface AddressRepository extends JpaRepository<Address, String> {
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.isActive = true")
     Page<Address> findByUserId(@Param("userId") String userId, Pageable pageable);
     
+    // Method expected by tests - using Spring Data JPA method naming convention
+    @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.isActive = true ORDER BY a.isDefault DESC, a.createdAt DESC")
+    List<Address> findByUserIdOrderByIsDefaultDescCreatedAtDesc(@Param("userId") String userId);
+    
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.isDefault = true AND a.isActive = true")
     Optional<Address> findDefaultAddressByUserId(@Param("userId") String userId);
     
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.addressType = :addressType AND a.isActive = true")
     List<Address> findByUserIdAndAddressType(@Param("userId") String userId, @Param("addressType") AddressType addressType);
+    
+    // Method for finding addresses excluding a specific address ID (used in delete operations)
+    @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.id != :excludeId AND a.isActive = true ORDER BY a.createdAt ASC")
+    List<Address> findByUserIdAndIdNotOrderByCreatedAtAsc(@Param("userId") String userId, @Param("excludeId") String excludeId);
     
     // Address Type Queries
     @Query("SELECT a FROM Address a WHERE a.addressType = :addressType AND a.isActive = true")

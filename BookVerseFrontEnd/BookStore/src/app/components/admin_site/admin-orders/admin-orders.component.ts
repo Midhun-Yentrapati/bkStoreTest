@@ -35,13 +35,11 @@ export class AdminOrdersComponent implements OnInit {
 
   // Available order statuses
   availableStatuses: Order['orderStatus'][] = [
-    'pending',
-    'confirmed', 
-    'processing',
-    'shipped',
-    'delivered',
-    'cancelled',
-    'returned'
+    'Pending',
+    'Confirmed', 
+    'Shipped',
+    'Delivered',
+    'Cancelled'
   ];
 
   constructor(
@@ -94,22 +92,31 @@ export class AdminOrdersComponent implements OnInit {
       switch (this.dateFilter) {
         case 'today':
           filtered = filtered.filter(order => {
-            orderDate.setTime(Date.parse(order.orderDate));
-            return orderDate.toDateString() === now.toDateString();
+            if (order.orderDate) {
+              orderDate.setTime(Date.parse(order.orderDate));
+              return orderDate.toDateString() === now.toDateString();
+            }
+            return false;
           });
           break;
         case 'week':
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           filtered = filtered.filter(order => {
-            orderDate.setTime(Date.parse(order.orderDate));
-            return orderDate >= weekAgo;
+            if (order.orderDate) {
+              orderDate.setTime(Date.parse(order.orderDate));
+              return orderDate >= weekAgo;
+            }
+            return false;
           });
           break;
         case 'month':
           const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           filtered = filtered.filter(order => {
-            orderDate.setTime(Date.parse(order.orderDate));
-            return orderDate >= monthAgo;
+            if (order.orderDate) {
+              orderDate.setTime(Date.parse(order.orderDate));
+              return orderDate >= monthAgo;
+            }
+            return false;
           });
           break;
       }
@@ -120,7 +127,7 @@ export class AdminOrdersComponent implements OnInit {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(order => 
         order.id.toLowerCase().includes(query) ||
-        order.shippingAddress.name.toLowerCase().includes(query) ||
+        (order.shippingAddress && order.shippingAddress.name?.toLowerCase().includes(query)) ||
         order.items.some(item => 
           item.title?.toLowerCase().includes(query) ||
           item.author?.toLowerCase().includes(query)
@@ -265,25 +272,25 @@ export class AdminOrdersComponent implements OnInit {
 
   getTotalRevenue(): number {
     return this.orders
-      .filter(order => order.paymentStatus === 'paid')
+      .filter(order => order.paymentStatus === 'Paid')
       .reduce((total, order) => total + this.getOrderTotal(order), 0);
   }
 
   // Check if status can be updated (prevent updating delivered/cancelled orders)
   canUpdateStatus(order: OrderWithDetails): boolean {
-    return !['delivered', 'cancelled'].includes(order.orderStatus);
+    return !!order.orderStatus && !['Delivered', 'Cancelled'].includes(order.orderStatus);
   }
 
   // Get next possible statuses based on current status
   getNextPossibleStatuses(currentStatus: Order['orderStatus']): Order['orderStatus'][] {
+    if (!currentStatus) return [];
+    
     const statusFlow: { [key: string]: Order['orderStatus'][] } = {
-      'pending': ['confirmed', 'cancelled'],
-      'confirmed': ['processing', 'cancelled'],
-      'processing': ['shipped', 'cancelled'],
-      'shipped': ['delivered', 'returned'],
-      'delivered': ['returned'],
-      'cancelled': [],
-      'returned': []
+      'Pending': ['Confirmed', 'Cancelled'],
+      'Confirmed': ['Shipped', 'Cancelled'],
+      'Shipped': ['Delivered', 'Cancelled'],
+      'Delivered': [],
+      'Cancelled': []
     };
     
     return statusFlow[currentStatus] || [];

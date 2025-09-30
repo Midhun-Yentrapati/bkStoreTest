@@ -20,12 +20,14 @@ export class AddressManagementComponent implements OnInit {
     phone: '',
     alternatePhone: '',
     pincode: '',
-    address: '',
+    addressLine1: '',      // Changed from 'address' to 'addressLine1'
+    addressLine2: '',      // Added addressLine2
     locality: '',
     city: '',
     state: '',
+    country: 'India',      // Default country as required by backend
     landmark: '',
-    addressType: 'Home'
+    addressType: 'HOME'
   };
 
   isEditing: boolean = false;
@@ -46,9 +48,9 @@ export class AddressManagementComponent implements OnInit {
   ];
 
   addressTypes = [
-    { value: 'Home', label: 'Home', description: 'All day delivery' },
-    { value: 'Work', label: 'Work', description: 'Delivery between 10 AM - 5 PM' },
-    { value: 'Other', label: 'Other', description: 'Custom delivery time' }
+    { value: 'HOME', label: 'Home', description: 'All day delivery' },
+    { value: 'WORK', label: 'Work', description: 'Delivery between 10 AM - 5 PM' },
+    { value: 'OTHER', label: 'Other', description: 'Custom delivery time' }
   ];
 
   constructor(
@@ -149,30 +151,45 @@ export class AddressManagementComponent implements OnInit {
 
     if (this.isEditing && this.editId) {
       this.addressService.updateAddress(this.editId, this.address).subscribe({
-        next: () => {
+        next: (response) => {
           this.notificationService.success('Success', 'Address updated successfully!');
           this.router.navigate(['/checkout']);
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Error updating address:', error);
-          this.notificationService.error('Update Failed', 'Failed to update address. Please try again.');
+          this.handleAddressError(error);
           this.isLoading = false;
         }
       });
     } else {
       this.addressService.addAddress(this.address).subscribe({
-        next: () => {
+        next: (response) => {
           this.notificationService.success('Success', 'Address added successfully!');
           this.router.navigate(['/checkout']);
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Error adding address:', error);
-          this.notificationService.error('Add Failed', 'Failed to add address. Please try again.');
+          this.handleAddressError(error);
           this.isLoading = false;
         }
       });
+    }
+  }
+
+  handleAddressError(error: any): void {
+    if (error.status === 400 && error.error) {
+      // Handle validation errors from backend
+      if (typeof error.error === 'string') {
+        this.notificationService.error('Validation Error', error.error);
+      } else if (error.error.message) {
+        this.notificationService.error('Validation Error', error.error.message);
+      } else {
+        this.notificationService.error('Validation Error', 'Please check your input and try again.');
+      }
+    } else {
+      this.notificationService.error('Error', 'Failed to save address. Please try again.');
     }
   }
 
@@ -206,13 +223,8 @@ export class AddressManagementComponent implements OnInit {
       isValid = false;
     }
 
-    if (!this.address.address.trim()) {
-      this.formErrors['address'] = 'Please enter your address';
-      isValid = false;
-    }
-
-    if (!this.address.locality.trim()) {
-      this.formErrors['locality'] = 'Please enter your locality';
+    if (!this.address.addressLine1.trim()) {
+      this.formErrors['addressLine1'] = 'Please enter your address';
       isValid = false;
     }
 
@@ -223,6 +235,11 @@ export class AddressManagementComponent implements OnInit {
 
     if (!this.address.state.trim()) {
       this.formErrors['state'] = 'Please select your state';
+      isValid = false;
+    }
+
+    if (!this.address.country.trim()) {
+      this.formErrors['country'] = 'Please enter your country';
       isValid = false;
     }
 

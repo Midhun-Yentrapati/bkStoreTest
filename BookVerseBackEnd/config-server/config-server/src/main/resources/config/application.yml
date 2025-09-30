@@ -1,5 +1,15 @@
 # Default configuration for all services
 spring:
+  datasource:
+    # Default H2 configuration for development
+    url: jdbc:h2:mem:bookstore_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   jpa:
     hibernate:
       ddl-auto: update
@@ -7,6 +17,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# JWT Configuration - Centralized secure secret key
+jwt:
+  secret: fl34VPmxm39ay5O5wST05MDqxiwr4Bo83aa+OgNhVTVV1LQoxMhWG4aOQXxKqJVH
+  expiration: 86400000  # 24 hours
+  refresh-expiration: 604800000  # 7 days
+  access-token-expiration: 86400000  # 24 hours
+  refresh-token-expiration: 604800000  # 7 days
 
 # CORS Configuration
 cors:

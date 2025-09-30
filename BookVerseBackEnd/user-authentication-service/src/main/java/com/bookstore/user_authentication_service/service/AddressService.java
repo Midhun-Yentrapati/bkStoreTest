@@ -18,6 +18,8 @@ public interface AddressService {
     AddressDTO updateAddress(String userId, String addressId, AddressDTO addressDTO);
     void deleteAddress(String userId, String addressId);
     
+    Optional<AddressDTO> getAddressByIdAndUserId(String addressId, String userId);
+    
     // Default Address Management
     AddressDTO setDefaultAddress(String userId, String addressId);
     Optional<AddressDTO> getDefaultAddress(String userId);
@@ -25,6 +27,7 @@ public interface AddressService {
     void unsetAllDefaultAddresses(String userId);
     
     // Address Type Operations
+    
     List<AddressDTO> getAddressesByType(String userId, AddressType addressType);
     Page<AddressDTO> getAddressesByType(AddressType addressType, Pageable pageable);
     

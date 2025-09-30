@@ -6,10 +6,15 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +25,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -169,6 +174,7 @@ public class User {
         return permissions != null && permissions.contains(permission);
     }
     
+    @Override
     public boolean isAccountNonLocked() {
         return accountLockedUntil == null || accountLockedUntil.isBefore(LocalDateTime.now());
     }
@@ -216,5 +222,43 @@ public class User {
         this.lastLoginAt = LocalDateTime.now();
         this.lastLoginIp = ipAddress;
         resetFailedLoginAttempts();
+    }
+    
+    // Spring Security UserDetails interface methods
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Convert userType to Spring Security authority
+        String authority = "ROLE_" + (userType != null ? userType.name() : "USER");
+        return Collections.singletonList(new SimpleGrantedAuthority(authority));
+    }
+    
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+    
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        // Account never expires in our system
+        return true;
+    }
+    
+    // isAccountNonLocked() method already exists above - no need to duplicate
+    
+    @Override
+    public boolean isCredentialsNonExpired() {
+        // Credentials never expire in our system
+        return true;
+    }
+    
+    @Override
+    public boolean isEnabled() {
+        // Account is enabled if status is ACTIVE and email is verified
+        return accountStatus == AccountStatus.ACTIVE && Boolean.TRUE.equals(isEmailVerified);
     }
 }

@@ -1,0 +1,55 @@
+# Configuration specific to Cart Order Management Service
+server:
+  port: 8083
+
+spring:
+  application:
+    name: cart-order-management
+  datasource:
+    # MySQL Configuration for production
+    url: jdbc:mysql://localhost:3306/cart_order_management?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Midhun@64
+    platform: mysql
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    defer-datasource-initialization: true
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+# JWT Configuration is inherited from application.yml (global config)
+
+# Cart and Order specific Configuration
+cart:
+  session:
+    timeout: 3600000  # 1 hour
+  cleanup:
+    interval: 1800000  # 30 minutes
+
+order:
+  pagination:
+    default-size: 10
+    max-size: 50
+  status:
+    auto-confirm-timeout: 900000  # 15 minutes
+  payment:
+    timeout: 600000  # 10 minutes
+
+# Coupon Configuration
+coupon:
+  max-usage-per-user: 5
+  expiry-check-interval: 86400000  # 24 hours 

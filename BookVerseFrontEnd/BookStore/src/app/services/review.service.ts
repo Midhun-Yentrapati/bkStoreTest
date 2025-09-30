@@ -1,122 +1,88 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, map, catchError } from 'rxjs';
+import { BookService } from './book.service';
+import { CustomerRating } from '../models/book.model';
 import { AuthService } from './auth.service';
-
-export interface ReviewRequest {
-  bookId: number;
-  userId: string;
-  userName: string;
-  rating: number;
-  comment?: string;
-  orderItemId?: string;
-  isVerifiedPurchase?: boolean;
-}
-
-export interface ReviewResponse {
-  id: number;
-  bookId: number;
-  bookTitle: string;
-  userId: string;
-  userName: string;
-  rating: number;
-  comment?: string;
-  isVerifiedPurchase: boolean;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  moderatedBy?: string;
-  moderatedAt?: string;
-}
-
-export interface ReviewStats {
-  averageRating: number;
-  reviewCount: number;
-  ratingDistribution: { [key: number]: number };
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReviewService {
 
-  private baseUrl = 'http://localhost:8080/api/reviews';
-
   constructor(
-    private http: HttpClient,
+    private bookService: BookService,
     private authService: AuthService
   ) { }
 
   /**
    * Submit a new review for a book
+   * @param bookId - Book ID
+   * @param rating - Rating (1-5)
+   * @param reviewText - Review text
+   * @returns Observable of success/failure
    */
-  submitReview(bookId: number, rating: number, reviewText: string, orderItemId?: string): Observable<ReviewResponse | null> {
-    const currentUser = this.authService.getCurrentCustomer();
+  submitReview(bookId: string, rating: number, reviewText: string): Observable<boolean> {
+    const currentUser = this.authService.currentCustomer();
     
     if (!currentUser) {
       console.error('User must be logged in to submit a review');
-      return of(null);
+      return of(false);
     }
 
-    const reviewRequest: ReviewRequest = {
-      bookId: bookId,
-      userId: currentUser.id,
-      userName: currentUser.fullName || currentUser.username,
+    const reviewData = {
       rating: rating,
-      comment: reviewText,
-      orderItemId: orderItemId,
-      isVerifiedPurchase: !!orderItemId
+      review: reviewText,
+      userId: currentUser.id,
+      userName: currentUser.fullName || currentUser.username
     };
 
-    return this.http.post<ReviewResponse>(this.baseUrl, reviewRequest).pipe(
+    return this.bookService.addReview(bookId, reviewData).pipe(
+      map(() => true),
       catchError(error => {
         console.error('Failed to submit review:', error);
-        return of(null);
+        return of(false);
       })
     );
   }
 
   /**
    * Update an existing review
+   * @param bookId - Book ID
+   * @param rating - New rating
+   * @param reviewText - New review text
+   * @returns Observable of success/failure
    */
-  updateReview(reviewId: number, rating: number, reviewText: string): Observable<ReviewResponse | null> {
-    const currentUser = this.authService.getCurrentCustomer();
+  updateReview(bookId: string, rating: number, reviewText: string): Observable<boolean> {
+    const currentUser = this.authService.currentCustomer();
     
     if (!currentUser) {
       console.error('User must be logged in to update a review');
-      return of(null);
+      return of(false);
     }
 
-    const reviewRequest: ReviewRequest = {
-      bookId: 0, // Will be ignored in update
-      userId: currentUser.id,
-      userName: currentUser.fullName || currentUser.username,
-      rating: rating,
-      comment: reviewText
-    };
-
-    return this.http.put<ReviewResponse>(`${this.baseUrl}/${reviewId}`, reviewRequest).pipe(
+    return this.bookService.updateReview(bookId, currentUser.id, { rating, review: reviewText }).pipe(
+      map(() => true),
       catchError(error => {
         console.error('Failed to update review:', error);
-        return of(null);
+        return of(false);
       })
     );
   }
 
   /**
    * Delete a review
+   * @param bookId - Book ID
+   * @returns Observable of success/failure
    */
-  deleteReview(reviewId: number): Observable<boolean> {
-    const currentUser = this.authService.getCurrentCustomer();
+  deleteReview(bookId: string): Observable<boolean> {
+    const currentUser = this.authService.currentCustomer();
     
     if (!currentUser) {
       console.error('User must be logged in to delete a review');
       return of(false);
     }
 
-    const params = new HttpParams().set('userId', currentUser.id);
-
-    return this.http.delete(`${this.baseUrl}/${reviewId}`, { params }).pipe(
+    return this.bookService.deleteReview(bookId, currentUser.id).pipe(
       map(() => true),
       catchError(error => {
         console.error('Failed to delete review:', error);
@@ -127,133 +93,86 @@ export class ReviewService {
 
   /**
    * Get all reviews for a book
+   * @param bookId - Book ID
+   * @returns Observable of customer ratings array
    */
-  getBookReviews(bookId: number): Observable<ReviewResponse[]> {
-    return this.http.get<ReviewResponse[]>(`${this.baseUrl}/book/${bookId}`).pipe(
-      catchError(error => {
-        console.error('Failed to get book reviews:', error);
-        return of([]);
-      })
-    );
-  }
-
-  /**
-   * Get reviews for a book with pagination
-   */
-  getBookReviewsWithPagination(bookId: number, page: number = 0, size: number = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-
-    return this.http.get<any>(`${this.baseUrl}/book/${bookId}/page`, { params }).pipe(
-      catchError(error => {
-        console.error('Failed to get book reviews with pagination:', error);
-        return of({ content: [], totalElements: 0, totalPages: 0 });
-      })
-    );
+  getBookReviews(bookId: string): Observable<CustomerRating[]> {
+    return this.bookService.getBookReviews(bookId);
   }
 
   /**
    * Get current user's review for a book
+   * @param bookId - Book ID
+   * @returns Observable of user's review or null
    */
-  getUserReview(bookId: number): Observable<ReviewResponse | null> {
-    const currentUser = this.authService.getCurrentCustomer();
+  getUserReview(bookId: string): Observable<CustomerRating | null> {
+    const currentUser = this.authService.currentCustomer();
     
     if (!currentUser) {
       return of(null);
     }
 
-    return this.http.get<ReviewResponse>(`${this.baseUrl}/book/${bookId}/user/${currentUser.id}`).pipe(
-      catchError(error => {
-        // 404 is expected if user hasn't reviewed the book
-        return of(null);
-      })
-    );
+    return this.bookService.getUserReviewForBook(bookId, currentUser.id);
   }
 
   /**
-   * Get user's all reviews
+   * Get average rating for a book
+   * @param bookId - Book ID
+   * @returns Observable of average rating
    */
-  getUserReviews(): Observable<ReviewResponse[]> {
-    const currentUser = this.authService.getCurrentCustomer();
-    
-    if (!currentUser) {
-      return of([]);
-    }
-
-    return this.http.get<ReviewResponse[]>(`${this.baseUrl}/user/${currentUser.id}`).pipe(
-      catchError(error => {
-        console.error('Failed to get user reviews:', error);
-        return of([]);
-      })
-    );
-  }
-
-  /**
-   * Get review statistics for a book
-   */
-  getReviewStatistics(bookId: number): Observable<ReviewStats> {
-    return this.http.get<ReviewStats>(`${this.baseUrl}/book/${bookId}/stats`).pipe(
-      catchError(error => {
-        console.error('Failed to get review statistics:', error);
-        return of({
-          averageRating: 0,
-          reviewCount: 0,
-          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-        });
-      })
-    );
+  getAverageRating(bookId: string): Observable<number> {
+    return this.bookService.getBookAverageRating(bookId);
   }
 
   /**
    * Check if current user can review a book
+   * @param bookId - Book ID
+   * @returns Boolean indicating if user can review
    */
-  canUserReview(bookId: number): Observable<boolean> {
-    const currentUser = this.authService.getCurrentCustomer();
-    
-    if (!currentUser) {
-      return of(false);
-    }
-
-    return this.http.get<{canReview: boolean}>(`${this.baseUrl}/book/${bookId}/user/${currentUser.id}/can-review`).pipe(
-      map(response => response.canReview),
-      catchError(error => {
-        console.error('Failed to check if user can review:', error);
-        return of(false);
-      })
-    );
+  canUserReview(bookId: string): boolean {
+    const currentUser = this.authService.currentCustomer();
+    return currentUser !== null;
   }
 
   /**
-   * Search reviews by text content
+   * Get review statistics for a book
+   * @param bookId - Book ID
+   * @returns Observable of review statistics
    */
-  searchReviews(searchText: string): Observable<ReviewResponse[]> {
-    const params = new HttpParams().set('q', searchText);
+  getReviewStatistics(bookId: string): Observable<{
+    totalReviews: number;
+    averageRating: number;
+    ratingDistribution: { [key: number]: number };
+  }> {
+    return this.getBookReviews(bookId).pipe(
+      map(reviews => {
+        const totalReviews = reviews.length;
+        const averageRating = totalReviews > 0 
+          ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews) * 10) / 10 
+          : 0;
+        
+        const ratingDistribution: { [key: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        reviews.forEach(review => {
+          ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+        });
 
-    return this.http.get<ReviewResponse[]>(`${this.baseUrl}/search`, { params }).pipe(
+        return {
+          totalReviews,
+          averageRating,
+          ratingDistribution
+        };
+      }),
       catchError(error => {
-        console.error('Failed to search reviews:', error);
-        return of([]);
+        console.error('Failed to get review statistics:', error);
+        return of({ totalReviews: 0, averageRating: 0, ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } });
       })
     );
-  }
-
-  /**
-   * Get rating text description
-   */
-  getRatingText(rating: number): string {
-    switch (rating) {
-      case 1: return 'Poor';
-      case 2: return 'Fair';
-      case 3: return 'Good';
-      case 4: return 'Very Good';
-      case 5: return 'Excellent';
-      default: return 'No Rating';
-    }
   }
 
   /**
    * Format review date for display
+   * @param dateString - ISO date string
+   * @returns Formatted date string
    */
   formatReviewDate(dateString: string): string {
     const date = new Date(dateString);
@@ -264,37 +183,19 @@ export class ReviewService {
     });
   }
 
-  // Admin methods (if needed)
-  
   /**
-   * Admin: Get all reviews for moderation
+   * Get rating text description
+   * @param rating - Rating value (1-5)
+   * @returns Text description of rating
    */
-  getAllReviewsForModeration(page: number = 0, size: number = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-
-    return this.http.get<any>(`${this.baseUrl}/admin/moderation`, { params }).pipe(
-      catchError(error => {
-        console.error('Failed to get reviews for moderation:', error);
-        return of({ content: [], totalElements: 0, totalPages: 0 });
-      })
-    );
-  }
-
-  /**
-   * Admin: Moderate a review
-   */
-  moderateReview(reviewId: number, status: string, moderatorId: string): Observable<ReviewResponse | null> {
-    const params = new HttpParams()
-      .set('status', status)
-      .set('moderatorId', moderatorId);
-
-    return this.http.put<ReviewResponse>(`${this.baseUrl}/admin/${reviewId}/moderate`, null, { params }).pipe(
-      catchError(error => {
-        console.error('Failed to moderate review:', error);
-        return of(null);
-      })
-    );
+  getRatingText(rating: number): string {
+    switch (rating) {
+      case 1: return 'Poor';
+      case 2: return 'Fair';
+      case 3: return 'Good';
+      case 4: return 'Very Good';
+      case 5: return 'Excellent';
+      default: return 'No Rating';
+    }
   }
 }

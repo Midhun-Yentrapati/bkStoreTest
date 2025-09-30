@@ -2,12 +2,14 @@ package com.bookstore.user_authentication_service.controller;
 
 import com.bookstore.user_authentication_service.dto.*;
 import com.bookstore.user_authentication_service.entity.*;
+import com.bookstore.user_authentication_service.service.AddressService;
 import com.bookstore.user_authentication_service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import java.util.Optional;
 public class UserController {
     
     private final UserService userService;
+    private final AddressService addressService;
     
     // ==================== USER PROFILE MANAGEMENT ====================
     
@@ -115,6 +118,8 @@ public class UserController {
             description = "Get all addresses for the authenticated user",
             security = @SecurityRequirement(name = "bearerAuth")
     )
+    
+    @Transactional()
     @GetMapping("/addresses")
     public ResponseEntity<?> getUserAddresses() {
         try {
@@ -200,6 +205,42 @@ public class UserController {
             log.error("Error deleting user address: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+
+ // In UserController.java
+
+    @Operation(
+            summary = "Get User Address by ID",
+            description = "Get a specific address by its ID for the authenticated user",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Address retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Address does not belong to user"),
+            @ApiResponse(responseCode = "404", description = "Address not found")
+    })
+    @GetMapping("/addresses/{addressId}")
+    public ResponseEntity<?> getAddressById(@PathVariable String addressId) {
+        try {
+            String userId = getCurrentUserId();
+            log.info("Getting address {} for user: {}", addressId, userId);
+
+            // We'll use the AddressService to handle fetching and ownership validation
+            Optional<AddressDTO> addressDTO = addressService.getAddressByIdAndUserId(addressId, userId);
+
+            if (addressDTO.isPresent()) {
+                return ResponseEntity.ok(addressDTO.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("error", "Address not found or not owned by user"));
+            }
+        } catch (Exception e) {
+            log.error("Error getting address by ID: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "Failed to retrieve address"));
         }
     }
     

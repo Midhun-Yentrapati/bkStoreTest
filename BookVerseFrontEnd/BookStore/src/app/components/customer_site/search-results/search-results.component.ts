@@ -58,11 +58,10 @@ export class SearchResultsComponent implements OnInit {
     
     // Convert category IDs to category names for proper filtering
     if (filters.categories && filters.categories.length > 0) {
-      const categoryNames = filters.categories.map((catId: string) => {
-        // Remove the 'cat_' prefix if it exists
-        const cleanCatId = catId.replace('cat_', '');
-        const category = this.categories.find(cat => cat.id === cleanCatId);
-        return category ? category.name : cleanCatId;
+      const categoryNames = filters.categories.map((catId: number) => {
+        // Find category by numeric ID
+        const category = this.categories.find(cat => cat.id === catId);
+        return category ? category.name : catId.toString();
       }).filter(Boolean); // Remove any undefined values
       
       this.currentFilters = {
@@ -84,7 +83,7 @@ export class SearchResultsComponent implements OnInit {
 
         // Fetch similar books only if there are primary results
         if (this.searchResults.length > 0) {
-          this.fetchSimilarBooks(this.searchResults[0].id);
+          this.fetchSimilarBooks(this.searchResults[0].id.toString());
         } else {
           this.similarBooks = [];
         }

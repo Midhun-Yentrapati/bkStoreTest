@@ -32,9 +32,9 @@ describe('HomeComponent', () => {
   ];
 
   const mockCategories: CategoryModel[] = [
-    { id: '1', name: 'Fiction' },
-    { id: '2', name: 'Non-Fiction' },
-    { id: '3', name: 'Adventure' }
+    { id: 1, name: 'Fiction' },
+    { id: 2, name: 'Non-Fiction' },
+    { id: 3, name: 'Adventure' }
   ];
 
   beforeEach(async () => {

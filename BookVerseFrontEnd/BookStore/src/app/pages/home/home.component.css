@@ -68,8 +68,8 @@ section.container {
   line-height: 1.1;
   margin-bottom: 1.5rem;
   background: linear-gradient(45deg, #ffffff, #e2e8f0);
-  -webkit-background-clip: text;
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

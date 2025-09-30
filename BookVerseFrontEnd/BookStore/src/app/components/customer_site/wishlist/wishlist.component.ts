@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BookService } from '../../../services/book.service';
-import { WishlistService, WishlistItemWithDetails } from '../../../services/wishlist.service';
+import { WishlistService } from '../../../services/wishlist.service';
+import { WishlistItemWithDetails } from '../../../models/wishlist.model';
 import { CartService } from '../../../services/cart.service';
 import { BookModel } from '../../../models/book.model';
 
@@ -87,13 +88,13 @@ export class WishlistComponent implements OnInit {
     return item.id;
   }
 
-  navigateToBook(bookId: string): void {
+  navigateToBook(bookId: string | number): void {
     console.log('Navigating to book with ID:', bookId);
-    this.router.navigate(['/book', bookId]);
+    this.router.navigate(['/book', bookId.toString()]);
   }
 
   moveAllToCart(): void {
-    const availableItems = this.wishlistItems.filter(item => item.book.stockActual > 0);
+    const availableItems = this.wishlistItems.filter(item => item.book.stock_actual > 0);
     
     if (availableItems.length === 0) {
       alert('No items available to add to cart.');
@@ -131,24 +132,35 @@ export class WishlistComponent implements OnInit {
 
   clearWishlist(): void {
     if (confirm('Are you sure you want to clear your entire wishlist?')) {
-      this.wishlistService.clearWishlist().subscribe({
-        next: () => {
-          console.log('Wishlist cleared successfully');
-          alert('Wishlist cleared successfully!');
-        },
-        error: (error) => {
-          console.error('Error clearing wishlist:', error);
-          alert('Error clearing wishlist. Please try again.');
-        }
+      // Clear wishlist by removing all items individually
+      const itemsToRemove = [...this.wishlistItems];
+      let remainingItems = itemsToRemove.length;
+      
+      if (remainingItems === 0) {
+        alert('Wishlist is already empty!');
+        return;
+      }
+      
+      itemsToRemove.forEach(item => {
+        this.wishlistService.removeFromWishlist(item.id).subscribe({
+          next: () => {
+            remainingItems--;
+            if (remainingItems === 0) {
+              console.log('Wishlist cleared successfully');
+              alert('Wishlist cleared successfully!');
+            }
+          },
+          error: (error: any) => {
+            console.error('Error removing item from wishlist:', error);
+            remainingItems--;
+            if (remainingItems === 0) {
+              alert('Some items could not be removed. Please refresh and try again.');
+            }
+          }
+        });
       });
     }
   }
 
-  getBookImage(book: BookModel): string {
-    if (book.images && book.images.length > 0) {
-      const primaryImage = book.images.find(img => img.isPrimary) || book.images[0];
-      return primaryImage.imageUrl;
-    }
-    return 'https://placehold.co/200x300?text=No+Image';
-  }
+
 } 

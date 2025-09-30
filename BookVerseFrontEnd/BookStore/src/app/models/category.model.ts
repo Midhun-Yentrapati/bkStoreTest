@@ -1,12 +1,11 @@
 export interface CategoryModel {
-    id: string;
+    id: number; // Backend uses Long (number) type
     name: string;
-    slug?: string;
     description?: string;
-    image?: string;
-    displayOrder?: number;
+    slug?: string;
     isActive?: boolean;
+    priority?: number;
+    image?: string;
     createdAt?: string;
     updatedAt?: string;
-    deletedAt?: string;
 }

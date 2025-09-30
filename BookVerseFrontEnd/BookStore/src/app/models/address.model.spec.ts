@@ -11,13 +11,14 @@ describe('Address', () => {
       alternatePhone: '0987654321',
       email: 'john@example.com',
       pincode: '12345',
-      address: '123 Test Street',
+      addressLine1: '123 Test Street',
+      addressLine2: 'Apt 4B',
       locality: 'Test Area',
       city: 'Test City',
       state: 'Test State',
       country: 'Test Country',
       landmark: 'Near Test Landmark',
-      addressType: 'Home',
+      addressType: 'HOME',
       isDefault: true,
       isActive: true,
       coordinates: {
@@ -34,17 +35,17 @@ describe('Address', () => {
     expect(mockAddress).toBeTruthy();
     expect(mockAddress.id).toBe('addr1');
     expect(mockAddress.name).toBe('John Doe');
-    expect(mockAddress.addressType).toBe('Home');
+    expect(mockAddress.addressType).toBe('HOME');
   });
 
   it('should have all required properties', () => {
     expect(mockAddress.name).toBeDefined();
     expect(mockAddress.phone).toBeDefined();
     expect(mockAddress.pincode).toBeDefined();
-    expect(mockAddress.address).toBeDefined();
-    expect(mockAddress.locality).toBeDefined();
+    expect(mockAddress.addressLine1).toBeDefined();
     expect(mockAddress.city).toBeDefined();
     expect(mockAddress.state).toBeDefined();
+    expect(mockAddress.country).toBeDefined();
     expect(mockAddress.addressType).toBeDefined();
   });
 
@@ -52,7 +53,8 @@ describe('Address', () => {
     expect(mockAddress.id).toBeDefined();
     expect(mockAddress.alternatePhone).toBeDefined();
     expect(mockAddress.email).toBeDefined();
-    expect(mockAddress.country).toBeDefined();
+    expect(mockAddress.addressLine2).toBeDefined();
+    expect(mockAddress.locality).toBeDefined();
     expect(mockAddress.landmark).toBeDefined();
     expect(mockAddress.isDefault).toBeDefined();
     expect(mockAddress.isActive).toBeDefined();
@@ -66,15 +68,15 @@ describe('Address', () => {
     expect(typeof mockAddress.name).toBe('string');
     expect(typeof mockAddress.phone).toBe('string');
     expect(typeof mockAddress.pincode).toBe('string');
-    expect(typeof mockAddress.address).toBe('string');
-    expect(typeof mockAddress.locality).toBe('string');
+    expect(typeof mockAddress.addressLine1).toBe('string');
     expect(typeof mockAddress.city).toBe('string');
     expect(typeof mockAddress.state).toBe('string');
+    expect(typeof mockAddress.country).toBe('string');
     expect(typeof mockAddress.addressType).toBe('string');
   });
 
   it('should have valid address type values', () => {
-    const validAddressTypes = ['Home', 'Work', 'Other'];
+    const validAddressTypes = ['HOME', 'WORK', 'OTHER'];
     expect(validAddressTypes).toContain(mockAddress.addressType);
   });
 
@@ -90,11 +92,11 @@ describe('Address', () => {
       name: 'Jane Doe',
       phone: '0987654321',
       pincode: '54321',
-      address: '456 Test Ave',
-      locality: 'Test Locality',
+      addressLine1: '456 Test Ave',
       city: 'Test City',
       state: 'Test State',
-      addressType: 'Work'
+      country: 'India',
+      addressType: 'WORK'
     };
 
     expect(minimalAddress).toBeTruthy();

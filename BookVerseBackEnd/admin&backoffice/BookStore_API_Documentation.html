@@ -1,0 +1,662 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+        
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .get { background-color: #28a745; color: white; }
+        .post { background-color: #007bff; color: white; }
+        .put { background-color: #ffc107; color: black; }
+        .delete { background-color: #dc3545; color: white; }
+        
+        .url {
+            font-family: 'Courier New', monospace;
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .description {
+            margin: 10px 0;
+            color: #666;
+        }
+        
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table th {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .toc {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            list-style: none;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-beta {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> BookStore API Documentation</h1>
+            <p>Complete API Reference for Admin Activity Logs & Analytics Services</p>
+            <p><span class="status-badge status-active">Version 1.0.0</span> <span class="status-badge status-active">Active</span></p>
+        </div>
+
+        <div class="toc">
+            <h3> Table of Contents</h3>
+            <ul>
+                <li><a href="#overview"> Project Overview</a></li>
+                <li><a href="#architecture"> Architecture</a></li>
+                <li><a href="#features"> Features</a></li>
+                <li><a href="#entities"> Data Models</a></li>
+                <li><a href="#admin-endpoints"> Admin Activity Logs API</a></li>
+                <li><a href="#analytics-endpoints"> Analytics API</a></li>
+                <li><a href="#health-endpoints"> Health Check API</a></li>
+                <li><a href="#examples"> Usage Examples</a></li>
+                <li><a href="#database"> Database Schema</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="overview">
+            <h2> Project Overview</h2>
+            <p>This Spring Boot application provides comprehensive admin activity logging and analytics services for a bookstore management system. It includes RESTful APIs for tracking admin actions, monitoring system performance, and generating daily sales analytics.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4> Admin Activity Logging</h4>
+                    <p>Track all admin actions, login attempts, system changes, and errors with detailed metadata and timestamps.</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Sales Analytics</h4>
+                    <p>Generate daily sales summaries, track revenue, identify top/least selling items, and monitor business performance.</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Advanced Filtering</h4>
+                    <p>Filter logs by admin, action type, date range, status, and entity type for comprehensive analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Performance Monitoring</h4>
+                    <p>Monitor slow operations, track error rates, and analyze system performance metrics.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="architecture">
+            <h2> Architecture</h2>
+            <h3>Technology Stack</h3>
+            <ul>
+                <li><strong>Framework:</strong> Spring Boot 3.5.5</li>
+                <li><strong>Database:</strong> MySQL 8.0</li>
+                <li><strong>ORM:</strong> JPA/Hibernate</li>
+                <li><strong>Java Version:</strong> 21</li>
+                <li><strong>Build Tool:</strong> Maven</li>
+            </ul>
+            
+            <h3>Project Structure</h3>
+            <div class="code-block">
+com.bookstore2.Bookstore2/
+ Bookstore2Application.java          # Main Spring Boot Application
+ Controller/                         # REST API Controllers
+    AdminController.java           # Admin Activity Logs API
+    AnalyticsController.java       # Analytics API
+ Models/                            # JPA Entities
+    AdminActivityLog.java         # Admin activity log entity
+    DailySalesSummary.java        # Daily sales summary entity
+ Repository/                        # Data Access Layer
+    AdminActivityLogRepository.java
+    DailySalesSummaryRepository.java
+ Service/                          # Business Logic Layer
+     AdminService.java
+     AnalyticsService.java
+            </div>
+        </div>
+
+        <div class="section" id="features">
+            <h2> Features</h2>
+            
+            <h3> Admin Activity Logging Features</h3>
+            <ul>
+                <li> Track admin login/logout activities</li>
+                <li> Monitor system configuration changes</li>
+                <li> Log user management operations</li>
+                <li> Record error occurrences and exceptions</li>
+                <li> Track performance metrics (response times)</li>
+                <li> Store IP addresses and user agents</li>
+                <li> Session tracking and management</li>
+                <li> Advanced filtering and search capabilities</li>
+            </ul>
+
+            <h3> Analytics Features</h3>
+            <ul>
+                <li> Daily sales revenue tracking</li>
+                <li> Order count and item sales monitoring</li>
+                <li> Average order value calculations</li>
+                <li> Top selling items identification</li>
+                <li> Least selling items tracking</li>
+                <li> Date range analytics</li>
+                <li> Comprehensive dashboard data</li>
+                <li> Historical trend analysis</li>
+            </ul>
+        </div>
+
+        <div class="section" id="entities">
+            <h2> Data Models</h2>
+            
+            <h3>AdminActivityLog Entity</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>id</td><td>Long</td><td>Primary key (auto-generated)</td></tr>
+                    <tr><td>adminId</td><td>String</td><td>Unique admin identifier</td></tr>
+                    <tr><td>adminName</td><td>String</td><td>Display name of admin</td></tr>
+                    <tr><td>action</td><td>String</td><td>Action performed (LOGIN, LOGOUT, CREATE, UPDATE, DELETE)</td></tr>
+                    <tr><td>entityType</td><td>String</td><td>Type of entity affected (USER, BOOK, ORDER)</td></tr>
+                    <tr><td>entityId</td><td>String</td><td>ID of affected entity</td></tr>
+                    <tr><td>description</td><td>String</td><td>Detailed description of action</td></tr>
+                    <tr><td>ipAddress</td><td>String</td><td>IP address of admin</td></tr>
+                    <tr><td>userAgent</td><td>String</td><td>Browser/client information</td></tr>
+                    <tr><td>status</td><td>String</td><td>SUCCESS, FAILED, ERROR</td></tr>
+                    <tr><td>errorMessage</td><td>String</td><td>Error details if status is FAILED</td></tr>
+                    <tr><td>metadata</td><td>String</td><td>Additional JSON metadata</td></tr>
+                    <tr><td>sessionId</td><td>String</td><td>Session identifier</td></tr>
+                    <tr><td>durationMs</td><td>Long</td><td>Operation duration in milliseconds</td></tr>
+                    <tr><td>createdAt</td><td>LocalDateTime</td><td>Timestamp of log creation</td></tr>
+                </tbody>
+            </table>
+
+            <h3>DailySalesSummary Entity</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>id</td><td>Long</td><td>Primary key (auto-generated)</td></tr>
+                    <tr><td>salesDate</td><td>LocalDate</td><td>Date of sales summary (unique)</td></tr>
+                    <tr><td>totalRevenue</td><td>BigDecimal</td><td>Total revenue for the day</td></tr>
+                    <tr><td>totalOrders</td><td>Integer</td><td>Number of orders placed</td></tr>
+                    <tr><td>totalItemsSold</td><td>Integer</td><td>Total items sold</td></tr>
+                    <tr><td>averageOrderValue</td><td>BigDecimal</td><td>Average value per order</td></tr>
+                    <tr><td>topSellingItem</td><td>String</td><td>Name of best-selling item</td></tr>
+                    <tr><td>topSellingItemQuantity</td><td>Integer</td><td>Quantity of top-selling item</td></tr>
+                    <tr><td>leastSellingItem</td><td>String</td><td>Name of least-selling item</td></tr>
+                    <tr><td>leastSellingItemQuantity</td><td>Integer</td><td>Quantity of least-selling item</td></tr>
+                    <tr><td>createdAt</td><td>LocalDateTime</td><td>Summary creation timestamp</td></tr>
+                    <tr><td>updatedAt</td><td>LocalDateTime</td><td>Last update timestamp</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="admin-endpoints">
+            <h2> Admin Activity Logs API</h2>
+            <p>Base URL: <code>http://localhost:8080/api/admin</code></p>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/admin/activity/log</span>
+                <div class="description">Create a new admin activity log entry</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/recent</span>
+                <div class="description">Get recent activities (last 24 hours)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/admin/{adminId}</span>
+                <div class="description">Get all activities for a specific admin</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/admin/{adminId}/page</span>
+                <div class="description">Get paginated activities for a specific admin</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/action/{action}</span>
+                <div class="description">Get activities by action type (LOGIN, LOGOUT, CREATE, etc.)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/entity/{entityType}</span>
+                <div class="description">Get activities by entity type (USER, BOOK, ORDER)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/status/{status}</span>
+                <div class="description">Get activities by status (SUCCESS, FAILED, ERROR)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/date-range?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get activities within a date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/errors</span>
+                <div class="description">Get all activities with errors</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/slow-operations?minDurationMs={duration}</span>
+                <div class="description">Get operations slower than specified duration</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/stats/top-admins</span>
+                <div class="description">Get most active admins (last 7 days)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/stats/common-actions</span>
+                <div class="description">Get most common actions (last 7 days)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/stats</span>
+                <div class="description">Get comprehensive activity statistics</div>
+            </div>
+        </div>
+
+        <div class="section" id="analytics-endpoints">
+            <h2> Analytics API</h2>
+            <p>Base URL: <code>http://localhost:8080/api/analytics</code></p>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/analytics/daily-sales/process</span>
+                <div class="description">Process and save daily sales summary</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/daily-sales/recent</span>
+                <div class="description">Get recent daily sales summaries (last 10)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/daily-sales/{salesDate}</span>
+                <div class="description">Get sales summary for specific date</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/daily-sales/date-range?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get sales summaries within date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/total-revenue?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get total revenue for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/total-orders?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get total orders for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/total-items-sold?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get total items sold for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/average-order-value?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get average order value for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/top-selling-items?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get top selling items for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/stats/least-selling-items?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get least selling items for date range</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/dashboard?startDate={startDate}&endDate={endDate}</span>
+                <div class="description">Get comprehensive analytics dashboard data</div>
+            </div>
+        </div>
+
+        <div class="section" id="health-endpoints">
+            <h2> Health Check API</h2>
+            <p>Base URL: <code>http://localhost:8080</code></p>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/actuator/health</span>
+                <div class="description">Application health status and database connectivity</div>
+            </div>
+        </div>
+
+        <div class="section" id="examples">
+            <h2> Usage Examples</h2>
+            
+            <h3>Creating an Admin Activity Log</h3>
+            <div class="code-block">
+POST http://localhost:8080/api/admin/activity/log
+Content-Type: application/json
+
+{
+  "adminId": "admin001",
+  "adminName": "John Admin",
+  "action": "LOGIN",
+  "entityType": "USER",
+  "entityId": "user123",
+  "description": "User logged in successfully",
+  "ipAddress": "192.168.1.100",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "status": "SUCCESS",
+  "sessionId": "sess_abc123",
+  "durationMs": 150
+}
+            </div>
+
+            <h3>Creating a Daily Sales Summary</h3>
+            <div class="code-block">
+POST http://localhost:8080/api/analytics/daily-sales/process
+Content-Type: application/json
+
+{
+  "salesDate": "2025-09-10",
+  "totalRevenue": 1500.50,
+  "totalOrders": 25,
+  "totalItemsSold": 45,
+  "averageOrderValue": 60.02,
+  "topSellingItem": "The Great Gatsby",
+  "topSellingItemQuantity": 15,
+  "leastSellingItem": "Advanced Mathematics",
+  "leastSellingItemQuantity": 2
+}
+            </div>
+
+            <h3>Getting Analytics Dashboard</h3>
+            <div class="code-block">
+GET http://localhost:8080/api/analytics/dashboard?startDate=2025-09-01&endDate=2025-09-10
+            </div>
+
+            <h3>Response Example</h3>
+            <div class="code-block">
+{
+  "totalRevenue": 15000.50,
+  "totalOrders": 250,
+  "totalItemsSold": 450,
+  "averageOrderValue": 60.02,
+  "topSellingItems": [
+    ["The Great Gatsby", 150],
+    ["To Kill a Mockingbird", 120]
+  ],
+  "leastSellingItems": [
+    ["Advanced Mathematics", 5],
+    ["Quantum Physics", 3]
+  ]
+}
+            </div>
+        </div>
+
+        <div class="section" id="database">
+            <h2> Database Schema</h2>
+            
+            <h3>admin_activity_logs Table</h3>
+            <div class="code-block">
+CREATE TABLE admin_activity_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    admin_id VARCHAR(255) NOT NULL,
+    admin_name VARCHAR(255) NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    entity_type VARCHAR(255),
+    entity_id VARCHAR(255),
+    description TEXT,
+    ip_address VARCHAR(255),
+    user_agent TEXT,
+    status VARCHAR(255) NOT NULL,
+    error_message TEXT,
+    metadata TEXT,
+    session_id VARCHAR(255),
+    duration_ms BIGINT,
+    created_at DATETIME NOT NULL,
+    INDEX idx_admin_id (admin_id),
+    INDEX idx_action (action),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+);
+            </div>
+
+            <h3>daily_sales_summary Table</h3>
+            <div class="code-block">
+CREATE TABLE daily_sales_summary (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sales_date DATE NOT NULL UNIQUE,
+    total_revenue DECIMAL(10,2),
+    total_orders INT,
+    total_items_sold INT,
+    average_order_value DECIMAL(10,2),
+    top_selling_item VARCHAR(255),
+    top_selling_item_quantity INT,
+    least_selling_item VARCHAR(255),
+    least_selling_item_quantity INT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME,
+    INDEX idx_sales_date (sales_date)
+);
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Getting Started</h2>
+            <ol>
+                <li><strong>Start the Application:</strong> Run <code>mvn spring-boot:run</code> from the project directory</li>
+                <li><strong>Database Setup:</strong> Ensure MySQL is running on localhost:3306 with database 'bookstore_db'</li>
+                <li><strong>Test Health:</strong> Visit <code>http://localhost:8080/actuator/health</code></li>
+                <li><strong>Create Sample Data:</strong> Use the POST endpoints to create activity logs and sales summaries</li>
+                <li><strong>View Analytics:</strong> Use the dashboard endpoint to see comprehensive analytics</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2> Support</h2>
+            <p>For technical support or questions about this API, please refer to the project documentation or contact the development team.</p>
+            <p><strong>API Version:</strong> 1.0.0</p>
+            <p><strong>Last Updated:</strong> September 10, 2025</p>
+        </div>
+    </div>
+</body>
+</html>

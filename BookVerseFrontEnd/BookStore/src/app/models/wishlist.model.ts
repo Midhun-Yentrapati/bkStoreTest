@@ -1,18 +1,22 @@
+import { BookModel } from './book.model';
+
 export interface WishlistItem {
   id: string;
   userId: string;
   bookId: string;
-  addedAt: string;
+  priceWhenAdded?: number;
+  notifyOnSale?: boolean;
+  addedAt: string; // LocalDateTime from backend
+}
+
+export interface WishlistItemDto {
+  id?: string;
+  userId: string;
+  bookId: string;
+  priceWhenAdded?: number;
+  notifyOnSale?: boolean;
 }
 
 export interface WishlistItemWithDetails extends WishlistItem {
-  book: {
-    id: string;
-    title: string;
-    author: string;
-    price: number;
-    image_urls: string[];
-    description: string;
-    stock_display: number;
-  };
+  book: BookModel; // Full book details fetched separately
 }

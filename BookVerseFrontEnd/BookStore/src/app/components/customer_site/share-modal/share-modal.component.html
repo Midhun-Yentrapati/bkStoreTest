@@ -1,4 +1,4 @@
-﻿<div class="share-modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+<div class="share-modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
   <div class="share-modal" (click)="$event.stopPropagation()">
     <div class="share-modal-header">
       <h3 class="share-modal-title">Share Book</h3>
@@ -9,7 +9,7 @@
 
     <div class="share-modal-content" *ngIf="book">
       <div class="book-preview">
-        <img [src]="book.images[0]" [alt]="book.title" class="book-image">
+        <img [src]="book.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" [alt]="book.title" class="book-image">
         <div class="book-info">
           <h4 class="book-title">{{ book.title }}</h4>
           <p class="book-author">by {{ book.author }}</p>

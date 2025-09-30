@@ -1,6 +1,7 @@
 package com.bookstore.user_authentication_service.controller;
 
 import com.bookstore.user_authentication_service.dto.*;
+import com.bookstore.user_authentication_service.exception.ValidationException;
 import com.bookstore.user_authentication_service.service.AuthenticationService;
 import com.bookstore.user_authentication_service.service.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -498,32 +499,58 @@ public class AuthController {
     public ResponseEntity<UsernameAvailabilityResponse> checkUsernameAvailability(
             @PathVariable String username) {
         
-        // This would be implemented in UserService
-        boolean available = true; // Placeholder
-        
-        UsernameAvailabilityResponse response = UsernameAvailabilityResponse.builder()
-                .username(username)
-                .available(available)
-                .message(available ? "Username is available" : "Username is already taken")
-                .build();
-        
-        return ResponseEntity.ok(response);
+        try {
+            // Validate username availability using AuthenticationService
+            authenticationService.validateUsernameAvailability(username);
+            
+            // If no exception is thrown, username is available
+            UsernameAvailabilityResponse response = UsernameAvailabilityResponse.builder()
+                    .username(username)
+                    .available(true)
+                    .message("Username is available")
+                    .build();
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (ValidationException e) {
+            // Username is already taken
+            UsernameAvailabilityResponse response = UsernameAvailabilityResponse.builder()
+                    .username(username)
+                    .available(false)
+                    .message(e.getMessage())
+                    .build();
+            
+            return ResponseEntity.ok(response);
+        }
     }
     
     @GetMapping("/check-email/{email}") // GET /api/auth/check-email/{email} - Check email availability
     public ResponseEntity<EmailAvailabilityResponse> checkEmailAvailability(
             @PathVariable String email) {
         
-        // This would be implemented in UserService
-        boolean available = true; // Placeholder
-        
-        EmailAvailabilityResponse response = EmailAvailabilityResponse.builder()
-                .email(email)
-                .available(available)
-                .message(available ? "Email is available" : "Email is already registered")
-                .build();
-        
-        return ResponseEntity.ok(response);
+        try {
+            // Validate email availability using AuthenticationService
+            authenticationService.validateEmailAvailability(email);
+            
+            // If no exception is thrown, email is available
+            EmailAvailabilityResponse response = EmailAvailabilityResponse.builder()
+                    .email(email)
+                    .available(true)
+                    .message("Email is available")
+                    .build();
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (ValidationException e) {
+            // Email is already registered
+            EmailAvailabilityResponse response = EmailAvailabilityResponse.builder()
+                    .email(email)
+                    .available(false)
+                    .message(e.getMessage())
+                    .build();
+            
+            return ResponseEntity.ok(response);
+        }
     }
     
     @GetMapping("/generate-hash/{password}") // GET /api/auth/generate-hash/{password} - Generate password hash

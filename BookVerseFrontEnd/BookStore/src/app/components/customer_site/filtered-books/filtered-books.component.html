@@ -46,14 +46,7 @@
     <form [formGroup]="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <!-- Basic search (keep for backward compatibility) -->
       <div class="hidden">
-        <label for="basic-search-query" class="sr-only">Search</label>
-        <input
-          id="basic-search-query"
-          type="text"
-          formControlName="query"
-          placeholder="Search"
-          title="Search"
-        />
+        <input type="text" formControlName="query" />
       </div>
       
       <!-- Advanced search fields -->
@@ -245,7 +238,7 @@
               <div class="flex flex-wrap gap-1">
                 <span 
                   *ngFor="let category of book.categories?.slice(0, 2)"
-                  [class]="getCategoryBadgeClasses(category.name)"
+                  [class]="getCategoryBadgeClasses(category)"
                   class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
                   {{ category }}
                 </span>
@@ -265,17 +258,17 @@
             
             <!-- Display Stock -->
             <td class="px-4 py-4 whitespace-nowrap">
-              <span [class]="book.stockDisplay <= 10 ? 'text-red-600 font-semibold' : 'text-green-600'"
+              <span [class]="book.stock_display <= 10 ? 'text-red-600 font-semibold' : 'text-green-600'"
                     class="text-sm">
-                {{ book.stockDisplay }}
+                {{ book.stock_display }}
               </span>
             </td>
             
             <!-- Actual Stock -->
             <td class="px-4 py-4 whitespace-nowrap">
-              <span [class]="book.stockActual <= 10 ? 'text-red-600 font-semibold' : 'text-green-600'"
+              <span [class]="book.stock_actual <= 10 ? 'text-red-600 font-semibold' : 'text-green-600'"
                     class="text-sm">
-                {{ book.stockActual }}
+                {{ book.stock_actual }}
               </span>
             </td>
             

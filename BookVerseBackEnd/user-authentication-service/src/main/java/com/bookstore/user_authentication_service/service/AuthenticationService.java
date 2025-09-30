@@ -54,4 +54,8 @@ public interface AuthenticationService {
     boolean isAccountLocked(String userId);
     void handleFailedLoginAttempt(String userId);
     void handleSuccessfulLogin(String userId, String ipAddress);
+    
+    // Availability Validation
+    void validateUsernameAvailability(String username);
+    void validateEmailAvailability(String email);
 }

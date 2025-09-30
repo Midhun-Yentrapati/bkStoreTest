@@ -2,7 +2,7 @@ import { Component, Input} from '@angular/core';
 import { BookModel } from '../../../models/book.model';
 import { NgFor } from '@angular/common';
 import { BookCardComponent } from '../book-card/book-card.component';
-import { HttpClient } from '@angular/common/http';
+
 
 
 @Component({

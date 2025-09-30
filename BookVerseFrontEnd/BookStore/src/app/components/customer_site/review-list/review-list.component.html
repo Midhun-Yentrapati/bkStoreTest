@@ -21,12 +21,7 @@
             {{ getInitials(review.userName) }}
           </div>
           <div class="reviewer-details">
-            <h4 class="reviewer-name">
-              {{ review.userName }}
-              <span class="verified-badge" *ngIf="review.isVerifiedPurchase" title="Verified Purchase">
-                <span class="material-icons">verified</span>
-              </span>
-            </h4>
+            <h4 class="reviewer-name">{{ review.userName }}</h4>
             <div class="review-meta">
               <app-star-rating 
                 [rating]="review.rating" 
@@ -39,8 +34,8 @@
         </div>
       </div>
       
-      <div class="review-content" *ngIf="getReviewText(review)">
-        <p class="review-text">{{ getReviewText(review) }}</p>
+      <div class="review-content" *ngIf="review.review">
+        <p class="review-text">{{ review.review }}</p>
       </div>
     </div>
   </div>

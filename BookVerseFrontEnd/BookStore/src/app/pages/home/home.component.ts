@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { BookService } from '../../services/book.service';
 import { BookModel, BookWithSales } from '../../models/book.model';
 import { NgFor, NgIf } from '@angular/common';
@@ -15,42 +15,29 @@ import { VerticalBookGridComponent } from '../../components/customer_site/vertic
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
 
   books: BookModel[] = [];
   filtreredBooks: BookModel[] = [];
 
-  newlyLaunchedBooks: BookModel[] = [];
-  bestSellers: BookModel[] = [];
-  specialOffers: BookModel[] = [];
+  newlyLaunchedBooks: BookWithSales[] = [];
+  bestSellers: BookWithSales[] = [];
+  specialOffers: BookWithSales[] = [];
 
-  categories: CategoryModel[] = [];
+  categories: String[] = [];
 
   constructor(private bookService: BookService, private categoryService: CategoryService) { }
 
   ngOnInit(): void {
 
-    //for 3 sections on home page  
+    //for 3 sections on home page - now using books_by_category
     this.bookService.getNewlyLaunchedBooks().subscribe(books => this.newlyLaunchedBooks = books);
     this.bookService.getBestSellers().subscribe(books => this.bestSellers = books);
     this.bookService.getSpecialOffers().subscribe(books => this.specialOffers = books);
 
-    //displays active categories in the category bar (sorted by display order)
-    console.log('HomeComponent: Loading active categories...');
-    this.categoryService.getActiveCategoriesForNavigation().subscribe({
-      next: (data) => {
-        console.log('HomeComponent: Received active categories:', data);
-        this.categories = [
-          { id: 'all', name: 'All', slug: 'all', isActive: true, displayOrder: 0 },
-          ...data
-        ];
-        console.log('HomeComponent: Final categories array:', this.categories);
-      },
-      error: (error) => {
-        console.error('HomeComponent: Failed to load active categories:', error);
-        // Fallback to just "All" category if loading fails
-        this.categories = [{ id: 'all', name: 'All', slug: 'all', isActive: true, displayOrder: 0 }];
-      }
+    //displays categories in the category bar
+    this.categoryService.getAllCategories().subscribe(data => {
+      this.categories = ['All', ...data.map((cat:CategoryModel) => cat.name)];
     });
 
     //displays all books
@@ -62,20 +49,22 @@ export class HomeComponent implements OnInit {
 
   //for 4th section on home page
   onCategorySelected(category: string): void {
-    console.log('HomeComponent: Category selected:', category);
     if (category === 'All') {
       this.filtreredBooks = this.books;
     } else {
       this.filtreredBooks = this.books.filter(book => {
-        return book.categories.some(cat => cat.name === category);
+        if (!book.categories) return false;
+        return book.categories.some(cat => {
+          const categoryName = typeof cat === 'string' ? cat : cat.name;
+          return categoryName.trim().toLowerCase() === category.trim().toLowerCase();
+        });
       });
     }
-    console.log('HomeComponent: Filtered books count:', this.filtreredBooks.length);
   }
 
   getLimitedBooks(): BookModel[] {
     const booksToShow = this.filtreredBooks.length > 0 ? this.filtreredBooks : this.books;
-    return booksToShow.slice(0, 20); // (5 rows × 4 books)
+    return booksToShow.slice(0, 20); // Limit to 20 books (5 rows × 4 books)
   }
   
 }

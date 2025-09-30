@@ -1,4 +1,4 @@
-﻿import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { catchError, throwError } from 'rxjs';
@@ -81,10 +81,23 @@ function isPublicEndpoint(url: string): boolean {
   
   // Check for exact matches or specific patterns
   return publicEndpoints.some(endpoint => {
-    if (endpoint === '/api/books') {
+    return url.includes(endpoint);
+  }) || isPublicBookEndpoint(url);
+}
+
+function isPublicBookEndpoint(url: string): boolean {
+  // Allow public book browsing endpoints
+  const publicBookPatterns = [
+    '/api/books',
+    '/api/categories',
+    '/api/reviews'
+  ];
+  
+  return publicBookPatterns.some(pattern => {
+    if (pattern === '/api/books') {
       // Allow public book browsing but not admin book operations
       return url.includes('/api/books') && !url.includes('/api/books/admin');
     }
-    return url.includes(endpoint);
+    return url.includes(pattern);
   });
 }

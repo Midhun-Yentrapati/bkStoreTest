@@ -76,9 +76,9 @@
               </div>
               <p class="text-sm text-gray-700">{{ coupon.title }}</p>
               <div class="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-                <span>Min. order: ₹{{ coupon.minOrderAmount }}</span>
-                <span *ngIf="coupon.maxDiscountAmount > 0">
-                  Max discount: ₹{{ coupon.maxDiscountAmount }}
+                <span>Min. order: ₹{{ coupon.minOrderAmount || coupon.minimumOrderAmount || 0 }}</span>
+                <span *ngIf="(coupon.maxDiscountAmount || coupon.maximumDiscountAmount || 0) > 0">
+                  Max discount: ₹{{ coupon.maxDiscountAmount || coupon.maximumDiscountAmount || 0 }}
                 </span>
                 <span>Valid till: {{ coupon.validUntil | date:'MMM d' }}</span>
               </div>
@@ -94,7 +94,7 @@
           <!-- Eligibility Warning -->
           <div *ngIf="!isEligibleForCoupon(coupon)" 
                class="mt-2 text-xs text-orange-600">
-            Add ₹{{ coupon.minOrderAmount - orderAmount }} more to use this coupon
+            Add ₹{{ (coupon.minOrderAmount || coupon.minimumOrderAmount || 0) - orderAmount }} more to use this coupon
           </div>
         </div>
       </div>

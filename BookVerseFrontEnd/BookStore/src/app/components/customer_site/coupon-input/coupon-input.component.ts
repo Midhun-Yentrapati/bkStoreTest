@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CouponService } from '../../../services/coupon.service';
 import { AuthService } from '../../../services/auth.service';
-import { Coupon, CouponValidationResult } from '../../../models/coupon.model';
+import { Coupon, CouponValidationResponse } from '../../../models/coupon.model';
 import { UserModel } from '../../../models/user.model';
 
 @Component({
@@ -40,15 +40,6 @@ export class CouponInputComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentCustomer();
-    this.couponService.appliedCoupon$.subscribe(coupon => {
-      this.appliedCoupon = coupon;
-      if (coupon) {
-        this.couponForm.patchValue({ couponCode: coupon.code });
-      } else {
-        this.couponForm.patchValue({ couponCode: '' });
-      }
-    });
-
     this.loadAvailableCoupons();
   }
 
@@ -56,7 +47,7 @@ export class CouponInputComponent implements OnInit {
     this.couponService.getActiveCoupons().subscribe({
       next: (coupons) => {
         this.availableCoupons = coupons.filter(c => 
-          c.minOrderAmount <= this.orderAmount && c.isActive
+          (c.minimumOrderAmount || 0) <= this.orderAmount && c.isActive
         );
       },
       error: (error) => {
@@ -76,15 +67,15 @@ export class CouponInputComponent implements OnInit {
     this.loading = true;
     this.validationMessage = '';
 
-    this.couponService.validateCoupon(couponCode, this.orderAmount, this.currentUser.id)
+    this.couponService.applyCoupon(couponCode, this.orderAmount)
       .subscribe({
-        next: (result: CouponValidationResult) => {
+        next: (result: CouponValidationResponse) => {
           this.loading = false;
-          this.validationMessage = result.message;
-          this.validationSuccess = result.isValid;
+          this.validationMessage = result.message || '';
+          this.validationSuccess = result.valid;
 
-          if (result.isValid && result.coupon) {
-            this.couponService.applyCoupon(result.coupon);
+          if (result.valid && result.coupon && result.discountAmount !== undefined) {
+            this.appliedCoupon = result.coupon;
             this.couponApplied.emit({
               coupon: result.coupon,
               discountAmount: result.discountAmount
@@ -93,18 +84,19 @@ export class CouponInputComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.validationMessage = 'Error validating coupon. Please try again.';
+          this.validationMessage = 'Error applying coupon. Please try again.';
           this.validationSuccess = false;
-          console.error('Coupon validation error:', error);
+          console.error('Coupon application error:', error);
         }
       });
   }
 
   removeCoupon() {
-    this.couponService.removeCoupon();
+    this.appliedCoupon = null;
     this.couponRemoved.emit();
     this.validationMessage = '';
     this.validationSuccess = false;
+    this.couponForm.patchValue({ couponCode: '' });
   }
 
   selectCoupon(coupon: Coupon) {
@@ -121,7 +113,7 @@ export class CouponInputComponent implements OnInit {
   }
 
   getDiscountText(coupon: Coupon): string {
-    if (coupon.discountType === 'percentage') {
+    if (coupon.discountType === 'PERCENTAGE') {
       return `${coupon.discountValue}% off`;
     } else {
       return `₹${coupon.discountValue} off`;
@@ -129,6 +121,6 @@ export class CouponInputComponent implements OnInit {
   }
 
   isEligibleForCoupon(coupon: Coupon): boolean {
-    return this.orderAmount >= coupon.minOrderAmount;
+    return this.orderAmount >= (coupon.minimumOrderAmount || 0);
   }
 }

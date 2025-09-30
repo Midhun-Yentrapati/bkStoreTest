@@ -37,16 +37,30 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
+      console.log('Login form submitted with:', this.loginForm.value);
+      console.log('Return URL:', this.returnUrl);
+      
       this.authService.login(this.loginForm.value).subscribe({
-        next: () => {
-          // On successful login, navigate to the return URL or home page
-          this.router.navigate([this.returnUrl]);
+        next: (user) => {
+          console.log('Login successful, user received:', user);
+          console.log('Navigating to:', this.returnUrl);
+          
+          // Check if user is admin and redirect accordingly
+          if (user && user.userRole && user.userRole !== 'CUSTOMER') {
+            console.log('Admin user detected, redirecting to admin dashboard');
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            console.log('Customer user detected, redirecting to:', this.returnUrl);
+            this.router.navigate([this.returnUrl]);
+          }
         },
         error: (err) => {
-          alert(err.message); // Show any login errors
+          console.error('Login failed:', err);
+          alert('Login failed: ' + err.message);
         }
       });
     } else {
+      console.log('Form is invalid:', this.loginForm.errors);
       this.loginForm.markAllAsTouched();
     }
   }

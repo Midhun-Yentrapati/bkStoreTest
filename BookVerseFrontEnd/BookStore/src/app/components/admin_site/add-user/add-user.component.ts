@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { AdminUser } from '../../../models/admin.model';
+import { AuthService } from '../../../services/auth.service';
+import { AdminUser } from '../../../models/book';
 
 @Component({
   selector: 'app-add-user',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.css']
 })
@@ -18,40 +18,66 @@ export class AddUserComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
 
-  private adminUsersUrl = 'http://localhost:3000/adminUsers';
-
   constructor(
     private fb: FormBuilder, 
     private router: Router,
-    private http: HttpClient
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
       email: ['', [Validators.required, Validators.email]], 
-      passwordHash: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/)]]
-    });
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)]],
+      confirmPassword: ['', [Validators.required]],
+      fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      employeeId: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      department: ['Administration', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      mobileNumber: ['', [Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
+      dateOfBirth: [''],
+      userRole: ['ADMIN'],
+      hireDate: [''],
+      salary: ['', [Validators.min(0)]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  // Custom validator for password confirmation
+  passwordMatchValidator(form: any) {
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+    
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    } else {
+      if (confirmPassword?.errors?.['passwordMismatch']) {
+        delete confirmPassword.errors['passwordMismatch'];
+        if (Object.keys(confirmPassword.errors).length === 0) {
+          confirmPassword.setErrors(null);
+        }
+      }
+    }
+    return null;
   }
 
   // Password validation helper methods
   hasUppercase(): boolean {
-    const password = this.userForm.get('passwordHash')?.value;
+    const password = this.userForm.get('password')?.value;
     return password && /[A-Z]/.test(password);
   }
 
   hasLowercase(): boolean {
-    const password = this.userForm.get('passwordHash')?.value;
+    const password = this.userForm.get('password')?.value;
     return password && /[a-z]/.test(password);
   }
 
   hasNumber(): boolean {
-    const password = this.userForm.get('passwordHash')?.value;
+    const password = this.userForm.get('password')?.value;
     return password && /[0-9]/.test(password);
   }
 
   hasSpecialChar(): boolean {
-    const password = this.userForm.get('passwordHash')?.value;
+    const password = this.userForm.get('password')?.value;
     return password && /[!@#$%^&*(),.?":{}|<>]/.test(password);
   }
 
@@ -61,17 +87,27 @@ export class AddUserComponent implements OnInit {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const newAdminUser: AdminUser = {
-        id: crypto.randomUUID(),
-        ...this.userForm.value
+      const adminRegistrationData = {
+        username: this.userForm.value.username,
+        email: this.userForm.value.email,
+        password: this.userForm.value.password,
+        confirmPassword: this.userForm.value.confirmPassword,
+        fullName: this.userForm.value.fullName, 
+        userRole: this.userForm.value.userRole,
+        department: this.userForm.value.department,
+        employeeId: this.userForm.value.employeeId,
+        mobileNumber: this.userForm.value.mobileNumber,
+        dateOfBirth: this.userForm.value.dateOfBirth,
+        hireDate: this.userForm.value.hireDate,
+        salary: this.userForm.value.salary
       };
 
-      console.log('New Admin User Data:', newAdminUser);
+      console.log('Admin Registration Data:', adminRegistrationData);
       
-      // Save to JSON server
-      this.http.post<AdminUser>(this.adminUsersUrl, newAdminUser).subscribe({
-        next: (savedUser) => {
-          console.log('Admin user saved successfully:', savedUser);
+      // Use AuthService for admin registration
+      this.authService.registerAdmin(adminRegistrationData).subscribe({
+        next: (response: any) => {
+          console.log('Admin user created successfully:', response);
           this.successMessage = 'Admin user created successfully!';
           this.isLoading = false;
           
@@ -79,7 +115,16 @@ export class AddUserComponent implements OnInit {
           this.userForm.reset({
             username: '',
             email: '',
-            passwordHash: ''
+            password: '',
+            confirmPassword: '',
+            fullName: '',
+            employeeId: '',
+            department: 'Administration',
+            mobileNumber: '',
+            dateOfBirth: '',
+            userRole: 'ADMIN',
+            hireDate: '',
+            salary: ''
           });
           
           // Redirect back to users list after a short delay
@@ -87,9 +132,9 @@ export class AddUserComponent implements OnInit {
             this.router.navigate(['/admin/users']);
           }, 2000);
         },
-        error: (error) => {
-          console.error('Error saving admin user:', error);
-          this.errorMessage = 'Failed to create admin user. Please try again.';
+        error: (error: any) => {
+          console.error('Error creating admin user:', error);
+          this.errorMessage = error.error?.message || 'Failed to create admin user. Please try again.';
           this.isLoading = false;
         }
       });

@@ -1,100 +1,146 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { Coupon, CouponValidationResult } from '../models/coupon.model';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { Coupon, CouponDto, CouponValidationResponse } from '../models/coupon.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CouponService {
-  private apiUrl = 'http://localhost:3000/api';
-  private appliedCouponSubject = new BehaviorSubject<Coupon | null>(null);
-  public appliedCoupon$ = this.appliedCouponSubject.asObservable();
+  private apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
+  private apiUrl = `${this.apiBaseUrl}/coupons`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  // Get all active coupons for user
-  getActiveCoupons(): Observable<Coupon[]> {
-    return this.http.get<Coupon[]>(`${this.apiUrl}/coupons/active`);
-  }
-
-  // Validate and apply coupon
-  validateCoupon(code: string, orderAmount: number, userId: string): Observable<CouponValidationResult> {
-    return this.http.post<CouponValidationResult>(`${this.apiUrl}/coupons/validate`, {
-      code,
-      orderAmount,
-      userId
-    });
-  }
-
-  // Apply coupon (store in service)
-  applyCoupon(coupon: Coupon) {
-    this.appliedCouponSubject.next(coupon);
-  }
-
-  // Remove applied coupon
-  removeCoupon() {
-    this.appliedCouponSubject.next(null);
-  }
-
-  // Get currently applied coupon
-  getAppliedCoupon(): Coupon | null {
-    return this.appliedCouponSubject.value;
-  }
-
-  // Calculate discount amount
-  calculateDiscount(coupon: Coupon, orderAmount: number): number {
-    if (coupon.discountType === 'percentage') {
-      const discount = (orderAmount * coupon.discountValue) / 100;
-      return Math.min(discount, coupon.maxDiscountAmount);
-    } else {
-      return Math.min(coupon.discountValue, orderAmount);
-    }
-  }
-
-  // Admin: Create new coupon
-  createCoupon(coupon: Omit<Coupon, 'id' | 'usageCount' | 'createdAt' | 'updatedAt'>): Observable<Coupon> {
-    return this.http.post<Coupon>(`${this.apiUrl}/admin/coupons`, coupon);
-  }
-
-  // Admin: Update coupon
-  updateCoupon(couponId: string, coupon: Partial<Coupon>): Observable<Coupon> {
-    return this.http.put<Coupon>(`${this.apiUrl}/admin/coupons/${couponId}`, coupon);
-  }
-
-  // Admin: Delete coupon
-  deleteCoupon(couponId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/admin/coupons/${couponId}`);
-  }
-
-  // Admin: Get all coupons
   getAllCoupons(): Observable<Coupon[]> {
-    return this.http.get<Coupon[]>(`${this.apiUrl}/admin/coupons`);
+    return this.http.get<Coupon[]>(this.apiUrl).pipe(
+      catchError(error => {
+        console.error('Error fetching coupons:', error);
+        return of([]);
+      })
+    );
   }
 
-  // Get coupon usage statistics
-  getCouponStats(couponId: string): Observable<{
-    totalUsage: number;
-    uniqueUsers: number;
-    totalDiscountGiven: number;
-    recentUsage: any[];
-  }> {
-    return this.http.get<{
-      totalUsage: number;
-      uniqueUsers: number;
-      totalDiscountGiven: number;
-      recentUsage: any[];
-    }>(`${this.apiUrl}/admin/coupons/${couponId}/stats`);
+  getActiveCoupons(): Observable<Coupon[]> {
+    return this.http.get<Coupon[]>(`${this.apiUrl}/active`).pipe(
+      catchError(error => {
+        console.error('Error fetching active coupons:', error);
+        return of([]);
+      })
+    );
   }
 
-  // Check if user has used coupon before
-  hasUserUsedCoupon(userId: string, couponId: string): Observable<{
-    hasUsed: boolean;
-    usageCount: number;
-  }> {
-    return this.http.get<{
-      hasUsed: boolean;
-      usageCount: number;
-    }>(`${this.apiUrl}/coupons/${couponId}/user-usage/${userId}`);
+  getCouponById(couponId: string): Observable<Coupon | null> {
+    return this.http.get<Coupon>(`${this.apiUrl}/${couponId}`).pipe(
+      catchError(error => {
+        console.error('Error fetching coupon:', error);
+        return of(null);
+      })
+    );
+  }
+
+  validateCoupon(couponCode: string, orderAmount: number): Observable<CouponValidationResponse> {
+    return this.http.post<CouponValidationResponse>(`${this.apiUrl}/validate`, null, {
+      params: {
+        code: couponCode,
+        orderAmount: orderAmount.toString()
+      }
+    }).pipe(
+      catchError(error => {
+        console.error('Error validating coupon:', error);
+        return of({
+          valid: false,
+          message: 'Error validating coupon. Please try again.'
+        });
+      })
+    );
+  }
+
+  applyCoupon(couponCode: string, orderAmount: number): Observable<CouponValidationResponse> {
+    const currentUser = this.authService.getCurrentCustomer();
+    if (!currentUser) {
+      return throwError(() => new Error('User must be logged in to apply coupon'));
+    }
+
+    return this.http.post<CouponValidationResponse>(`${this.apiUrl}/apply`, null, {
+      params: {
+        code: couponCode,
+        userId: currentUser.id,
+        orderAmount: orderAmount.toString()
+      }
+    }).pipe(
+      catchError(error => {
+        console.error('Error applying coupon:', error);
+        return of({
+          valid: false,
+          message: 'Error applying coupon. Please try again.'
+        });
+      })
+    );
+  }
+
+  createCoupon(couponDto: CouponDto): Observable<Coupon> {
+    const currentUser = this.authService.getCurrentCustomer();
+    if (!currentUser) {
+      return throwError(() => new Error('User must be logged in to create coupon'));
+    }
+
+    // Only admin users can create coupons
+    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
+    if (!isAdmin) {
+      return throwError(() => new Error('Only admin users can create coupons'));
+    }
+
+    return this.http.post<Coupon>(this.apiUrl, couponDto).pipe(
+      catchError(error => {
+        console.error('Error creating coupon:', error);
+        throw error;
+      })
+    );
+  }
+
+  updateCoupon(couponId: string, couponDto: CouponDto): Observable<Coupon> {
+    const currentUser = this.authService.getCurrentCustomer();
+    if (!currentUser) {
+      return throwError(() => new Error('User must be logged in to update coupon'));
+    }
+
+    // Only admin users can update coupons
+    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
+    if (!isAdmin) {
+      return throwError(() => new Error('Only admin users can update coupons'));
+    }
+
+    return this.http.put<Coupon>(`${this.apiUrl}/${couponId}`, couponDto).pipe(
+      catchError(error => {
+        console.error('Error updating coupon:', error);
+        throw error;
+      })
+    );
+  }
+
+  deleteCoupon(couponId: string): Observable<void> {
+    const currentUser = this.authService.getCurrentCustomer();
+    if (!currentUser) {
+      return throwError(() => new Error('User must be logged in to delete coupon'));
+    }
+
+    // Only admin users can delete coupons
+    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
+    if (!isAdmin) {
+      return throwError(() => new Error('Only admin users can delete coupons'));
+    }
+
+    return this.http.delete<void>(`${this.apiUrl}/${couponId}`).pipe(
+      catchError(error => {
+        console.error('Error deleting coupon:', error);
+        throw error;
+      })
+    );
   }
 }

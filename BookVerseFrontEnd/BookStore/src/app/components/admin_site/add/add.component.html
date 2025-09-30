@@ -475,8 +475,8 @@
                     [class.border-red-500]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
                     [class.border-green-500]="categoryForm.get('name')?.valid && categoryForm.get('name')?.touched"
                     placeholder="Enter category name">
-                  <div *ngIf="getFieldError('name')" class="text-red-500 text-sm mt-1">
-                    {{ getFieldError('name') }}
+                  <div *ngIf="getFieldError('name', categoryForm)" class="text-red-500 text-sm mt-1">
+                    {{ getFieldError('name', categoryForm) }}
                   </div>
                 </div>
                 <div>
@@ -489,8 +489,8 @@
                     [class.border-red-500]="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched"
                     [class.border-green-500]="categoryForm.get('slug')?.valid && categoryForm.get('slug')?.touched"
                     placeholder="category-slug">
-                  <div *ngIf="getFieldError('slug')" class="text-red-500 text-sm mt-1">
-                    {{ getFieldError('slug') }}
+                  <div *ngIf="getFieldError('slug', categoryForm)" class="text-red-500 text-sm mt-1">
+                    {{ getFieldError('slug', categoryForm) }}
                   </div>
                 </div>
               </div>
@@ -504,8 +504,8 @@
                   [class.border-red-500]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
                   [class.border-green-500]="categoryForm.get('description')?.valid && categoryForm.get('description')?.touched"
                   placeholder="Enter category description"></textarea>
-                <div *ngIf="getFieldError('description')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('description') }}
+                <div *ngIf="getFieldError('description', categoryForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('description', categoryForm) }}
                 </div>
               </div>
               <div class="flex gap-3 mt-4">
@@ -609,8 +609,8 @@
                   [class.border-red-500]="imageForm.get('imageUrl')?.invalid && imageForm.get('imageUrl')?.touched"
                   [class.border-green-500]="imageForm.get('imageUrl')?.valid && imageForm.get('imageUrl')?.touched"
                   placeholder="https://example.com/image.jpg">
-                <div *ngIf="getFieldError('imageUrl')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('imageUrl') }}
+                <div *ngIf="getFieldError('imageUrl', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('imageUrl', imageForm) }}
                 </div>
               </div>
 
@@ -625,8 +625,8 @@
                   [class.border-red-500]="imageForm.get('filePath')?.invalid && imageForm.get('filePath')?.touched"
                   [class.border-green-500]="imageForm.get('filePath')?.valid && imageForm.get('filePath')?.touched"
                   placeholder="images/book-cover.jpg">
-                <div *ngIf="getFieldError('filePath')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('filePath') }}
+                <div *ngIf="getFieldError('filePath', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('filePath', imageForm) }}
                 </div>
                 <div class="text-xs text-gray-400 mt-1">
                   Enter the path to image in public folder (e.g., images/1984.jpg)
@@ -642,8 +642,8 @@
                   [class.border-red-500]="imageForm.get('altText')?.invalid && imageForm.get('altText')?.touched"
                   [class.border-green-500]="imageForm.get('altText')?.valid && imageForm.get('altText')?.touched"
                   placeholder="Describe the image">
-                <div *ngIf="getFieldError('altText')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('altText') }}
+                <div *ngIf="getFieldError('altText', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('altText', imageForm) }}
                 </div>
               </div>
             </div>
@@ -659,8 +659,8 @@
                   [class.border-red-500]="imageForm.get('displayOrder')?.invalid && imageForm.get('displayOrder')?.touched"
                   [class.border-green-500]="imageForm.get('displayOrder')?.valid && imageForm.get('displayOrder')?.touched"
                   placeholder="0">
-                <div *ngIf="getFieldError('displayOrder')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('displayOrder') }}
+                <div *ngIf="getFieldError('displayOrder', imageForm)" class="text-red-500 text-sm mt-1">
+                  {{ getFieldError('displayOrder', imageForm) }}
                 </div>
               </div>
               <div class="flex items-end">

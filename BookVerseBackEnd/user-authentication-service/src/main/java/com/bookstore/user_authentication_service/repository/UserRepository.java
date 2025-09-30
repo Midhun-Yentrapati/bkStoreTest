@@ -3,6 +3,7 @@ package com.bookstore.user_authentication_service.repository;
 import com.bookstore.user_authentication_service.entity.AccountStatus;
 import com.bookstore.user_authentication_service.entity.User;
 import com.bookstore.user_authentication_service.entity.UserRole;
+import com.bookstore.user_authentication_service.entity.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,6 +58,13 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE u.userRole IN :roles AND u.deletedAt IS NULL")
     Page<User> findByUserRoleIn(@Param("roles") List<UserRole> roles, Pageable pageable);
     
+    // User Type Queries
+    @Query("SELECT u FROM User u WHERE u.userType = :userType AND u.deletedAt IS NULL")
+    List<User> findByUserType(@Param("userType") UserType userType);
+    
+    @Query("SELECT u FROM User u WHERE u.userType = :userType AND u.deletedAt IS NULL")
+    Page<User> findByUserType(@Param("userType") UserType userType, Pageable pageable);
+    
     // Status-based Queries
     @Query("SELECT u FROM User u WHERE u.accountStatus = :status AND u.deletedAt IS NULL")
     Page<User> findByAccountStatus(@Param("status") AccountStatus status, Pageable pageable);
@@ -79,6 +87,33 @@ public interface UserRepository extends JpaRepository<User, String> {
     
     @Query("SELECT u FROM User u WHERE u.isEmailVerified = false AND u.deletedAt IS NULL")
     Page<User> findUnverifiedEmailUsers(Pageable pageable);
+    
+    // Verification Status Queries (List variants for testing)
+    @Query("SELECT u FROM User u WHERE u.isEmailVerified = :verified AND u.deletedAt IS NULL")
+    List<User> findByEmailVerificationStatus(@Param("verified") Boolean verified);
+    
+    @Query("SELECT u FROM User u WHERE u.isMobileVerified = :verified AND u.deletedAt IS NULL")
+    List<User> findByMobileVerificationStatus(@Param("verified") Boolean verified);
+    
+    @Query("SELECT u FROM User u WHERE u.isEmailVerified = false AND u.isMobileVerified = false AND u.deletedAt IS NULL")
+    List<User> findUnverifiedUsers();
+    
+    @Query("SELECT u FROM User u WHERE u.isEmailVerified = false AND u.deletedAt IS NULL")
+    Page<User> findUnverifiedUsers(Pageable pageable);
+    
+    // Security Queries (List variants for testing)
+    @Query("SELECT u FROM User u WHERE u.failedLoginAttempts > 0 AND u.deletedAt IS NULL")
+    List<User> findUsersWithFailedAttempts();
+    
+    @Query("SELECT u FROM User u WHERE u.accountLockedUntil IS NOT NULL AND u.accountLockedUntil > :now AND u.deletedAt IS NULL")
+    List<User> findLockedUsers(@Param("now") LocalDateTime now);
+    
+    // Activity Queries (List variants for testing)
+    @Query("SELECT u FROM User u WHERE u.lastLoginAt >= :since AND u.deletedAt IS NULL")
+    List<User> findRecentlyActiveUsers(@Param("since") LocalDateTime since);
+    
+    @Query("SELECT u FROM User u WHERE (u.lastLoginAt IS NULL OR u.lastLoginAt < :since) AND u.deletedAt IS NULL")
+    List<User> findInactiveUsersSince(@Param("since") LocalDateTime since);
     
     // Department and Manager Queries
     @Query("SELECT u FROM User u WHERE u.department = :department AND u.deletedAt IS NULL")
@@ -116,12 +151,25 @@ public interface UserRepository extends JpaRepository<User, String> {
            "u.userRole != 'CUSTOMER' AND u.deletedAt IS NULL")
     Page<User> searchAdmins(@Param("searchTerm") String searchTerm, Pageable pageable);
     
+    // Search users by type (combines search with user type filtering)
+    @Query("SELECT u FROM User u WHERE " +
+           "(LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.employeeId) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.department) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "u.userType = :userType AND u.deletedAt IS NULL")
+    Page<User> searchUsersByType(@Param("searchTerm") String searchTerm, @Param("userType") UserType userType, Pageable pageable);
+    
     // Statistics Queries
     @Query("SELECT COUNT(u) FROM User u WHERE u.deletedAt IS NULL")
     long countAllUsers();
     
     @Query("SELECT COUNT(u) FROM User u WHERE u.userRole = :userRole AND u.deletedAt IS NULL")
     long countByUserRole(@Param("userRole") UserRole userRole);
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.userType = :userType AND u.deletedAt IS NULL")
+    long countByUserType(@Param("userType") UserType userType);
     
     @Query("SELECT COUNT(u) FROM User u WHERE u.accountStatus = :status AND u.deletedAt IS NULL")
     long countByAccountStatus(@Param("status") AccountStatus status);
@@ -135,34 +183,54 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt <= :endDate AND u.deletedAt IS NULL")
     long countUsersRegisteredBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     
+    // Statistics Queries - Group by UserType
+    @Query("SELECT u.userType, COUNT(u) FROM User u WHERE u.deletedAt IS NULL GROUP BY u.userType")
+    List<Object[]> getUserCountByType();
+    
+    // Registration Statistics - Group by Date
+    @Query("SELECT DATE(u.createdAt), COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.deletedAt IS NULL GROUP BY DATE(u.createdAt) ORDER BY DATE(u.createdAt)")
+    List<Object[]> getRegistrationCountByDate(@Param("startDate") LocalDateTime startDate);
+    
     // Update Queries
     @Modifying
     @Query("UPDATE User u SET u.failedLoginAttempts = :attempts WHERE u.id = :userId")
-    void updateFailedLoginAttempts(@Param("userId") String userId, @Param("attempts") Integer attempts);
+    int updateFailedLoginAttempts(@Param("userId") String userId, @Param("attempts") Integer attempts);
+    
+    @Modifying
+    @Query("UPDATE User u SET u.failedLoginAttempts = 0 WHERE u.id = :userId")
+    int resetFailedLoginAttempts(@Param("userId") String userId);
     
     @Modifying
     @Query("UPDATE User u SET u.accountLockedUntil = :lockedUntil WHERE u.id = :userId")
-    void updateAccountLockedUntil(@Param("userId") String userId, @Param("lockedUntil") LocalDateTime lockedUntil);
+    int updateAccountLockedUntil(@Param("userId") String userId, @Param("lockedUntil") LocalDateTime lockedUntil);
     
     @Modifying
     @Query("UPDATE User u SET u.lastLoginAt = :loginTime, u.lastLoginIp = :ipAddress WHERE u.id = :userId")
-    void updateLastLogin(@Param("userId") String userId, @Param("loginTime") LocalDateTime loginTime, @Param("ipAddress") String ipAddress);
+    int updateLastLogin(@Param("userId") String userId, @Param("loginTime") LocalDateTime loginTime, @Param("ipAddress") String ipAddress);
+    
+    @Modifying
+    @Query("UPDATE User u SET u.lastLoginAt = :loginTime WHERE u.id = :userId")
+    int updateLastLoginAt(@Param("userId") String userId, @Param("loginTime") LocalDateTime loginTime);
     
     @Modifying
     @Query("UPDATE User u SET u.isEmailVerified = :verified WHERE u.id = :userId")
-    void updateEmailVerified(@Param("userId") String userId, @Param("verified") Boolean verified);
+    int updateEmailVerified(@Param("userId") String userId, @Param("verified") Boolean verified);
+    
+    @Modifying
+    @Query("UPDATE User u SET u.isEmailVerified = :verified WHERE u.id = :userId")
+    int updateEmailVerificationStatus(@Param("userId") String userId, @Param("verified") Boolean verified);
     
     @Modifying
     @Query("UPDATE User u SET u.isMobileVerified = :verified WHERE u.id = :userId")
-    void updateMobileVerified(@Param("userId") String userId, @Param("verified") Boolean verified);
+    int updateMobileVerified(@Param("userId") String userId, @Param("verified") Boolean verified);
     
     @Modifying
     @Query("UPDATE User u SET u.accountStatus = :status WHERE u.id = :userId")
-    void updateAccountStatus(@Param("userId") String userId, @Param("status") AccountStatus status);
+    int updateAccountStatus(@Param("userId") String userId, @Param("status") AccountStatus status);
     
     @Modifying
     @Query("UPDATE User u SET u.deletedAt = :deletedAt WHERE u.id = :userId")
-    void softDeleteUser(@Param("userId") String userId, @Param("deletedAt") LocalDateTime deletedAt);
+    int softDeleteUser(@Param("userId") String userId, @Param("deletedAt") LocalDateTime deletedAt);
     
     // Recent Activity Queries
     @Query("SELECT u FROM User u WHERE u.lastLoginAt >= :since AND u.deletedAt IS NULL ORDER BY u.lastLoginAt DESC")
@@ -187,4 +255,34 @@ public interface UserRepository extends JpaRepository<User, String> {
         @Param("isMobileVerified") Boolean isMobileVerified,
         Pageable pageable
     );
+    
+    // ========== CLEANUP OPERATIONS ==========
+    
+    // Delete inactive users (soft deleted or inactive for specified period)
+    @Modifying
+    @Query("DELETE FROM User u WHERE " +
+           "(u.accountStatus = 'INACTIVE' OR u.deletedAt IS NOT NULL) AND " +
+           "u.createdAt < :cutoffDate")
+    int deleteInactiveUsers(@Param("cutoffDate") LocalDateTime cutoffDate);
+    
+    // Delete unverified users older than specified date
+    @Modifying
+    @Query("DELETE FROM User u WHERE " +
+           "u.isEmailVerified = false AND " +
+           "u.isMobileVerified = false AND " +
+           "u.createdAt < :cutoffDate")
+    int deleteUnverifiedUsers(@Param("cutoffDate") LocalDateTime cutoffDate);
+    
+    // Delete expired sessions (cleanup operation)
+    @Modifying
+    @Query("DELETE FROM UserSession us WHERE us.expiresAt < :currentTime")
+    int deleteExpiredSessions(@Param("currentTime") LocalDateTime currentTime);
+    
+    // Soft delete old inactive users (mark as deleted instead of hard delete)
+    @Modifying
+    @Query("UPDATE User u SET u.deletedAt = :deletedAt WHERE " +
+           "u.accountStatus = 'INACTIVE' AND " +
+           "u.lastLoginAt < :cutoffDate AND " +
+           "u.deletedAt IS NULL")
+    int softDeleteOldInactiveUsers(@Param("cutoffDate") LocalDateTime cutoffDate, @Param("deletedAt") LocalDateTime deletedAt);
 }

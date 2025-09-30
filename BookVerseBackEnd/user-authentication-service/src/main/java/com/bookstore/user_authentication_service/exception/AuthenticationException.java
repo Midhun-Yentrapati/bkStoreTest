@@ -1,33 +1,38 @@
 package com.bookstore.user_authentication_service.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
 public class AuthenticationException extends RuntimeException {
     
     private final String errorCode;
+    private final HttpStatus httpStatus;
     
     public AuthenticationException(String message) {
         super(message);
         this.errorCode = "AUTH_ERROR";
+        this.httpStatus = HttpStatus.UNAUTHORIZED;
     }
     
     public AuthenticationException(String message, String errorCode) {
         super(message);
         this.errorCode = errorCode;
+        this.httpStatus = HttpStatus.UNAUTHORIZED;
     }
     
     public AuthenticationException(String message, Throwable cause) {
         super(message, cause);
         this.errorCode = "AUTH_ERROR";
+        this.httpStatus = HttpStatus.UNAUTHORIZED;
     }
     
     public AuthenticationException(String message, String errorCode, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
+        this.httpStatus = HttpStatus.UNAUTHORIZED;
     }
-    
-    public String getErrorCode() {
-        return errorCode;
-    }
-    
+
     // Specific authentication error types
     public static AuthenticationException invalidCredentials() {
         return new AuthenticationException("Invalid username/email or password", "INVALID_CREDENTIALS");

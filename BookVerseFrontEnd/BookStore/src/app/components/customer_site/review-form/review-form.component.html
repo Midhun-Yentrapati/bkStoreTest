@@ -87,18 +87,6 @@
         </div>
       </div>
 
-      <!-- Error Message -->
-      <div class="error-message" *ngIf="submissionError">
-        <span class="material-icons">error</span>
-        {{ submissionError }}
-      </div>
-
-      <!-- Success Message -->
-      <div class="success-message" *ngIf="submissionSuccess">
-        <span class="material-icons">check_circle</span>
-        {{ isEditMode ? 'Review updated successfully!' : 'Review submitted successfully!' }}
-      </div>
-
       <!-- Submit Actions -->
       <div class="form-actions">
         <button 
@@ -109,24 +97,13 @@
           <span class="material-icons">close</span>
           Cancel
         </button>
-        
-        <button 
-          type="button" 
-          class="btn btn-danger" 
-          *ngIf="isEditMode"
-          (click)="onDelete()"
-          [disabled]="isSubmitting">
-          <span class="material-icons">delete</span>
-          Delete Review
-        </button>
-        
         <button 
           type="submit" 
           class="btn btn-primary submit-review-btn" 
           [disabled]="!isFormValid || isSubmitting || !hasChanges">
           <span class="material-icons" *ngIf="isSubmitting">hourglass_empty</span>
-          <span class="material-icons" *ngIf="!isSubmitting">{{ isEditMode ? 'edit' : 'send' }}</span>
-          <span class="button-text">{{ isSubmitting ? 'Submitting Review...' : (isEditMode ? 'Update Review' : 'Submit Review') }}</span>
+          <span class="material-icons" *ngIf="!isSubmitting">{{ existingReview ? 'edit' : 'send' }}</span>
+          <span class="button-text">{{ isSubmitting ? 'Submitting Review...' : (existingReview ? 'Update Review' : 'Submit Review') }}</span>
         </button>
       </div>
     </form>

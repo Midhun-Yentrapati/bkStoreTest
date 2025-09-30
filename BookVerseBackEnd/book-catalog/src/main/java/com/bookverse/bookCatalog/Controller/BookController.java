@@ -6,6 +6,7 @@ import com.bookverse.bookCatalog.Service.BookService;
 import com.bookverse.bookCatalog.Service.CategoryService;
 import com.bookverse.bookCatalog.DTO.BookCreateRequest;
 import com.bookverse.bookCatalog.DTO.BookWithRelations;
+import com.bookverse.bookCatalog.DTO.BookImageRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +23,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @Tag(name = "Books", description = "Book management operations")
 public class BookController {
 
@@ -103,9 +103,9 @@ public class BookController {
 
     // To modify stock count in Books table
     @PutMapping("/{id}/stock")
-    public ResponseEntity<String> decreaseStock(@PathVariable Long id, @RequestParam int quantity) {
-        bookService.decreaseStock(id, quantity);
-        return ResponseEntity.ok("Stock decreased successfully by " + quantity);
+    public ResponseEntity<Books> decreaseStock(@PathVariable Long id, @RequestParam int quantity) {
+        Books updatedBook = bookService.decreaseStock(id, quantity);
+        return ResponseEntity.ok(updatedBook);
     }
 
     @Operation(summary = "Search books", description = "Search books by title, author, or other criteria")
@@ -148,5 +148,39 @@ public class BookController {
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
         Category updatedCategory = categoryService.updateCategory(id, category);
         return ResponseEntity.ok(updatedCategory);
+    }
+    
+    // Update book categories
+    @Operation(summary = "Update book categories", description = "Updates the categories associated with a book")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Book categories updated successfully",
+                content = @Content(mediaType = "application/json", 
+                schema = @Schema(implementation = Books.class))),
+        @ApiResponse(responseCode = "404", description = "Book not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid category IDs")
+    })
+    @PutMapping("/{id}/categories")
+    public ResponseEntity<Books> updateBookCategories(
+            @Parameter(description = "ID of the book to update") @PathVariable Long id,
+            @Parameter(description = "List of category IDs") @RequestBody List<Long> categoryIds) {
+        Books updatedBook = bookService.updateBookCategories(id, categoryIds);
+        return ResponseEntity.ok(updatedBook);
+    }
+    
+    // Update book images
+    @Operation(summary = "Update book images", description = "Updates the images associated with a book")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Book images updated successfully",
+                content = @Content(mediaType = "application/json", 
+                schema = @Schema(implementation = Books.class))),
+        @ApiResponse(responseCode = "404", description = "Book not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid image data")
+    })
+    @PutMapping("/{id}/images")
+    public ResponseEntity<Books> updateBookImages(
+            @Parameter(description = "ID of the book to update") @PathVariable Long id,
+            @Parameter(description = "List of book images") @RequestBody List<BookImageRequest> images) {
+        Books updatedBook = bookService.updateBookImages(id, images);
+        return ResponseEntity.ok(updatedBook);
     }
 }

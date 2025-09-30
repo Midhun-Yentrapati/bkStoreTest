@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BookService } from '../../../services/book.service';
 
 interface ReviewRow {
-  bookId: string;
+  bookId: string | number;
   bookTitle: string;
   userId: string;
   userName: string;

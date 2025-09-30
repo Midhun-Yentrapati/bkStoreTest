@@ -1,17 +1,33 @@
 import { Address } from './address.model';
-import { BookImageModel } from './book.model';
 
-// Unified OrderItem interface for both admin and customer sides
+// OrderItem interface matching backend structure
 export interface OrderItem {
   id: string; // Order item ID
-  bookId?: string; // Reference to book (optional if details are embedded)
-  title?: string; // Book title for display
-  author?: string; // Book author for display
+  orderId: string; // Order ID reference
+  bookId: string; // Book ID reference
+  title: string; // Book title
+  author: string; // Book author
+  price: number; // Price at time of order (BigDecimal from backend)
+  quantity: number; // Quantity ordered
+  subtotal: number; // Subtotal for this item (BigDecimal from backend)
+  imageUrl?: string; // Single image URL
+  image_urls?: string[]; // Alternative field name for compatibility
+  category?: string; // Book category
+  itemStatus?: 'Pending' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled'; // Item status
+  createdAt: string; // Creation timestamp
+}
+
+// OrderItemDto for creating orders
+export interface OrderItemDto {
+  id?: string;
+  orderId?: string;
+  bookId: string;
+  title: string;
+  author: string;
+  price: number;
   quantity: number;
-  price: number; // Price at time of order (for historical accuracy)
-  images?: BookImageModel[]; // Book images for display
-  category?: string; // Book category for display
-  addedAt?: string; // ISO timestamp (optional for embedded items)
+  subtotal: number;
+  imageUrl?: string;
 }
 
 // Extended interface for UI display (with book details)
@@ -19,47 +35,103 @@ export interface OrderItemWithDetails extends OrderItem {
   book?: any; // Full book details fetched separately when needed
 }
 
-// Unified Order interface for both admin and customer sides
+// Order interface matching backend structure exactly
 export interface Order {
   id: string;
   userId: string;
-  items: OrderItem[]; // Primary field name - used in JSON
-  orderItems?: OrderItem[]; // Alternative field name for compatibility
-  shippingAddress: Address;
-  billingAddress?: Address;
-  orderDate: string;
-  orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
-  paymentMethod: string;
-  paymentDetails?: PaymentDetails;
+  billingAddressId?: string;
+  shippingAddressId?: string;
   
-  // Pricing breakdown
-  totalAmount: number; // Sum of all item prices
-  platformFee: number;
-  shippingFee: number;
-  taxes: number;
-  discount: number;
-  finalAmount: number;
-  totalPayable: number; // Alias for finalAmount
+  // Pricing breakdown (all BigDecimal from backend)
+  subtotal: number;
+  discountAmount?: number;
+  couponId?: string;
+  taxAmount?: number;
+  shippingAmount?: number;
+  platformFee?: number;
+  grandTotal: number;
+  currency?: string;
+  
+  // Payment and status - matching backend enums exactly
+  paymentMethod?: 'COD' | 'Card' | 'UPI' | 'NetBanking';
+  paymentStatus?: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  orderStatus?: 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Cancelled';
   
   // Delivery tracking
+  trackingId?: string;
   estimatedDelivery?: string;
   actualDelivery?: string;
-  trackingId?: string;
   
   // Additional fields
   notes?: string;
-  statusHistory: OrderStatusHistory[];
-  image_urls?: string[]; // Top-level images for order display
   
+  // Timestamps
   createdAt: string;
   updatedAt: string;
+  placedAt?: string;
+  paidAt?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
+  
+  // Relationships
+  orderItems?: OrderItem[];
+  items?: OrderItem[]; // Alternative field name for compatibility
+  statusHistory?: OrderStatusHistory[];
+  payments?: Payment[];
+  coupon?: any; // Coupon object
+  
+  // Template compatibility fields (computed/derived)
+  shippingAddress?: Address; // Will be populated from shippingAddressId
+  billingAddress?: Address; // Will be populated from billingAddressId
+  orderDate?: string; // Alias for createdAt or placedAt
+  totalAmount?: number; // Alias for subtotal
+  finalAmount?: number; // Alias for grandTotal
+}
+
+// OrderDto for creating orders
+export interface OrderDto {
+  id?: string;
+  userId: string;
+  billingAddressId?: string;
+  shippingAddressId?: string;
+  subtotal: number;
+  discountAmount?: number;
+  couponCode?: string;
+  taxAmount?: number;
+  shippingAmount?: number;
+  platformFee?: number;
+  grandTotal: number;
+  currency?: string;
+  paymentMethod?: 'COD' | 'Card' | 'UPI' | 'NetBanking';
+  paymentStatus?: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  orderStatus?: 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Cancelled';
+  trackingId?: string;
+  notes?: string;
+  orderItems: OrderItemDto[];
 }
 
 // Extended interface for UI display (with book details)
 export interface OrderWithDetails extends Omit<Order, 'items' | 'orderItems'> {
   items: OrderItemWithDetails[]; // Order items with book details
   orderItems?: OrderItemWithDetails[]; // Alternative field name for compatibility
+}
+
+// Payment interface matching backend structure
+export interface Payment {
+  id: string;
+  orderId: string;
+  transactionId?: string;
+  amount: number; // BigDecimal from backend
+  currency?: string;
+  paymentStatus: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  paymentGateway?: string;
+  paymentMethod?: string;
+  refundedAmount?: number; // BigDecimal from backend
+  failureReason?: string;
+  gatewayResponse?: string; // JSON string from backend
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaymentDetails {

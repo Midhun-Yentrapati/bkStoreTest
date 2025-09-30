@@ -18,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @Tag(name = "Categories", description = "Category management operations")
 public class CategoryController {
 

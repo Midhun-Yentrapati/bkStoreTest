@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { BookService } from '../../../services/book.service';
-import { BookModel, BookWithSales } from '../../../models/book.model';
+import { BookWithSales } from '../../../models/book.model';
 import { Router } from '@angular/router';
 import { ModernPieChartComponent } from '../../shared/modern-pie-chart/modern-pie-chart.component';
 
@@ -41,13 +41,13 @@ export class HighlySoldComponent implements OnInit, OnDestroy {
 
     // Use the new getHighlySoldBooks method
     this.salesSubscription = this.bookService.getHighlySoldBooks(this.limit).subscribe({
-      next: (books: BookModel[]) => {
+      next: (books: BookWithSales[]) => {
         this.isLoading = false;
         if (books && books.length > 0) {
           this.hasChartData = true;
           this.chartData = books.map(book => ({
             label: book.title,
-            value: book.noOfBooksSold || 0
+            value: book.no_of_books_sold
           }));
         } else {
           this.hasChartData = false;

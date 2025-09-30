@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore API Documentation - Interview Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .endpoint {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .endpoint:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+        
+        .url {
+            font-family: 'Courier New', monospace;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        
+        .description {
+            color: #666;
+            margin: 8px 0;
+            font-style: italic;
+        }
+        
+        .json-example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .online { background: #28a745; }
+        .offline { background: #dc3545; }
+        
+        .demo-section {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .demo-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .demo-steps {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .demo-steps li {
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #fff;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .highlight h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> BookStore API Documentation</h1>
+            <p>Complete Admin Activity Logs & Daily Sales Analytics System</p>
+            <p>Server Status: <span class="status-indicator online"></span>Online at http://localhost:8080</p>
+        </div>
+
+        <div class="demo-section">
+            <h3> Interview Demo Guide</h3>
+            <ol class="demo-steps">
+                <li><strong>Start with Admin Activity Logs:</strong> Show recent activities and create new logs</li>
+                <li><strong>Demonstrate Filtering:</strong> Filter by admin, action type, and status</li>
+                <li><strong>Show Error Monitoring:</strong> Display error tracking capabilities</li>
+                <li><strong>Present Analytics:</strong> Show daily sales summaries and statistics</li>
+                <li><strong>Highlight Key Features:</strong> Real-time monitoring, comprehensive reporting</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2> Admin Activity Logs API</h2>
+            <p>Track and monitor all administrative activities in the BookStore system.</p>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/recent</div>
+                <div class="description">Shows all admin activities from the last 24 hours</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/admin/admin12345</div>
+                <div class="description">Retrieves all activities performed by a specific admin user</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/action/LOGIN</div>
+                <div class="description">Filters activities by action type (LOGIN, LOGOUT, CREATE, UPDATE, DELETE)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/status/SUCCESS</div>
+                <div class="description">Filters activities by status (SUCCESS, FAILED, ERROR)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/errors</div>
+                <div class="description">Shows all activities that resulted in errors - critical for debugging</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/logs/date-range?startDate=2025-09-01T00:00:00&endDate=2025-09-16T23:59:59</div>
+                <div class="description">Retrieves activities within a specific date range for reporting</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/stats/top-admins</div>
+                <div class="description">Returns statistics showing which admins are most active</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/admin/activity/stats/common-actions</div>
+                <div class="description">Shows statistics of the most frequently performed actions</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <div class="url">http://localhost:8080/api/admin/activity/log</div>
+                <div class="description">Creates a new activity log entry with essential fields</div>
+                <div class="json-example">
+{
+  "adminId": "admin12345",
+  "adminUsername": "sayan",
+  "actionType": "LOGIN",
+  "status": "SUCCESS"
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Daily Sales Summary API</h2>
+            <p>Comprehensive business analytics and sales reporting system.</p>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/daily-sales/recent</div>
+                <div class="description">Shows the 10 most recent daily sales summaries</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/daily-sales/2025-09-15</div>
+                <div class="description">Retrieves sales summary for a specific date</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/daily-sales/date-range?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Gets sales summaries within a date range for trend analysis</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/total-revenue?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Calculates total revenue for a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/total-orders?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Counts total orders placed in a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/total-items-sold?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Counts total items sold in a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/average-order-value?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Calculates average order value for a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/top-selling-items?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Shows the best-selling items in a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/stats/least-selling-items?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Shows the least-selling items in a specific period</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <div class="url">http://localhost:8080/api/analytics/dashboard?startDate=2025-09-01&endDate=2025-09-16</div>
+                <div class="description">Returns a comprehensive dashboard with all key metrics</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <div class="url">http://localhost:8080/api/analytics/daily-sales/process</div>
+                <div class="description">Creates or updates a daily sales summary entry</div>
+                <div class="json-example">
+{
+  "salesDate": "2025-09-16",
+  "totalRevenue": 1250.50,
+  "totalOrders": 45,
+  "totalItemsSold": 120,
+  "averageOrderValue": 27.79,
+  "topSellingItem": "The Great Gatsby",
+  "topSellingItemQuantity": 15,
+  "leastSellingItem": "Advanced Mathematics",
+  "leastSellingItemQuantity": 2
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h4> Quick Start for Interview Demo</h4>
+            <p><strong>1. Admin Activity Logs:</strong> Start with GET /api/admin/activity/logs/recent</p>
+            <p><strong>2. Create Log Entry:</strong> POST /api/admin/activity/log with the JSON example above</p>
+            <p><strong>3. Show Filtering:</strong> GET /api/admin/activity/logs/action/LOGIN</p>
+            <p><strong>4. Daily Sales:</strong> GET /api/analytics/daily-sales/recent</p>
+            <p><strong>5. Analytics Dashboard:</strong> GET /api/analytics/dashboard with date range</p>
+        </div>
+
+        <div class="highlight">
+            <h4> Key Features to Highlight</h4>
+            <ul>
+                <li><strong>Real-time Monitoring:</strong> Track admin activities as they happen</li>
+                <li><strong>Comprehensive Analytics:</strong> Complete business intelligence dashboard</li>
+                <li><strong>Flexible Filtering:</strong> Multiple ways to analyze and filter data</li>
+                <li><strong>Error Tracking:</strong> Identify and debug system issues quickly</li>
+                <li><strong>Performance Metrics:</strong> Revenue, orders, and product performance analysis</li>
+                <li><strong>Audit Trail:</strong> Complete record of all administrative actions</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p> BookStore API Documentation | Interview Demo Ready | Server: http://localhost:8080</p>
+            <p>Built with Spring Boot, MySQL, and Angular | Comprehensive Analytics & Admin Management System</p>
+        </div>
+    </div>
+
+    <script>
+        // Copy URL functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('URL copied to clipboard!');
+            });
+        }
+
+        // Add copy buttons to all URLs
+        document.addEventListener('DOMContentLoaded', function() {
+            const urls = document.querySelectorAll('.url');
+            urls.forEach(function(url) {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    copyToClipboard(url.textContent);
+                };
+                url.parentNode.insertBefore(copyBtn, url.nextSibling);
+            });
+        });
+    </script>
+</body>
+</html>

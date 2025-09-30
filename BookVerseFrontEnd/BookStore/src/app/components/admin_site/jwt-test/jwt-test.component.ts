@@ -1,4 +1,4 @@
-﻿import { Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../../services/auth.service';
@@ -101,7 +101,7 @@ export class JwtTestComponent {
     this.addResult('Testing public endpoint...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addResult(' Public endpoint success (mock):', JSON.stringify({status: 'UP', service: 'auth-service'}, null, 2));
+      this.addResult('✅ Public endpoint success (mock):', JSON.stringify({status: 'UP', service: 'auth-service'}, null, 2));
     }, 500);
   }
   
@@ -109,7 +109,7 @@ export class JwtTestComponent {
     this.addResult('Testing auth context endpoint...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addResult(' Auth context success (mock):', JSON.stringify({authenticated: true, user: 'test-user'}, null, 2));
+      this.addResult('✅ Auth context success (mock):', JSON.stringify({authenticated: true, user: 'test-user'}, null, 2));
     }, 500);
   }
   
@@ -117,7 +117,7 @@ export class JwtTestComponent {
     this.addResult('Testing JWT claims endpoint...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addResult(' JWT claims success (mock):', JSON.stringify({sub: 'user-id', userRole: 'ADMIN', exp: Date.now()}, null, 2));
+      this.addResult('✅ JWT claims success (mock):', JSON.stringify({sub: 'user-id', userRole: 'ADMIN', exp: Date.now()}, null, 2));
     }, 500);
   }
   
@@ -125,7 +125,7 @@ export class JwtTestComponent {
     this.addResult('Testing admin endpoint...');
     // Mock implementation - TODO: Use AuthService
     setTimeout(() => {
-      this.addResult(' Admin endpoint success (mock):', JSON.stringify({customers: [], total: 0}, null, 2));
+      this.addResult('✅ Admin endpoint success (mock):', JSON.stringify({customers: [], total: 0}, null, 2));
     }, 500);
   }
   

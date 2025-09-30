@@ -14,9 +14,9 @@ describe('CategoryManagementComponent', () => {
   let mockRouter: jasmine.SpyObj<Router>;
 
   const mockCategories: CategoryModel[] = [
-    { id: '1', name: 'Fantasy' },
-    { id: '2', name: 'Science Fiction' },
-    { id: '3', name: 'Mystery' }
+    { id: 1, name: 'Fantasy' },
+    { id: 2, name: 'Science Fiction' },
+    { id: 3, name: 'Mystery' }
   ];
 
   beforeEach(async () => {

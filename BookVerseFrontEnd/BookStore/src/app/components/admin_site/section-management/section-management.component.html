@@ -84,14 +84,12 @@
               <div class="flex-1">
                 <h4 class="font-medium text-gray-900">{{ book.title }}</h4>
                 <p class="text-sm text-gray-600">{{ book.author }}</p>
-                <p class="text-sm text-gray-500 mt-1">Sales: {{ book.noOfBooksSold || 0 }}</p>
+                <p class="text-sm text-gray-500 mt-1">Sales: {{ book.no_of_books_sold }}</p>
               </div>
               <button 
                 (click)="removeBookFromSection(book.id, selectedCategory)"
                 [disabled]="isLoading"
-                class="ml-2 text-red-600 hover:text-red-800 disabled:opacity-50"
-                aria-label="Remove book from section"
-                title="Remove book from section">
+                class="ml-2 text-red-600 hover:text-red-800 disabled:opacity-50">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
@@ -123,9 +121,7 @@
               <button 
                 (click)="selectedBookId = book.id; addBookToSection()"
                 [disabled]="isLoading"
-                class="ml-2 text-blue-600 hover:text-blue-800 disabled:opacity-50"
-                aria-label="Add book to section"
-                title="Add book to section">
+                class="ml-2 text-blue-600 hover:text-blue-800 disabled:opacity-50">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>

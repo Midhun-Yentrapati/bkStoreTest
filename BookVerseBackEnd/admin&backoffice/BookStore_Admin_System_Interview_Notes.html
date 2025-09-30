@@ -1,0 +1,576 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore Admin System - Interview Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tech-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .file-structure {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: "Courier New", monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .get { background-color: #28a745; color: white; }
+        .post { background-color: #007bff; color: white; }
+        .put { background-color: #ffc107; color: black; }
+        .delete { background-color: #dc3545; color: white; }
+        
+        .url {
+            font-family: "Courier New", monospace;
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table th {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .demo-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .demo-section h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: "Courier New", monospace;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 0 5px 5px 0;
+            margin: 15px 0;
+        }
+        
+        .interview-tips {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .interview-tips h3 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .interview-tips ul {
+            margin-left: 20px;
+        }
+        
+        .interview-tips li {
+            margin: 8px 0;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> BookStore Admin Management System</h1>
+            <p>Complete Spring Boot Application with JWT Authentication & Role-Based Access Control</p>
+            <span class="badge">Spring Boot 3.5.5</span>
+            <span class="badge">JWT Authentication</span>
+            <span class="badge">MySQL Database</span>
+            <span class="badge">Role-Based Security</span>
+        </div>
+
+        <div class="section">
+            <h2> Project Overview</h2>
+            <p>This is a comprehensive admin management system for a bookstore built with Spring Boot. The system includes admin activity logging, daily sales analytics, and a complete role-based authentication system with JWT tokens.</p>
+            
+            <div class="highlight">
+                <strong>Key Achievement:</strong> Implemented a full-stack admin system with 3 major modules: Activity Logging, Sales Analytics, and Role-Based Authentication with 30+ API endpoints and granular permission system.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Technology Stack</h2>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <h4>Backend Framework</h4>
+                    <p>Spring Boot 3.5.5</p>
+                    <p>Spring Security</p>
+                    <p>Spring Data JPA</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Database</h4>
+                    <p>MySQL 8.0</p>
+                    <p>JPA/Hibernate ORM</p>
+                    <p>Database Relations</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Security</h4>
+                    <p>JWT Authentication</p>
+                    <p>BCrypt Password Encoding</p>
+                    <p>Role-Based Access Control</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Build Tool</h4>
+                    <p>Maven</p>
+                    <p>Java 21</p>
+                    <p>Lombok</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Project Structure & Files</h2>
+            <h3>Complete File Organization:</h3>
+            <div class="file-structure">
+com.bookstore2.Bookstore2/
+  Config/
+    SecurityConfig.java                    # JWT Security Configuration
+  Controller/
+    AdminController.java                   # Admin Activity Logs API
+    AnalyticsController.java               # Sales Analytics API
+    AuthController.java                    # Authentication API
+  Models/
+    AdminActivityLog.java                  # Activity Log Entity
+    AdminUser.java                         # Admin User Entity
+    AdminRole.java                         # Role Enum
+    AdminPermission.java                   # Permission Enum
+    DailySalesSummary.java                 # Sales Summary Entity
+  Repository/
+    AdminActivityLogRepository.java        # Activity Log Data Access
+    AdminUserRepository.java               # User Data Access
+    DailySalesSummaryRepository.java       # Sales Data Access
+  Service/
+    AdminService.java                      # Activity Log Business Logic
+    AdminUserService.java                  # User Management Logic
+    AnalyticsService.java                  # Analytics Business Logic
+    JwtService.java                        # JWT Token Management
+    JwtAuthenticationFilter.java           # JWT Security Filter
+  Resources/
+    application.properties                 # Database & JWT Configuration
+ pom.xml                                    # Maven Dependencies
+ Bookstore2Application.java                 # Main Spring Boot Class
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Security Implementation</h2>
+            <h3>JWT Token Structure:</h3>
+            <div class="code-block">
+{
+  "sub": "admin-uuid-12345",              // Subject (Admin User ID)
+  "username": "admin.user",               // Admin username
+  "email": "admin@bookstore.com",         // Admin email
+  "userType": "ADMIN",                    // User type (always ADMIN)
+  "adminRole": "SUPER_ADMIN",             // Admin role hierarchy
+  "department": "IT",                     // Admin department
+  "employeeId": "EMP001",                 // Employee ID
+  "fullName": "John Admin",               // Full name
+  "permissions": [                        // Granular permissions array
+    "USER_READ", "USER_WRITE", "USER_DELETE",
+    "BOOK_READ", "BOOK_WRITE", "BOOK_DELETE", 
+    "ORDER_READ", "ORDER_WRITE", "ORDER_DELETE",
+    "ADMIN_READ", "ADMIN_WRITE", "ADMIN_DELETE",
+    "SYSTEM_CONFIG", "AUDIT_READ"
+  ],
+  "roles": ["ROLE_ADMIN", "ROLE_USER"],   // Spring Security roles
+  "iat": 1694123456,                      // Issued at timestamp
+  "exp": 1694209856,                      // Expiration (24h)
+  "jti": "admin-token-uuid"               // JWT ID for tracking
+}
+            </div>
+
+            <h3>Role Hierarchy:</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Description</th>
+                        <th>Access Level</th>
+                        <th>Key Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>SUPER_ADMIN</td><td>Super Administrator</td><td>Full system access</td><td>All permissions</td></tr>
+                    <tr><td>ADMIN</td><td>Administrator</td><td>Department admin access</td><td>User, Book, Order management</td></tr>
+                    <tr><td>MANAGER</td><td>Manager</td><td>Team management access</td><td>Analytics, Reports</td></tr>
+                    <tr><td>MODERATOR</td><td>Moderator</td><td>Content moderation access</td><td>Read-only access</td></tr>
+                    <tr><td>SUPPORT</td><td>Support</td><td>Customer support access</td><td>Limited read access</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2> Database Schema</h2>
+            <h3>Tables Created:</h3>
+            <div class="file-structure">
+-- Main Tables
+admin_users                    # Admin user information
+admin_activity_logs           # Activity logging
+daily_sales_summary           # Sales analytics
+admin_permissions             # User-specific permissions
+admin_roles                   # Spring Security roles
+
+-- Sample Data
+3 Admin Users (SUPER_ADMIN, ADMIN, MANAGER)
+30+ Granular Permissions
+Role-based Access Control
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Complete API Endpoints</h2>
+            
+            <h3> Authentication Endpoints:</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/auth/login</span>
+                <div>Admin login with JWT token generation</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/auth/register</span>
+                <div>Admin user registration</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/auth/logout</span>
+                <div>Admin logout</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/auth/profile</span>
+                <div>Get current admin profile</div>
+            </div>
+
+            <h3> Admin Activity Logs (ADMIN+ roles):</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/logs/recent</span>
+                <div>Get recent activities (last 24 hours)</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/admin/activity/stats</span>
+                <div>Get activity statistics</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/admin/activity/log</span>
+                <div>Create new activity log (SUPER_ADMIN only)</div>
+            </div>
+
+            <h3> Analytics (MANAGER+ roles):</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/daily-sales/recent</span>
+                <div>Get recent daily sales summaries</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/analytics/dashboard?startDate=2025-09-01&endDate=2025-09-10</span>
+                <div>Get comprehensive analytics dashboard</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/analytics/daily-sales/process</span>
+                <div>Process daily sales summary</div>
+            </div>
+
+            <h3> Health Check:</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/actuator/health</span>
+                <div>Application health status</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Key Features Implemented</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4> JWT Authentication</h4>
+                    <p>Secure token-based authentication with role extraction and validation</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Role-Based Access Control</h4>
+                    <p>5-tier role hierarchy with granular permission system (30+ permissions)</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Admin Activity Logging</h4>
+                    <p>Comprehensive tracking of admin actions with metadata and performance metrics</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Sales Analytics</h4>
+                    <p>Daily sales summaries with revenue tracking and top/least selling items</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Security Features</h4>
+                    <p>Password encryption, session management, and API endpoint protection</p>
+                </div>
+                <div class="feature-card">
+                    <h4> Database Integration</h4>
+                    <p>MySQL database with proper relationships and indexing</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2> Demo Instructions</h2>
+            <h3>Step 1: Database Setup</h3>
+            <div class="code-block">
+1. Run admin_role_system_setup.sql in MySQL Workbench
+2. This creates all tables and sample data
+3. Verify 3 admin users are created with different roles
+            </div>
+
+            <h3>Step 2: Start Application</h3>
+            <div class="code-block">
+cd Backend-o/Bookstore2
+mvn spring-boot:run
+Application starts on http://localhost:8080
+            </div>
+
+            <h3>Step 3: Test Authentication</h3>
+            <div class="code-block">
+POST http://localhost:8080/api/auth/login
+{
+  "username": "super.admin",
+  "password": "password123"
+}
+
+Response: JWT token + admin user details
+            </div>
+
+            <h3>Step 4: Test Protected Endpoints</h3>
+            <div class="code-block">
+# Use JWT token in Authorization header
+Authorization: Bearer &lt;your-jwt-token&gt;
+
+GET /api/admin/activity/logs/recent
+GET /api/analytics/dashboard?startDate=2025-09-01&endDate=2025-09-10
+GET /api/auth/profile
+            </div>
+        </div>
+
+        <div class="interview-tips">
+            <h3> Interview Talking Points</h3>
+            <ul>
+                <li><strong>Architecture:</strong> "I implemented a 3-tier architecture with Controller-Service-Repository pattern"</li>
+                <li><strong>Security:</strong> "JWT tokens contain role and permission information for fine-grained access control"</li>
+                <li><strong>Database Design:</strong> "Used proper normalization with foreign key relationships and indexing"</li>
+                <li><strong>Scalability:</strong> "Stateless JWT authentication allows horizontal scaling"</li>
+                <li><strong>Maintainability:</strong> "Clean separation of concerns with dependency injection"</li>
+                <li><strong>Testing:</strong> "All endpoints can be tested with Postman using the provided URLs"</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2> Technical Achievements</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Implementation</th>
+                        <th>Benefit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Authentication</td><td>JWT with role-based claims</td><td>Stateless, scalable security</td></tr>
+                    <tr><td>Authorization</td><td>Method-level security with @PreAuthorize</td><td>Fine-grained access control</td></tr>
+                    <tr><td>Data Persistence</td><td>JPA/Hibernate with MySQL</td><td>Object-relational mapping</td></tr>
+                    <tr><td>API Design</td><td>RESTful endpoints with proper HTTP methods</td><td>Industry standard practices</td></tr>
+                    <tr><td>Error Handling</td><td>Global exception handling</td><td>Consistent error responses</td></tr>
+                    <tr><td>Configuration</td><td>Externalized configuration</td><td>Environment-specific settings</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2> Future Enhancements</h2>
+            <ul>
+                <li>Two-Factor Authentication (2FA) implementation</li>
+                <li>Audit trail with detailed change tracking</li>
+                <li>Real-time notifications using WebSocket</li>
+                <li>API rate limiting and throttling</li>
+                <li>Comprehensive unit and integration tests</li>
+                <li>Docker containerization for deployment</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2> Contact & Support</h2>
+            <p><strong>Project Repository:</strong> BookStore Admin Management System</p>
+            <p><strong>Technology:</strong> Spring Boot 3.5.5, JWT, MySQL, Maven</p>
+            <p><strong>Total Endpoints:</strong> 20+ RESTful APIs</p>
+            <p><strong>Security Features:</strong> JWT Authentication, Role-Based Access Control, Password Encryption</p>
+            <p><strong>Database Tables:</strong> 5 tables with proper relationships</p>
+        </div>
+    </div>
+</body>
+</html>

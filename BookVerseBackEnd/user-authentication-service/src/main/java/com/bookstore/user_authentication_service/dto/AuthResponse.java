@@ -55,4 +55,25 @@ public class AuthResponse {
                 .message(message)
                 .build();
     }
+    
+    // Inner DTO classes for request handling
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class RefreshTokenRequest {
+        private String refreshToken;
+    }
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class LogoutRequest {
+        private String sessionId;
+        private Boolean logoutAllSessions;
+    }
 }

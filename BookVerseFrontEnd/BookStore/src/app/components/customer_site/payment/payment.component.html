@@ -273,7 +273,7 @@
             <div class="address-name">{{ deliveryAddress.name }}</div>
             <div class="address-phone">{{ deliveryAddress.phone }}</div>
             <div class="address-text">
-              {{ deliveryAddress.address }}, {{ deliveryAddress.locality }}<br>
+              {{ deliveryAddress.addressLine1 }}{{ deliveryAddress.addressLine2 ? ', ' + deliveryAddress.addressLine2 : '' }}, {{ deliveryAddress.locality }}<br>
               {{ deliveryAddress.city }}, {{ deliveryAddress.state }} - {{ deliveryAddress.pincode }}
             </div>
           </div>

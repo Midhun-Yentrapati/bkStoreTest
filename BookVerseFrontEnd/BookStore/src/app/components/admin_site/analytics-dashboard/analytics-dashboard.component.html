@@ -1,0 +1,220 @@
+<div class="analytics-dashboard">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">📊 Analytics Dashboard</h1>
+    <p class="dashboard-subtitle">Comprehensive sales and admin activity analytics</p>
+  </div>
+
+  <!-- Date Range Controls -->
+  <div class="date-controls">
+    <div class="control-group">
+      <label for="periodSelect">Quick Select:</label>
+      <select id="periodSelect" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="form-select">
+        <option value="last7days">Last 7 Days</option>
+        <option value="last30days">Last 30 Days</option>
+        <option value="last90days">Last 90 Days</option>
+        <option value="thisMonth">This Month</option>
+        <option value="lastMonth">Last Month</option>
+        <option value="custom">Custom Range</option>
+      </select>
+    </div>
+    
+    <div class="control-group" [ngClass]="{'disabled': selectedPeriod !== 'custom'}">
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" [(ngModel)]="selectedStartDate" 
+             (change)="onCustomDateChange()" class="form-input"
+             [disabled]="selectedPeriod !== 'custom'">
+    </div>
+    
+    <div class="control-group" [ngClass]="{'disabled': selectedPeriod !== 'custom'}">
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" [(ngModel)]="selectedEndDate" 
+             (change)="onCustomDateChange()" class="form-input"
+             [disabled]="selectedPeriod !== 'custom'">
+    </div>
+    
+    <button (click)="refreshData()" class="btn btn-primary refresh-btn">
+      🔄 Refresh Data
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoadingDashboard" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <!-- Main Analytics Dashboard -->
+  <div *ngIf="!isLoadingDashboard && analyticsDashboard" class="dashboard-content">
+    
+    <!-- Key Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card revenue">
+        <div class="metric-icon">💰</div>
+        <div class="metric-content">
+          <h3>Total Revenue</h3>
+          <p class="metric-value">{{ formatCurrency(analyticsDashboard.totalRevenue) }}</p>
+        </div>
+      </div>
+      
+      <div class="metric-card orders">
+        <div class="metric-icon">📦</div>
+        <div class="metric-content">
+          <h3>Total Orders</h3>
+          <p class="metric-value">{{ analyticsDashboard.totalOrders }}</p>
+        </div>
+      </div>
+      
+      <div class="metric-card items">
+        <div class="metric-icon">📚</div>
+        <div class="metric-content">
+          <h3>Items Sold</h3>
+          <p class="metric-value">{{ analyticsDashboard.totalItemsSold }}</p>
+        </div>
+      </div>
+      
+      <div class="metric-card average">
+        <div class="metric-icon">📊</div>
+        <div class="metric-content">
+          <h3>Avg Order Value</h3>
+          <p class="metric-value">{{ formatCurrency(analyticsDashboard.averageOrderValue) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-container">
+        <h3>Revenue Trends</h3>
+        <div class="chart-wrapper">
+          <canvas #revenueChart width="400" height="200"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <h3>Admin Activity Distribution</h3>
+        <div class="chart-wrapper">
+          <canvas #activityChart width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top/Least Selling Items -->
+    <div class="items-section">
+      <div class="items-container">
+        <h3>🏆 Top Selling Items</h3>
+        <div class="items-list" *ngIf="analyticsDashboard.topSellingItems.length > 0; else noTopItems">
+          <div class="item-card" *ngFor="let item of analyticsDashboard.topSellingItems; let i = index">
+            <div class="item-rank">{{ i + 1 }}</div>
+            <div class="item-details">
+              <h4>{{ item[0] }}</h4>
+              <p>Quantity: {{ item[1] }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTopItems>
+          <p class="no-data">No top selling items data available</p>
+        </ng-template>
+      </div>
+      
+      <div class="items-container">
+        <h3>📉 Least Selling Items</h3>
+        <div class="items-list" *ngIf="analyticsDashboard.leastSellingItems.length > 0; else noLeastItems">
+          <div class="item-card" *ngFor="let item of analyticsDashboard.leastSellingItems; let i = index">
+            <div class="item-rank">{{ i + 1 }}</div>
+            <div class="item-details">
+              <h4>{{ item[0] }}</h4>
+              <p>Quantity: {{ item[1] }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noLeastItems>
+          <p class="no-data">No least selling items data available</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Activity Section -->
+  <div class="activity-section">
+    <h2>👥 Admin Activity Insights</h2>
+    
+    <!-- Activity Stats -->
+    <div class="activity-stats" *ngIf="!isLoadingStats">
+      <div class="stat-card">
+        <h4>🏅 Top Active Admins</h4>
+        <div class="admin-list" *ngIf="topActiveAdmins.length > 0; else noTopAdmins">
+          <div class="admin-item" *ngFor="let admin of topActiveAdmins; let i = index">
+            <span class="admin-rank">{{ i + 1 }}.</span>
+            <span class="admin-name">{{ admin[0] }}</span>
+            <span class="admin-count">{{ admin[1] }} activities</span>
+          </div>
+        </div>
+        <ng-template #noTopAdmins>
+          <p class="no-data">No admin activity data available</p>
+        </ng-template>
+      </div>
+      
+      <div class="stat-card">
+        <h4>🎯 Most Common Actions</h4>
+        <div class="action-list" *ngIf="commonActions.length > 0; else noCommonActions">
+          <div class="action-item" *ngFor="let action of commonActions; let i = index">
+            <span class="action-icon">{{ getActionTypeIcon(action[0]) }}</span>
+            <span class="action-name">{{ action[0] }}</span>
+            <span class="action-count">{{ action[1] }} times</span>
+          </div>
+        </div>
+        <ng-template #noCommonActions>
+          <p class="no-data">No action data available</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="recent-activities">
+      <h3>🕒 Recent Admin Activities</h3>
+      <div class="activities-list" *ngIf="!isLoadingActivities && recentActivities.length > 0; else noRecentActivities">
+        <div class="activity-item" *ngFor="let activity of recentActivities.slice(0, 10)">
+          <div class="activity-header">
+            <span class="activity-icon">{{ getActionTypeIcon(activity.actionType) }}</span>
+            <span class="activity-admin">{{ activity.adminUsername }}</span>
+            <span class="activity-time">{{ formatDateTime(activity.createdAt) }}</span>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(activity.status)">
+              {{ activity.status }}
+            </span>
+          </div>
+          <div class="activity-details">
+            <p class="activity-action">{{ activity.actionType }}: {{ activity.actionDescription }}</p>
+            <div class="activity-meta" *ngIf="activity.serviceName || activity.endpoint">
+              <span *ngIf="activity.serviceName" class="service-name">{{ activity.serviceName }}</span>
+              <span *ngIf="activity.endpoint" class="endpoint">{{ activity.httpMethod }} {{ activity.endpoint }}</span>
+              <span *ngIf="activity.executionTimeMs" class="execution-time">{{ activity.executionTimeMs }}ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noRecentActivities>
+        <div class="no-data" *ngIf="!isLoadingActivities">No recent activities available</div>
+        <div class="loading-spinner" *ngIf="isLoadingActivities">Loading activities...</div>
+      </ng-template>
+    </div>
+
+    <!-- Error Logs -->
+    <div class="error-logs" *ngIf="errorLogs.length > 0">
+      <h3>⚠️ Recent Error Logs</h3>
+      <div class="error-list">
+        <div class="error-item" *ngFor="let error of errorLogs.slice(0, 5)">
+          <div class="error-header">
+            <span class="error-icon">❌</span>
+            <span class="error-admin">{{ error.adminUsername }}</span>
+            <span class="error-time">{{ formatDateTime(error.createdAt) }}</span>
+          </div>
+          <div class="error-details">
+            <p class="error-action">{{ error.actionType }}: {{ error.actionDescription }}</p>
+            <p class="error-message" *ngIf="error.errorMessage">{{ error.errorMessage }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

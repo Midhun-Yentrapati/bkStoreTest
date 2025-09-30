@@ -103,7 +103,7 @@ export class CouponManagementComponent implements OnInit {
     if (this.searchTerm) {
       filtered = filtered.filter(coupon => 
         coupon.code.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        coupon.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+        (coupon.title && coupon.title.toLowerCase().includes(this.searchTerm.toLowerCase()))
       );
     }
 
@@ -228,7 +228,21 @@ export class CouponManagementComponent implements OnInit {
 
   toggleCouponStatus(coupon: Coupon) {
     const newStatus = !coupon.isActive;
-    this.couponService.updateCoupon(coupon.id, { isActive: newStatus }).subscribe({
+    const updateData = {
+      code: coupon.code,
+      title: coupon.title,
+      description: coupon.description,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      minimumOrderAmount: coupon.minimumOrderAmount,
+      maximumDiscountAmount: coupon.maximumDiscountAmount,
+      validFrom: coupon.validFrom,
+      validUntil: coupon.validUntil,
+      usageLimit: coupon.usageLimit,
+      isActive: newStatus
+    };
+    
+    this.couponService.updateCoupon(coupon.id, updateData).subscribe({
       next: () => {
         coupon.isActive = newStatus;
         this.applyFilters();
@@ -258,7 +272,7 @@ export class CouponManagementComponent implements OnInit {
   }
 
   getDiscountText(coupon: Coupon): string {
-    if (coupon.discountType === 'percentage') {
+    if (coupon.discountType === 'PERCENTAGE') {
       return `${coupon.discountValue}% off`;
     } else {
       return `₹${coupon.discountValue} off`;
@@ -266,6 +280,8 @@ export class CouponManagementComponent implements OnInit {
   }
 
   getUsagePercentage(coupon: Coupon): number {
-    return (coupon.usageCount / coupon.usageLimit) * 100;
+    const usageCount = coupon.usageCount || coupon.usedCount || 0;
+    const usageLimit = coupon.usageLimit || 0;
+    return usageLimit > 0 ? (usageCount / usageLimit) * 100 : 0;
   }
 }

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { map, catchError, tap, switchMap } from 'rxjs/operators';
-import { Order, OrderItem, OrderSummary, PaymentDetails, OrderStatusHistory, OrderWithDetails, OrderItemWithDetails } from '../models/order.model';
+import { Order, OrderItem, OrderDto, OrderItemDto, OrderSummary, PaymentDetails, OrderStatusHistory, OrderWithDetails, OrderItemWithDetails } from '../models/order.model';
+import { CartItemWithDetails } from '../models/cart.model';
 import { Address } from '../models/address.model';
 import { BookService } from './book.service';
-import { CartService, CartItemWithDetails } from './cart.service';
+import { CartService } from './cart.service';
 import { AuthService } from './auth.service';
 import { AdminNotificationsService } from './admin-notifications.service';
 
@@ -13,8 +14,8 @@ import { AdminNotificationsService } from './admin-notifications.service';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiBaseUrl = 'http://localhost:8090/api';
-  private apiUrl = ${this.apiBaseUrl}/orders;
+  private apiBaseUrl = 'http://localhost:8090/api' // Temporary: Direct to service
+  private apiUrl = `${this.apiBaseUrl}/orders`;
 
   constructor(
     private http: HttpClient,
@@ -30,11 +31,54 @@ export class OrderService {
       return throwError(() => new Error('User not logged in'));
     }
 
-    // Check if user is admin (for admin dashboard)
+    // Use backend endpoint: /api/orders?userId={userId} or /api/orders for admin
     const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
     const url = isAdmin ? this.apiUrl : `${this.apiUrl}?userId=${currentUser.id}`;
     
-    return this.http.get<Order[]>(url);
+    console.log('Fetching orders from URL:', url);
+    
+    return this.http.get<any>(url).pipe(
+      map(response => {
+        console.log('Raw orders response received:', response);
+        console.log('Response type:', typeof response);
+        console.log('Is array:', Array.isArray(response));
+        
+        // Handle different response formats
+        let orders: Order[];
+        if (Array.isArray(response)) {
+          orders = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          orders = response.data;
+        } else if (response && response.orders && Array.isArray(response.orders)) {
+          orders = response.orders;
+        } else {
+          console.warn('Unexpected response format, treating as empty array');
+          orders = [];
+        }
+        
+        console.log('Processed orders:', orders.length);
+        return orders;
+      }),
+      catchError(error => {
+        console.error('Orders API error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url,
+          message: error.message,
+          error: error.error
+        });
+        
+        // If it's a 200 response but treated as error, it might be a parsing issue
+        if (error.status === 200) {
+          console.log('Status 200 but treated as error - likely parsing issue');
+          console.log('Error response body:', error.error);
+          // Try to return empty array for 200 errors
+          return of([]);
+        }
+        
+        return throwError(() => error);
+      })
+    );
   }
 
   getOrdersWithDetails(): Observable<OrderWithDetails[]> {
@@ -57,24 +101,32 @@ export class OrderService {
   }
 
   private loadOrderWithDetails(order: Order): Observable<OrderWithDetails> {
-    // Use 'items' as the primary field name
-    const orderItems = order.items || order.orderItems || [];
+    // Use 'orderItems' as the primary field name (backend structure)
+    const orderItems = order.orderItems || order.items || [];
+    
+    // Populate template compatibility fields
+    const enrichedOrder = {
+      ...order,
+      orderDate: order.placedAt || order.createdAt,
+      totalAmount: order.subtotal,
+      finalAmount: order.grandTotal,
+      items: orderItems
+    };
     
     if (orderItems.length === 0) {
-      return of({ ...order, items: [] });
+      return of({ ...enrichedOrder, items: [] });
     }
 
     // Check if items already have book details embedded
     const itemsWithDetails = orderItems.map(item => {
-      // If item has title, author, image_urls, etc., it already has book details
-      if (item.title && item.author && item.images) {
+      // If item has title, author, imageUrl, etc., it already has book details
+      if (item.title && item.author) {
         // Create a book object from the embedded details
         const book = {
           id: item.bookId || item.id,
           title: item.title,
           author: item.author,
-                      images: item.images,
-          category: item.category,
+          image_urls: item.imageUrl ? [item.imageUrl] : [],
           price: item.price,
           description: '',
           isbn: '',
@@ -108,7 +160,7 @@ export class OrderService {
     // If all items have embedded details, return immediately
     if (itemsWithDetails.every(item => typeof item === 'object' && 'book' in item)) {
       return of({
-        ...order,
+        ...enrichedOrder,
         items: itemsWithDetails as OrderItemWithDetails[]
       } as OrderWithDetails);
     }
@@ -120,12 +172,12 @@ export class OrderService {
 
     return forkJoin(itemRequests).pipe(
       map(itemsWithDetails => ({
-        ...order,
+        ...enrichedOrder,
         items: itemsWithDetails
       } as OrderWithDetails)),
       catchError(error => {
         console.error('Error loading order items with details:', error);
-        return of({ ...order, items: order.items as OrderItemWithDetails[] });
+        return of({ ...enrichedOrder, items: orderItems as OrderItemWithDetails[] });
       })
     );
   }
@@ -165,115 +217,64 @@ export class OrderService {
           throw new Error('Cart is empty');
         }
 
-        // Convert cart items to order items
-        const orderItems: OrderItem[] = cartItems.map((cartItem: CartItemWithDetails) => ({
-          id: crypto.randomUUID(),
-          bookId: cartItem.bookId || cartItem.book.id,
+        // Convert cart items to order items (matching backend DTO structure)
+        const orderItems: OrderItemDto[] = cartItems.map((cartItem: CartItemWithDetails) => ({
+          bookId: cartItem.bookId,
           title: cartItem.book.title,
           author: cartItem.book.author,
+          price: cartItem.priceWhenAdded, // Use price when added to cart
           quantity: cartItem.quantity,
-          price: cartItem.book.price, // Store current price for historical accuracy
-          images: cartItem.book.images,
-                      category: cartItem.book.categories?.[0]?.name || 'Unknown',
-          addedAt: new Date().toISOString()
+          subtotal: cartItem.priceWhenAdded * cartItem.quantity,
+          imageUrl: cartItem.book.image_urls?.[0]
         }));
 
         // Calculate order summary
         const orderSummary = this.calculateOrderSummary(cartItems);
         
-        // Create order object
-        const newOrder: any = {
-          id: crypto.randomUUID(),
+        // Create order DTO (matching backend OrderDto structure)
+        const orderDto: OrderDto = {
           userId: currentUser.id,
-          items: orderItems, // Use 'items' to match JSON structure
-          shippingAddress: deliveryAddress,
-          orderDate: new Date().toISOString(),
-          orderStatus: 'pending',
-          paymentMethod: paymentMethod,
-          paymentStatus: paymentMethod === 'COD' ? 'pending' : 'paid',
-          paymentDetails: paymentDetails,
-          totalAmount: orderSummary.totalAmount,
-          platformFee: orderSummary.platformFee,
-          shippingFee: orderSummary.shippingFee,
-          taxes: orderSummary.taxes,
-          discount: orderSummary.discount,
-          finalAmount: orderSummary.finalAmount,
-          totalPayable: orderSummary.totalPayable,
-          estimatedDelivery: this.calculateEstimatedDelivery(),
-          trackingId: this.generateTrackingId(),
-          statusHistory: [{
-            status: 'pending',
-            timestamp: new Date().toISOString(),
-            note: 'Order placed successfully'
-          }],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          billingAddressId: deliveryAddress.id || undefined,
+          shippingAddressId: deliveryAddress.id || undefined,
+          subtotal: orderSummary.totalAmount,
+          discountAmount: orderSummary.discount || 0,
+          taxAmount: orderSummary.taxes || 0,
+          shippingAmount: orderSummary.shippingFee || 0,
+          platformFee: orderSummary.platformFee || 0,
+          grandTotal: orderSummary.finalAmount,
+          currency: 'INR',
+          paymentMethod: paymentMethod.toUpperCase() as 'COD' | 'Card' | 'UPI' | 'NetBanking',
+          paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Paid',
+          orderStatus: 'Pending',
+          notes: undefined,
+          orderItems: orderItems
         };
 
-        return this.http.post<Order>(this.apiUrl, newOrder).pipe(
-          tap(() => {
-            // Clear cart after successful order creation
-            this.cartService.clearCart().subscribe();
+        return this.http.post<Order>(this.apiUrl, orderDto).pipe(
+          tap((createdOrder) => {
+            // Create admin notification for new order (temporarily disabled due to auth issues)
+            // this.adminNotificationsService.createOrderNotification(
+            //   createdOrder.id,
+            //   deliveryAddress.name,
+            //   orderSummary.totalPayable
+            // ).subscribe({
+            //   next: (notification) => {
+            //     console.log('Admin notification created for new order:', notification);
+            //   },
+            //   error: (error) => {
+            //     console.error('Error creating admin notification:', error);
+            //   }
+            // });
+            console.log('Order created successfully, admin notification temporarily disabled');
             
-            // Create admin notification for new order
-            this.adminNotificationsService.createOrderNotification(
-              newOrder.id,
-              deliveryAddress.name,
-              orderSummary.totalPayable
-            ).subscribe({
-              next: (notification) => {
-                console.log('Admin notification created for new order:', notification);
+            // Clear cart after successful order creation
+            // Note: Stock updates should be handled by the backend order service
+            this.cartService.clearCart().subscribe({
+              next: () => {
+                console.log('Cart cleared after successful order creation');
               },
               error: (error) => {
-                console.error('Error creating admin notification:', error);
-              }
-            });
-            
-            // UPDATED: Sales count tracking is now handled by Spring backend automatically
-            // Decrease stock for all books in the order
-            orderItems.forEach(item => {
-              if (item.bookId) {
-                // COMMENTED OUT - Sales count tracking is now handled by Spring backend
-                // const categories: ('newly launched' | 'highly rated' | 'special offers')[] = ['newly launched', 'highly rated', 'special offers'];
-                // categories.forEach(category => {
-                //   this.bookService.updateBookSalesCount(item.bookId!, category).subscribe({
-                //     next: (result: any) => {
-                //       if (result) {
-                //         console.log(`Updated sales count for book ${item.bookId} in ${category}`);
-                //       }
-                //     },
-                //     error: (error) => {
-                //       // Book might not be in this category, which is fine
-                //       console.log(`Book ${item.bookId} not found in ${category} category`);
-                //     }
-                //   });
-                // });
-
-                // Decrease book stock
-                this.bookService.updateBookStock(item.bookId!, item.quantity).subscribe({
-                  next: (result) => {
-                    console.log(`Decreased stock for book ${item.bookId} by ${item.quantity}`);
-                    
-                    // Check if stock is now low and create notification
-                    if (result.stockActual < 20) {
-                      this.adminNotificationsService.createLowStockNotification(
-                        result.id,
-                        result.title,
-                        result.stockActual
-                      ).subscribe({
-                        next: (notification) => {
-                          console.log('Low stock notification created:', notification);
-                        },
-                        error: (error) => {
-                          console.error('Error creating low stock notification:', error);
-                        }
-                      });
-                    }
-                  },
-                  error: (error) => {
-                    console.error(`Error decreasing stock for book ${item.bookId}:`, error);
-                  }
-                });
+                console.error('Error clearing cart:', error);
               }
             });
           }),
@@ -291,74 +292,36 @@ export class OrderService {
   }
 
   updateOrderStatus(orderId: string, newStatus: Order['orderStatus'], note?: string): Observable<Order> {
-    return this.getOrderById(orderId).pipe(
-      switchMap((order: Order | null) => {
-        if (!order) {
-          throw new Error('Order not found');
-        }
-
-        // Add to status history
-        const statusUpdate: OrderStatusHistory = {
-          status: newStatus,
-          timestamp: new Date().toISOString(),
-          note: note
-        };
-
-        const updatedOrder = {
-          ...order,
-          orderStatus: newStatus,
-          statusHistory: [...order.statusHistory, statusUpdate],
-          updatedAt: new Date().toISOString()
-        };
-
-        return this.http.put<Order>(`${this.apiUrl}/${orderId}`, updatedOrder).pipe(
-          catchError(error => {
-            console.error('Error updating order status:', error);
-            throw error;
-          })
-        );
-      }),
+    // Use backend endpoint: PUT /api/orders/{orderId}/status?status={status}
+    return this.http.put<Order>(`${this.apiUrl}/${orderId}/status`, null, {
+      params: { status: newStatus! }
+    }).pipe(
       catchError(error => {
-        console.error('Error in order status update process:', error);
+        console.error('Error updating order status:', error);
         throw error;
       })
     );
   }
 
   updatePaymentStatus(orderId: string, paymentStatus: Order['paymentStatus'], paymentDetails?: PaymentDetails): Observable<Order> {
-    return this.getOrderById(orderId).pipe(
-      switchMap((order: Order | null) => {
-        if (!order) {
-          throw new Error('Order not found');
-        }
-
-        const updatedOrder = {
-          ...order,
-          paymentStatus: paymentStatus,
-          paymentDetails: paymentDetails || order.paymentDetails,
-          updatedAt: new Date().toISOString()
-        };
-
-        return this.http.put<Order>(`${this.apiUrl}/${orderId}`, updatedOrder).pipe(
-          catchError(error => {
-            console.error('Error updating payment status:', error);
-            throw error;
-          })
-        );
-      }),
+    // Use backend endpoint: PUT /api/orders/{orderId}/payment-status?paymentStatus={status}
+    return this.http.put<Order>(`${this.apiUrl}/${orderId}/payment-status`, null, {
+      params: { paymentStatus: paymentStatus! }
+    }).pipe(
       catchError(error => {
-        console.error('Error in payment status update process:', error);
+        console.error('Error updating payment status:', error);
         throw error;
       })
     );
   }
 
   cancelOrder(orderId: string, reason?: string): Observable<Order> {
-    return this.updateOrderStatus(orderId, 'cancelled', reason);
+    return this.updateOrderStatus(orderId, 'Cancelled', reason);
   }
 
   returnOrder(orderId: string, reason?: string): Observable<Order> {
-    return this.updateOrderStatus(orderId, 'returned', reason);
+    // Note: backend doesn't have 'returned' status, using 'Cancelled' instead
+    return this.updateOrderStatus(orderId, 'Cancelled', reason);
   }
 
   getOrderSummary(): Observable<OrderSummary> {
@@ -381,7 +344,7 @@ export class OrderService {
   }
 
   private calculateOrderSummary(cartItems: CartItemWithDetails[]): OrderSummary {
-    const totalAmount = cartItems.reduce((sum, item) => sum + (item.book.price * item.quantity), 0);
+    const totalAmount = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
     const platformFee = 20; // Fixed platform fee
     const shippingFee = totalAmount >= 500 ? 0 : 50; // Free shipping over ₹500
     const taxes = Math.ceil(totalAmount * 0.18); // 18% GST
@@ -426,11 +389,9 @@ export class OrderService {
       return of([]);
     }
 
-    // If user is admin, get all orders by status; otherwise get user-specific orders by status
-    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    const url = isAdmin ? `${this.apiUrl}?orderStatus=${status}` : `${this.apiUrl}?userId=${currentUser.id}&orderStatus=${status}`;
-    
-    return this.http.get<Order[]>(url).pipe(
+    // Backend doesn't seem to support status filtering directly, so filter client-side
+    return this.getOrders().pipe(
+      map(orders => orders.filter(order => order.orderStatus === status)),
       catchError(error => {
         console.error('Error fetching orders by status:', error);
         return of([]);
@@ -444,7 +405,12 @@ export class OrderService {
       return of([]);
     }
 
-    return this.http.get<Order[]>(`${this.apiUrl}?userId=${currentUser.id}&q=${query}`).pipe(
+    // Backend doesn't seem to support search directly, so filter client-side
+    return this.getOrders().pipe(
+      map(orders => orders.filter(order => 
+        order.id.toLowerCase().includes(query.toLowerCase()) ||
+        order.trackingId?.toLowerCase().includes(query.toLowerCase())
+      )),
       catchError(error => {
         console.error('Error searching orders:', error);
         return of([]);
@@ -461,10 +427,10 @@ export class OrderService {
     return this.getOrders().pipe(
       map(orders => {
         const totalOrders = orders.length;
-        const completedOrders = orders.filter(order => order.orderStatus === 'delivered').length;
-        const pendingOrders = orders.filter(order => ['pending', 'confirmed', 'processing', 'shipped'].includes(order.orderStatus)).length;
-        const cancelledOrders = orders.filter(order => order.orderStatus === 'cancelled').length;
-        const totalSpent = orders.reduce((sum, order) => sum + order.finalAmount, 0);
+        const completedOrders = orders.filter(order => order.orderStatus === 'Delivered').length;
+        const pendingOrders = orders.filter(order => ['Pending', 'Confirmed', 'Shipped'].includes(order.orderStatus || '')).length;
+        const cancelledOrders = orders.filter(order => order.orderStatus === 'Cancelled').length;
+        const totalSpent = orders.reduce((sum, order) => sum + (order.grandTotal || 0), 0);
 
         return {
           totalOrders,

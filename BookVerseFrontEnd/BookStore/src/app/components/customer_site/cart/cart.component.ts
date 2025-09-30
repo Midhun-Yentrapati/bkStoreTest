@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { CartService, CartItemWithDetails } from '../../../services/cart.service';
+import { CartService } from '../../../services/cart.service';
+import { CartItemWithDetails } from '../../../models/cart.model';
 
 @Component({
   selector: 'app-cart',
@@ -114,9 +115,9 @@ export class CartComponent implements OnInit {
       newQuantity = 1; // Default to 1 if invalid input
       inputElement.value = newQuantity.toString(); // Update input field if invalid
     }
-    if (item?.book?.stockDisplay && newQuantity > item.book.stockDisplay) {
-        alert(`Cannot add more than available stock: ${item.book.stockDisplay}`);
-        newQuantity = item.book.stockDisplay; // Cap at available stock
+    if (item?.book?.stock_display && newQuantity > item.book.stock_display) {
+        alert(`Cannot add more than available stock: ${item.book.stock_display}`);
+        newQuantity = item.book.stock_display; // Cap at available stock
         inputElement.value = newQuantity.toString(); // Update input field if capped
     }
 
@@ -137,6 +138,8 @@ export class CartComponent implements OnInit {
     }
   }
 
+  // Removed duplicate - using existing method below
+
   /**
    * Changes the quantity of a cart item by a specific amount (+1 or -1).
    * Used by the increment/decrement buttons.
@@ -150,8 +153,8 @@ export class CartComponent implements OnInit {
     if (newQuantity < 1) {
       return; // Prevent quantity from going below 1
     }
-    if (item?.book?.stockDisplay && newQuantity > item.book.stockDisplay) {
-      alert(`Cannot add more than available stock: ${item.book.stockDisplay}`);
+    if (item?.book?.stock_display && newQuantity > item.book.stock_display) {
+      alert(`Cannot add more than available stock: ${item.book.stock_display}`);
       return; // Prevent quantity from exceeding stock
     }
 
@@ -185,7 +188,7 @@ export class CartComponent implements OnInit {
     }
 
     // Basic stock check before checkout
-    const outOfStockItems = this.cartItems.filter(item => item?.book?.stockDisplay && item.quantity > item.book.stockDisplay);
+    const outOfStockItems = this.cartItems.filter(item => item?.book?.stock_display && item.quantity > item.book.stock_display);
     if (outOfStockItems.length > 0) {
         alert('Some items in your cart exceed available stock. Please adjust quantities.');
         return;
@@ -217,16 +220,16 @@ export class CartComponent implements OnInit {
       console.warn('Found problematic cart items:', problematicItems);
     }
     
-    return this.cartItems.some(item => item?.book?.stockDisplay <= 0);
+    return this.cartItems.some(item => item?.book?.stock_display <= 0);
   }
 
   trackByItemId(index: number, item: CartItemWithDetails): string {
     return item?.id || `item-${index}`;
   }
 
-  navigateToBook(bookId: string): void {
+  navigateToBook(bookId: string | number): void {
     if (bookId) {
-      this.router.navigate(['/book', bookId]);
+      this.router.navigate(['/book', bookId.toString()]);
     }
   }
 

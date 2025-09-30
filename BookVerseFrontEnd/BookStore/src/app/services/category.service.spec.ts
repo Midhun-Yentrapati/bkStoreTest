@@ -26,9 +26,9 @@ describe('CategoryService', () => {
 
   it('should get active categories', () => {
     const mockCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' },
-      { id: '3', name: 'Science Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' },
+      { id: 3, name: 'Science Fiction' }
     ];
 
     service.getActiveCategories().subscribe(categories => {
@@ -42,10 +42,11 @@ describe('CategoryService', () => {
 
   it('should get all available categories', () => {
     const mockCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' },
-      { id: '3', name: 'Science Fiction' },
-      { id: '4', name: 'Mystery' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' },
+      { id: 3, name: 'Science Fiction' },
+      { id: 4, name: 'Mystery' },
+      { id: 5, name: 'Romance' }
     ];
 
     service.getAllAvailableCategories().subscribe(categories => {
@@ -59,8 +60,8 @@ describe('CategoryService', () => {
 
   it('should get all categories (legacy method)', () => {
     const mockCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' }
     ];
 
     service.getAllCategories().subscribe(categories => {
@@ -74,8 +75,8 @@ describe('CategoryService', () => {
 
   it('should update active categories', () => {
     const updatedCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' }
     ];
 
     service.updateActiveCategories(updatedCategories).subscribe(categories => {
@@ -89,19 +90,19 @@ describe('CategoryService', () => {
 
   it('should add category to active list', () => {
     const allCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' },
-      { id: '3', name: 'Science Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' },
+      { id: 3, name: 'Science Fiction' }
     ];
     const activeCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' }
+      { id: 1, name: 'Fiction' }
     ];
     const updatedActiveCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '3', name: 'Science Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 3, name: 'Science Fiction' }
     ];
 
-    service.addCategoryToActive('3').subscribe(categories => {
+    service.addCategoryToActive(3).subscribe(categories => {
       expect(categories).toEqual(updatedActiveCategories);
     });
 
@@ -121,14 +122,14 @@ describe('CategoryService', () => {
 
   it('should remove category from active list', () => {
     const activeCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' }
     ];
     const updatedActiveCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' }
+      { id: 1, name: 'Fiction' }
     ];
 
-    service.removeCategoryFromActive('2').subscribe(categories => {
+    service.removeCategoryFromActive(2).subscribe(categories => {
       expect(categories).toEqual(updatedActiveCategories);
     });
 
@@ -144,16 +145,16 @@ describe('CategoryService', () => {
 
   it('should get inactive categories', () => {
     const allCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' },
-      { id: '2', name: 'Non-Fiction' },
-      { id: '3', name: 'Science Fiction' }
+      { id: 1, name: 'Fiction' },
+      { id: 2, name: 'Non-Fiction' },
+      { id: 3, name: 'Science Fiction' }
     ];
     const activeCategories: CategoryModel[] = [
-      { id: '1', name: 'Fiction' }
+      { id: 1, name: 'Fiction' }
     ];
     const inactiveCategories: CategoryModel[] = [
-      { id: '2', name: 'Non-Fiction' },
-      { id: '3', name: 'Science Fiction' }
+      { id: 2, name: 'Non-Fiction' },
+      { id: 3, name: 'Science Fiction' }
     ];
 
     service.getInactiveCategories().subscribe(categories => {

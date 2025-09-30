@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { BookService } from '../../../services/book.service';
-import { BookModel } from '../../../models/book.model';
+import { BookModel, BookWithSales } from '../../../models/book.model';
+import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -14,16 +14,16 @@ import { forkJoin } from 'rxjs';
 })
 export class SectionManagementComponent implements OnInit {
   
-  allBooks: BookModel[] = []
+  allBooks: BookModel[] = [];
+  newlyLaunchedBooks: BookWithSales[] = [];
+  bestSellers: BookWithSales[] = [];
+  specialOffers: BookWithSales[] = [];
   
-  // UPDATED: Changed from BookWithSales[] to BookModel[] to match new service return type
-  newlyLaunchedBooks: BookModel[] = [];
-  bestSellers: BookModel[] = [];
-  specialOffers: BookModel[] = [];
-
-  selectedBookId: string = '';
+  categories: ('newly launched' | 'highly rated' | 'special offers')[] = ['newly launched', 'highly rated', 'special offers'];
+  
+  selectedBookId: string | number = '';
   selectedCategory: 'newly launched' | 'highly rated' | 'special offers' = 'newly launched';
-
+  
   isLoading: boolean = false;
   message: string = '';
   messageType: 'success' | 'error' = 'success';
@@ -37,9 +37,9 @@ export class SectionManagementComponent implements OnInit {
   loadAllData(): void {
     this.isLoading = true;
     
-    // Load all books and section data (admin sees all books including inactive)
+    // Load all books and section data
     forkJoin({
-      allBooks: this.bookService.getAllBooksForAdmin(),
+      allBooks: this.bookService.getAllBooks(),
       newlyLaunched: this.bookService.getNewlyLaunchedBooks(),
       bestSellers: this.bookService.getBestSellers(),
       specialOffers: this.bookService.getSpecialOffers()
@@ -59,80 +59,43 @@ export class SectionManagementComponent implements OnInit {
     });
   }
 
-  // DISABLED: These methods are no longer available with Spring backend
-  // The Spring backend manages sales categories differently
   addBookToSection(): void {
-    this.showMessage('Section management is now handled through the Spring backend. Please update book sales categories directly in the book edit form.', 'error');
-    
-    // COMMENTED OUT - Old implementation using JSON server
-    // if (!this.selectedBookId || !this.selectedCategory) {
-    //   this.showMessage('Please select both a book and category', 'error');
-    //   return;
-    // }
-    
-    // this.isLoading = true;
-    // this.bookService.addBookToCategory(this.selectedBookId, this.selectedCategory).subscribe({
-    //   next: () => {
-    //     this.showMessage('Book added to section successfully!', 'success');
-    //     this.loadAllData();
-    //     this.selectedBookId = '';
-    //   },
-    //   error: (error) => {
-    //     console.error('Error adding book to section:', error);
-    //     this.showMessage('Error adding book to section', 'error');
-    //     this.isLoading = false;
-    //   }
-    // });
-  }
-
-  removeBookFromSection(bookId: string, category: 'newly launched' | 'highly rated' | 'special offers'): void {
-    this.showMessage('Section management is now handled through the Spring backend. Please update book sales categories directly in the book edit form.', 'error');
-    
-    // COMMENTED OUT - Old implementation using JSON server
-    // this.isLoading = true;
-    // this.bookService.removeBookFromCategory(bookId, category).subscribe({
-    //   next: () => {
-    //     this.showMessage('Book removed from section successfully!', 'success');
-    //     this.loadAllData();
-    //   },
-    //   error: (error) => {
-    //     console.error('Error removing book from section:', error);
-    //     this.showMessage('Error removing book from section', 'error');
-    //     this.isLoading = false;
-    //   }
-    // });
-  }
-
-  private showMessage(message: string, type: 'success' | 'error'): void {
-    this.message = message;
-    this.messageType = type;
-    setTimeout(() => {
-      this.message = '';
-    }, 5000);
-  }
-
-  // Helper methods for template
-  getAvailableBooks(): BookModel[] {
-    return this.allBooks.filter(book => 
-      !this.newlyLaunchedBooks.some(nb => nb.id === book.id) &&
-      !this.bestSellers.some(bs => bs.id === book.id) &&
-      !this.specialOffers.some(so => so.id === book.id)
-    );
-  }
-
-  getCategoryDisplayName(category: string): string {
-    switch(category) {
-      case 'newly launched': return 'Newly Launched';
-      case 'highly rated': return 'Best Sellers';
-      case 'special offers': return 'Special Offers';
-      default: return category;
+    if (!this.selectedBookId || !this.selectedCategory) {
+      this.showMessage('Please select a book and category', 'error');
+      return;
     }
+
+    this.isLoading = true;
+    this.bookService.addBookToCategory(this.selectedBookId.toString(), this.selectedCategory).subscribe({
+      next: () => {
+        this.showMessage(`Book added to ${this.selectedCategory} successfully`, 'success');
+        this.loadAllData();
+        this.selectedBookId = '';
+      },
+      error: (error) => {
+        console.error('Error adding book to section:', error);
+        this.showMessage('Error adding book to section', 'error');
+        this.isLoading = false;
+      }
+    });
   }
 
-  // Add missing properties and methods for template compatibility
-  categories: ('newly launched' | 'highly rated' | 'special offers')[] = ['newly launched', 'highly rated', 'special offers'];
+  removeBookFromSection(bookId: string | number, category: 'newly launched' | 'highly rated' | 'special offers'): void {
+    this.isLoading = true;
+    this.bookService.removeBookFromCategory(bookId.toString(), category).subscribe({
+      next: () => {
+        this.showMessage(`Book removed from ${category} successfully`, 'success');
+        this.loadAllData();
+      },
+      error: (error) => {
+        console.error('Error removing book from section:', error);
+        this.showMessage('Error removing book from section', 'error');
+        this.isLoading = false;
+      }
+    });
+  }
 
-  getBooksForCategory(category: 'newly launched' | 'highly rated' | 'special offers'): BookModel[] {
+  getBooksForCategory(category: 'newly launched' | 'highly rated' | 'special offers'): BookWithSales[] {
     switch (category) {
       case 'newly launched':
         return this.newlyLaunchedBooks;
@@ -148,5 +111,13 @@ export class SectionManagementComponent implements OnInit {
   getAvailableBooksForCategory(category: 'newly launched' | 'highly rated' | 'special offers'): BookModel[] {
     const currentBookIds = this.getBooksForCategory(category).map(book => book.id);
     return this.allBooks.filter(book => !currentBookIds.includes(book.id));
+  }
+
+  private showMessage(message: string, type: 'success' | 'error'): void {
+    this.message = message;
+    this.messageType = type;
+    setTimeout(() => {
+      this.message = '';
+    }, 3000);
   }
 } 

@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CartService, CartItemWithDetails } from '../../../services/cart.service';
+import { CartService } from '../../../services/cart.service';
+import { CartItemWithDetails } from '../../../models/cart.model';
 import { AddressService } from '../../../services/address.service';
 import { OrderService } from '../../../services/order.service';
 import { Address } from '../../../models/address.model';

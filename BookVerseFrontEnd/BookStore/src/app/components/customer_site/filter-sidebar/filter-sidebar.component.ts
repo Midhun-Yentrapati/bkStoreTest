@@ -63,13 +63,14 @@ export class FilterSidebarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Helper methods to handle potentially numeric or special character IDs
-  getSafeFormControlName(id: string): string {
+  // Helper methods to handle numeric category IDs from backend
+  getSafeFormControlName(id: number): string {
     return `cat_${id}`;
   }
 
-  getOriginalId(safeKey: string): string {
-    return safeKey.replace('cat_', '');
+  getOriginalId(safeKey: string): number {
+    const idStr = safeKey.replace('cat_', '');
+    return Number(idStr);
   }
 
   resetFilters() {

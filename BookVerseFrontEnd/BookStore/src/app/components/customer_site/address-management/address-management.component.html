@@ -69,19 +69,31 @@
               <div *ngIf="pincodeValid === false" class="text-error mt-1 text-sm">Invalid pincode or not serviceable</div>
             </div>
 
-            <!-- Address -->
+            <!-- Address Line 1 -->
             <div class="form-group">
-              <label for="address" class="form-label">Address (Area and Street) *</label>
+              <label for="addressLine1" class="form-label">Address Line 1 (Area and Street) *</label>
               <textarea 
                 class="form-control" 
-                [class.border-error]="hasError('address')"
-                id="address" 
+                [class.border-error]="hasError('addressLine1')"
+                id="addressLine1" 
                 rows="3"
-                [(ngModel)]="address.address" 
-                name="address" 
+                [(ngModel)]="address.addressLine1" 
+                name="addressLine1" 
                 placeholder="Enter your complete address" 
                 required></textarea>
-              <div *ngIf="hasError('address')" class="text-error mt-1 text-sm">{{ getError('address') }}</div>
+              <div *ngIf="hasError('addressLine1')" class="text-error mt-1 text-sm">{{ getError('addressLine1') }}</div>
+            </div>
+
+            <!-- Address Line 2 -->
+            <div class="form-group">
+              <label for="addressLine2" class="form-label">Address Line 2 (Optional)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="addressLine2" 
+                [(ngModel)]="address.addressLine2" 
+                name="addressLine2" 
+                placeholder="Apartment, suite, floor, etc.">
             </div>
 
             <!-- City -->
@@ -120,17 +132,14 @@
 
             <!-- Locality -->
             <div class="form-group">
-              <label for="locality" class="form-label">Locality *</label>
+              <label for="locality" class="form-label">Locality (Optional)</label>
               <input 
                 type="text" 
                 class="form-control" 
-                [class.border-error]="hasError('locality')"
                 id="locality" 
                 [(ngModel)]="address.locality" 
                 name="locality" 
-                placeholder="Enter locality/area" 
-                required>
-              <div *ngIf="hasError('locality')" class="text-error mt-1 text-sm">{{ getError('locality') }}</div>
+                placeholder="Enter locality/area">
             </div>
 
             <!-- State -->
@@ -147,6 +156,21 @@
                 <option *ngFor="let state of states" [value]="state">{{ state }}</option>
               </select>
               <div *ngIf="hasError('state')" class="text-error mt-1 text-sm">{{ getError('state') }}</div>
+            </div>
+
+            <!-- Country -->
+            <div class="form-group">
+              <label for="country" class="form-label">Country *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [class.border-error]="hasError('country')"
+                id="country" 
+                [(ngModel)]="address.country" 
+                name="country" 
+                placeholder="Enter country" 
+                required>
+              <div *ngIf="hasError('country')" class="text-error mt-1 text-sm">{{ getError('country') }}</div>
             </div>
 
             <!-- Alternate Phone -->

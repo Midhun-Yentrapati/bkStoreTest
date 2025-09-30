@@ -24,8 +24,9 @@ export interface UPIValidationResult {
   providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = 'http://localhost:3000/payments';
-  private paymentsApiUrl = 'http://localhost:3000/api/payments';
+  private apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
+  private apiUrl = `${this.apiBaseUrl}/payments`;
+  private paymentsApiUrl = `${this.apiBaseUrl}/payments`;
 
   private paymentMethods: PaymentMethod[] = [
     {

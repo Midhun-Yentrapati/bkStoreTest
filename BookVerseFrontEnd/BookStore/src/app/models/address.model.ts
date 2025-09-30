@@ -5,20 +5,29 @@ export interface Address {
   alternatePhone?: string;
   email?: string;
   pincode: string;
-  address: string;
-  locality: string;
+  addressLine1: string;  // Changed from 'address' to match backend
+  addressLine2?: string; // Added to match backend
+  locality?: string;     // Made optional as backend doesn't require it
   city: string;
   state: string;
-  country?: string;
+  country: string;       // Made required to match backend
   landmark?: string;
-  addressType: 'Home' | 'Work' | 'Other';
+  addressType: 'HOME' | 'WORK' | 'OTHER';
   isDefault?: boolean;
   isActive?: boolean;
-  coordinates?: {
+  instructions?: string;
+  accessCode?: string;
+  latitude?: number;
+  longitude?: number;
+  coordinates?: {        // Keep for backward compatibility
     latitude: number;
     longitude: number;
   };
   createdAt?: Date;
   updatedAt?: Date;
   userId?: string;
-} 
+  // Computed fields from backend
+  fullAddress?: string;
+  shortAddress?: string;
+  hasCoordinates?: boolean;
+}

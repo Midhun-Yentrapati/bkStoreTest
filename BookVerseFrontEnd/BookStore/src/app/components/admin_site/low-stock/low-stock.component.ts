@@ -34,7 +34,7 @@ export class LowStockComponent implements OnInit {
 
     this.bookService.getAllBooks().subscribe({
       next: (books) => {
-        this.lowStockBooks = books.filter(book => book.stockActual < this.threshold);
+        this.lowStockBooks = books.filter(book => book.stock_actual < this.threshold);
         this.isLoading = false;
         console.log('Low stock books loaded:', this.lowStockBooks);
       },
@@ -55,14 +55,16 @@ export class LowStockComponent implements OnInit {
       filtered = filtered.filter(book => 
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
-        book.id.toLowerCase().includes(query)
+        book.id.toString().toLowerCase().includes(query)
       );
     }
 
     // Category filter
     if (this.categoryFilter !== 'all') {
       filtered = filtered.filter(book => 
-        book.categories.some(category => category.name === this.categoryFilter)
+        book.categories?.some(cat => 
+          typeof cat === 'string' ? cat === this.categoryFilter : cat.name === this.categoryFilter
+        )
       );
     }
 
@@ -86,17 +88,20 @@ export class LowStockComponent implements OnInit {
   getCategories(): string[] {
     const categories = new Set<string>();
     this.lowStockBooks.forEach(book => {
-      book.categories.forEach(category => categories.add(category.name));
+      book.categories?.forEach(category => {
+        const categoryName = typeof category === 'string' ? category : category.name;
+        categories.add(categoryName);
+      });
     });
     return Array.from(categories).sort();
   }
 
   getTotalValue(): number {
-    return this.lowStockBooks.reduce((total, book) => total + (book.price * book.stockActual), 0);
+    return this.lowStockBooks.reduce((total, book) => total + (book.price * book.stock_actual), 0);
   }
 
   getTotalBooks(): number {
-    return this.lowStockBooks.reduce((total, book) => total + book.stockActual, 0);
+    return this.lowStockBooks.reduce((total, book) => total + book.stock_actual, 0);
   }
 
   navigateToInventory(): void {
@@ -107,5 +112,14 @@ export class LowStockComponent implements OnInit {
   updateThreshold(newThreshold: number): void {
     this.threshold = newThreshold;
     this.loadLowStockBooks();
+  }
+  
+  // Get category display name - handles both string and object categories
+  getCategoryDisplayName(category: string | any): string {
+    if (typeof category === 'string') {
+      return category;
+    }
+    // If it's an object, try to get the name property
+    return category?.name || category?.categoryName || 'Unknown Category';
   }
 } 

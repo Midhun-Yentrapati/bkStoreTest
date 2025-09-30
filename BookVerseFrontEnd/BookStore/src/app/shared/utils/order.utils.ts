@@ -40,7 +40,7 @@ export class OrderUtils {
 
   static canCancelOrder(order: Order): boolean {
     const cancellableStatuses = ['pending', 'confirmed', 'processing'];
-    return cancellableStatuses.includes(order.orderStatus.toLowerCase());
+    return order.orderStatus ? cancellableStatuses.includes(order.orderStatus.toLowerCase()) : false;
   }
 
   static getOrderStatusText(status: string): string {
@@ -134,7 +134,7 @@ export class OrderUtils {
 
   static getOrderProgress(order: Order): number {
     const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
-    const currentIndex = statusOrder.indexOf(order.orderStatus.toLowerCase());
+    const currentIndex = order.orderStatus ? statusOrder.indexOf(order.orderStatus.toLowerCase()) : -1;
     return currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 0;
   }
 } 

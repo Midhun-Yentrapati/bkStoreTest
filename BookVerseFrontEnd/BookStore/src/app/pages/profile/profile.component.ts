@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { AddressService } from '../../services/address.service';
 import { UserModel } from '../../models/user.model';
 import { Address } from '../../models/address.model';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, map, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -41,12 +41,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private addressService: AddressService
   ) {
     this.profileForm = this.createProfileForm();
-    this.newAddressForm = this.createAddressForm();
+    this.newAddressForm = this.fb.group({
+      name: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
+      alternatePhone: [''],
+      pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+      addressLine1: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
+      addressLine2: [''],
+      locality: [''],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      country: ['India', Validators.required],
+      landmark: [''],
+      addressType: ['HOME', Validators.required],
+      isDefault: [false]
+    });
   }
 
   ngOnInit() {
     this.populateForm();
     this.loadAddresses();
+    
+    // Fetch complete user profile data when component loads
+    this.fetchCompleteUserProfile();
   }
 
   ngOnDestroy() {
@@ -66,27 +83,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createAddressForm(): FormGroup {
-    return this.fb.group({
-      name: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      alternatePhone: [''],
-      pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-      address: ['', Validators.required],
-      locality: ['', Validators.required],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      country: ['India', Validators.required],
-      landmark: [''],
-      addressType: ['Home', Validators.required],
-      isDefault: [false]
-    });
-  }
-
   private populateForm() {
     const user = this.currentUser();
+    console.log('🔍 Profile Component - Current user data:', user);
+    
     if (user) {
-      this.profileForm.patchValue({
+      console.log('🔍 Profile Component - DOB and Bio values:', {
+        dateOfBirth: user.dateOfBirth,
+        bio: user.bio
+      });
+      
+      const formValues = {
         fullName: user.fullName || '',
         username: user.username || '',
         email: user.email || '',
@@ -94,7 +101,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         profilePicture: user.profilePicture || '',
         dateOfBirth: user.dateOfBirth || '',
         bio: user.bio || ''
-      });
+      };
+      
+      console.log('🔍 Profile Component - Form values being set:', formValues);
+      
+      this.profileForm.patchValue(formValues);
+      
+      console.log('🔍 Profile Component - Form values after patch:', this.profileForm.value);
     }
   }
 
@@ -113,6 +126,27 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.isLoadingAddresses = false;
         }
       });
+  }
+
+  private loadStates() {
+    // This method is not implemented in the provided code
+  }
+
+  private fetchCompleteUserProfile() {
+    this.authService.fetchCompleteUserProfile().subscribe({
+      next: (completeUser) => {
+        console.log('✅ Profile component loaded with complete user data:', completeUser);
+        // Form will be populated automatically due to signal reactivity
+        setTimeout(() => {
+          this.populateForm();
+        }, 100);
+      },
+      error: (error) => {
+        console.warn('⚠️ Failed to fetch complete profile, using existing data:', error);
+        // Fallback to existing data
+        this.populateForm();
+      }
+    });
   }
 
   toggleEditMode() {
@@ -135,6 +169,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.successMessage = 'Profile updated successfully!';
           this.isSubmitting = false;
           this.isEditMode = false;
+          
+          // Wait for the AuthService signal to update, then refresh the form
+          setTimeout(() => {
+            this.populateForm();
+          }, 0);
+          
           console.log('Profile updated:', updatedUser);
         },
         error: (err) => {
@@ -166,8 +206,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       phone: address.phone,
       alternatePhone: address.alternatePhone || '',
       pincode: address.pincode,
-      address: address.address,
-      locality: address.locality,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2 || '',
+      locality: address.locality || '',
       city: address.city,
       state: address.state,
       country: address.country || 'India',
@@ -196,7 +237,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       state: '',
       country: 'India',
       landmark: '',
-      addressType: 'Home',
+      addressType: 'HOME',
       isDefault: false
     });
     this.isEditingAddress = false;
@@ -350,6 +391,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (field?.errors && field?.touched) {
       if (field.errors['required']) return `${this.getAddressFieldDisplayName(fieldName)} is required.`;
       if (field.errors['pattern']) return 'Please enter a valid format.';
+      if (field.errors['minlength']) return `${this.getAddressFieldDisplayName(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters.`;
+      if (field.errors['maxlength']) return `${this.getAddressFieldDisplayName(fieldName)} must not exceed ${field.errors['maxlength'].requiredLength} characters.`;
     }
     return '';
   }
@@ -390,9 +433,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   get addressTypes() {
     return [
-      { value: 'Home', label: 'Home', description: 'All day delivery' },
-      { value: 'Work', label: 'Work', description: 'Delivery between 10 AM - 5 PM' },
-      { value: 'Other', label: 'Other', description: 'Custom delivery time' }
+      { value: 'HOME', label: 'Home', description: 'All day delivery' },
+      { value: 'WORK', label: 'Work', description: 'Delivery between 10 AM - 5 PM' },
+      { value: 'OTHER', label: 'Other', description: 'Custom delivery time' }
     ];
   }
-} 
+}

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReviewResponse } from '../../../services/review.service';
+import { CustomerRating } from '../../../models/book.model';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 
 @Component({
@@ -10,11 +10,11 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
   styleUrl: './review-list.component.css'
 })
 export class ReviewListComponent {
-  @Input() reviews: ReviewResponse[] = [];
+  @Input() reviews: CustomerRating[] = [];
   @Input() bookTitle: string = '';
 
   get reviewsWithText() {
-    return this.reviews.filter(review => review.comment && review.comment.trim().length > 0);
+    return this.reviews.filter(review => review.review && review.review.trim().length > 0);
   }
 
   get averageRating() {
@@ -34,9 +34,5 @@ export class ReviewListComponent {
 
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  }
-
-  getReviewText(review: ReviewResponse): string {
-    return review.comment || '';
   }
 } 

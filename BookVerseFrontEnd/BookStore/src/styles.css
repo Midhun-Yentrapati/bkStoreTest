@@ -507,82 +507,17 @@ body {
 /* 6. RESPONSIVE DESIGN */
 @media (max-width: 768px) {
   .main-content-container {
-    padding: 0.75rem;
-  }
-  
-  .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-  }
-  
-  .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.85rem;
-  }
-  
-  /* Reduce padding and margins for mobile */
-  .container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-  
-  /* Smaller text sizes for mobile */
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
-  h4 { font-size: 1.1rem; }
-  h5 { font-size: 1rem; }
-  h6 { font-size: 0.9rem; }
-  
-  /* Form elements adjustments */
-  .form-control {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-  }
-  
-  /* Card adjustments */
-  .card {
     padding: 1rem;
-    margin-bottom: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content-container {
-    padding: 0.5rem;
   }
   
   .btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.75rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8rem;
   }
   
   .btn-lg {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.8rem;
-  }
-  
-  .container {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-  
-  /* Even smaller text sizes for very small screens */
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1.1rem; }
-  h4 { font-size: 1rem; }
-  h5 { font-size: 0.9rem; }
-  h6 { font-size: 0.85rem; }
-  
-  .form-control {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
-  }
-  
-  .card {
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9rem;
   }
 }
 

@@ -51,6 +51,7 @@
                  [class.selected]="selectedAddress?.id === address.id"
                  (click)="selectAddress(address)">
               
+              <label [for]="'address-' + address.id" class="sr-only">Select address for {{ address.name }}</label>
               <input class="address-radio" 
                      type="radio" 
                      [id]="'address-' + address.id" 
@@ -67,7 +68,7 @@
                 <div class="address-phone">{{ address.phone }}</div>
                 
                 <div class="address-details">
-                  {{ address.address }}, {{ address.locality }}<br>
+                  {{ address.addressLine1 }}{{ address.addressLine2 ? ', ' + address.addressLine2 : '' }}{{ address.locality ? ', ' + address.locality : '' }}<br>
                   {{ address.city }}, {{ address.state }} - {{ address.pincode }}
                   <span *ngIf="address.landmark"><br>Landmark: {{ address.landmark }}</span>
                 </div>

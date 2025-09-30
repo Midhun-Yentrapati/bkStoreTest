@@ -157,12 +157,12 @@
             
             <div class="info-item">
               <label>Date of Birth</label>
-              <span>Not provided</span>
+              <span>{{ currentUser()?.dateOfBirth || 'Not provided' }}</span>
             </div>
             
             <div class="info-item full-width">
               <label>Bio</label>
-              <span>Not provided</span>
+              <span>{{ currentUser()?.bio || 'Not provided' }}</span>
             </div>
           </div>
         </ng-template>
@@ -237,17 +237,27 @@
               </div>
 
               <div class="form-group full-width">
-                <label for="address">Address</label>
-                <input id="address" type="text" formControlName="address" 
+                <label for="addressLine1">Address Line 1</label>
+                <input id="addressLine1" type="text" formControlName="addressLine1" 
                        placeholder="House/Flat number, street, apartment, suite, etc."
-                       [class.error]="hasAddressFieldError('address')">
-                <div *ngIf="getAddressFieldError('address')" class="error-message">
-                  {{ getAddressFieldError('address') }}
+                       [class.error]="hasAddressFieldError('addressLine1')">
+                <div *ngIf="getAddressFieldError('addressLine1')" class="error-message">
+                  {{ getAddressFieldError('addressLine1') }}
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="locality">Locality</label>
+                <label for="addressLine2">Address Line 2 (Optional)</label>
+                <input id="addressLine2" type="text" formControlName="addressLine2" 
+                       placeholder="Apartment, suite, floor, etc."
+                       [class.error]="hasAddressFieldError('addressLine2')">
+                <div *ngIf="getAddressFieldError('addressLine2')" class="error-message">
+                  {{ getAddressFieldError('addressLine2') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="locality">Locality (Optional)</label>
                 <input id="locality" type="text" formControlName="locality" 
                        placeholder="Locality/Area"
                        [class.error]="hasAddressFieldError('locality')">
@@ -339,7 +349,7 @@
           <div *ngFor="let address of addresses" class="address-card" [class.default]="address.isDefault">
             <div class="address-header">
               <div class="address-type">
-                <span class="material-icons">{{ address.addressType === 'Home' ? 'home' : address.addressType === 'Work' ? 'work' : 'location_on' }}</span>
+                <span class="material-icons">{{ address.addressType === 'HOME' ? 'home' : address.addressType === 'WORK' ? 'work' : 'location_on' }}</span>
                 <span class="type-label">{{ address.name }}</span>
                 <span *ngIf="address.isDefault" class="default-badge">Default</span>
               </div>
@@ -364,7 +374,7 @@
                   / {{ address.alternatePhone }}
                 </span>
               </p>
-              <p class="street">{{ address.address }}</p>
+              <p class="street">{{ address.addressLine1 }}{{ address.addressLine2 ? ', ' + address.addressLine2 : '' }}</p>
               <p class="location">{{ address.locality }}, {{ address.city }}, {{ address.state }} {{ address.pincode }}</p>
               <p class="country">{{ address.country }}</p>
               <p *ngIf="address.landmark" class="landmark">

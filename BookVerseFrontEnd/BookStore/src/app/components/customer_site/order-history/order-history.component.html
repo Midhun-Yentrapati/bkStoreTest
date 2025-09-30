@@ -15,23 +15,23 @@
           <p class="mb-1">Total: <span class="fw-bold text-primary">₹{{ order.totalAmount | number:'1.2-2' }}</span></p>
           <p class="mb-2">
             Order Status: 
-                            <span class="badge" [ngClass]="getStatusBadgeClass(order.orderStatus)">
-                  {{ getOrderStatusText(order.orderStatus) }}
+                            <span class="badge" [ngClass]="getStatusBadgeClass(order.orderStatus || '')">
+                  {{ getOrderStatusText(order.orderStatus || '') }}
                 </span>
           </p>
           <p class="mb-2">
             Payment Status: 
-            <span class="badge" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus)">
-              {{ getPaymentStatusText(order.paymentStatus) }}
+            <span class="badge" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus || '')">
+              {{ getPaymentStatusText(order.paymentStatus || '') }}
             </span>
           </p>
           <p class="mb-2">
-            Payment Method: <strong>{{ order.paymentMethod }}</strong>
+            Payment Method: <strong>{{ order.paymentMethod || 'N/A' }}</strong>
           </p>
           <p class="mb-2">
             Delivery Address: 
             <small class="text-muted">
-              {{ order.shippingAddress.name }}, {{ order.shippingAddress.address }}, {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} - {{ order.shippingAddress.pincode }}
+              {{ order.shippingAddress?.name || 'N/A' }}, {{ order.shippingAddress?.addressLine1 || 'N/A' }}{{ order.shippingAddress?.addressLine2 ? ', ' + order.shippingAddress?.addressLine2 : '' }}, {{ order.shippingAddress?.city || 'N/A' }}, {{ order.shippingAddress?.state || 'N/A' }} - {{ order.shippingAddress?.pincode || 'N/A' }}
             </small>
           </p>
           <ul class="list-unstyled mb-2 small">

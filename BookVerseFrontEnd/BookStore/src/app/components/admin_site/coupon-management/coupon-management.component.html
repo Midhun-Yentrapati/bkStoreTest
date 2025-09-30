@@ -255,9 +255,9 @@
             <div class="discount-info mb-3">
               <div class="discount-amount">{{ getDiscountText(coupon) }}</div>
               <div class="text-muted small">
-                Min order: ₹{{ coupon.minOrderAmount }}
-                <span *ngIf="coupon.maxDiscountAmount > 0">
-                  • Max discount: ₹{{ coupon.maxDiscountAmount }}
+                Min order: ₹{{ coupon.minOrderAmount || coupon.minimumOrderAmount || 0 }}
+                <span *ngIf="(coupon.maxDiscountAmount || coupon.maximumDiscountAmount || 0) > 0">
+                  • Max discount: ₹{{ coupon.maxDiscountAmount || coupon.maximumDiscountAmount || 0 }}
                 </span>
               </div>
             </div>

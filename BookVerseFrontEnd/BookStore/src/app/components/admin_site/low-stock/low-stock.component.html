@@ -164,7 +164,7 @@
             
             <td class="px-6 py-4">
               <div class="flex items-center">
-                <img *ngIf="book.images && book.images[0]" [src]="book.images[0].imageUrl" alt="{{ book.title }}" class="w-12 h-16 object-cover rounded">
+                <img *ngIf="book.image_urls && book.image_urls[0]" [src]="book.image_urls[0]" alt="{{ book.title }}" class="w-12 h-16 object-cover rounded">
                 <div class="ml-4">
                   <div class="text-sm font-medium text-gray-900">{{ book.title }}</div>
                   <div class="text-sm text-gray-500">by {{ book.author }}</div>
@@ -175,14 +175,14 @@
             <td class="px-6 py-4">
               <div class="flex flex-wrap gap-1">
                 <span *ngFor="let category of book.categories" class="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
-                  {{ category }}
+                  {{ getCategoryDisplayName(category) }}
                 </span>
               </div>
             </td>
             
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ book.stockActual }}</div>
-              <div class="text-xs text-gray-500">Display: {{ book.stockDisplay }}</div>
+              <div class="text-sm font-medium text-gray-900">{{ book.stock_actual }}</div>
+              <div class="text-xs text-gray-500">Display: {{ book.stock_display }}</div>
             </td>
             
             <td class="px-6 py-4 whitespace-nowrap">
@@ -190,8 +190,8 @@
             </td>
             
             <td class="px-6 py-4 whitespace-nowrap">
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ getStockStatusClass(book.stockActual) }}">
-                {{ getStockStatusText(book.stockActual) }}
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ getStockStatusClass(book.stock_actual) }}">
+                {{ getStockStatusText(book.stock_actual) }}
               </span>
             </td>
             

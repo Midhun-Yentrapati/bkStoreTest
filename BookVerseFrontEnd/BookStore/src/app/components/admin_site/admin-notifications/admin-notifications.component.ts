@@ -64,8 +64,27 @@ export class AdminNotificationsComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.error('Error loading notifications:', error);
-        this.error = 'Failed to load notifications. Please try again.';
+        
+        // Handle different error types
+        if (error.status === 503) {
+          this.error = 'Notification service is temporarily unavailable.';
+          console.warn('Notification service unavailable (503) - continuing without notifications');
+        } else if (error.status === 404) {
+          this.error = 'Notification service not found.';
+          console.warn('Notification service not found (404) - continuing without notifications');
+        } else {
+          this.error = 'Failed to load notifications. Please try again.';
+        }
+        
+        // Set empty notifications array to prevent UI issues
+        this.notifications = [];
+        this.unreadCount = 0;
         this.isLoading = false;
+        
+        // Don't show error in UI for service unavailable - just log it
+        if (error.status === 503 || error.status === 404) {
+          this.error = null; // Hide error message from UI
+        }
       }
     });
   }
