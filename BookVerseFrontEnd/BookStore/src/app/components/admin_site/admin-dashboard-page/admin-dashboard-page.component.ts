@@ -250,50 +250,39 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
   }
 
   private loadDashboardData(): void {
-    // Load all dashboard data simultaneously using services
-    forkJoin({
-      orders: this.orderService.getAllOrders().pipe(
-        catchError(error => {
-          console.error('Error loading orders:', error);
-          return of([]); // Return empty array on error
-        })
-      ),
-      books: this.bookService.getAllBooks().pipe(
-        catchError(error => {
-          console.error('Error loading books:', error);
-          return of([]); // Return empty array on error
-        })
-      ),
-      totalUsers: this.getTotalUsersCount().pipe(
-        catchError(error => {
-          console.error('Error loading users count:', error);
-          return of(0); // Return 0 on error
-        })
-      )
-    }).subscribe({
-      next: (data) => {
-        this.totalOrders = data.orders.length;
-        this.totalBooks = data.books.length;
-        this.totalUsers = data.totalUsers;
-        this.allOrders = data.orders; // Store all orders for revenue calculation
-        this.calculateLowStockCount(data.books);
-        this.calculateRevenue(); // Calculate initial revenue
-        console.log('Dashboard data loaded successfully:', {
-          orders: this.totalOrders,
-          books: this.totalBooks,
-          users: this.totalUsers,
-          lowStock: this.lowStockCount,
-          revenue: this.totalRevenue
-        });
+    // Load dashboard stats from analytics service
+    this.analyticsService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.totalOrders = stats.totalOrders || 0;
+        this.totalRevenue = stats.totalRevenue || 0;
+        console.log('Dashboard stats loaded:', stats);
       },
       error: (error) => {
-        console.error('Error loading dashboard data:', error);
-        // Set fallback values on error
+        console.error('Error loading dashboard stats:', error);
         this.totalOrders = 0;
-        this.totalBooks = 0;
-        this.totalUsers = 0;
-        this.lowStockCount = 0;
         this.totalRevenue = 0;
+      }
+    });
+
+    // Load books and users separately
+    this.bookService.getAllBooks().subscribe({
+      next: (books) => {
+        this.totalBooks = books.length;
+        this.calculateLowStockCount(books);
+      },
+      error: (error) => {
+        console.error('Error loading books:', error);
+        this.totalBooks = 0;
+      }
+    });
+
+    this.getTotalUsersCount().subscribe({
+      next: (count) => {
+        this.totalUsers = count;
+      },
+      error: (error) => {
+        console.error('Error loading users count:', error);
+        this.totalUsers = 0;
       }
     });
   }

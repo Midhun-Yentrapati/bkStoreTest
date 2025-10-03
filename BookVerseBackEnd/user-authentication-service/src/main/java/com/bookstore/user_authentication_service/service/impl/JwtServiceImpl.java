@@ -29,7 +29,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateAccessToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userRole", user.getUserRole().name());
+        extraClaims.put("userRole", "ROLE_" + user.getUserRole().name());
         extraClaims.put("userType", user.getUserType().name());
         extraClaims.put("tokenType", "ACCESS");
         

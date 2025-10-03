@@ -21,6 +21,7 @@ public class AdminController {
 
     @PostMapping("/activity/log")
     public ResponseEntity<AdminActivityLog> logActivity(@RequestBody Map<String, Object> activityData) {
+        System.out.println("[ADMIN CONTROLLER] Received activity log request: " + activityData);
         try {
             AdminActivityLog log = adminService.logActivity(
                 (String) activityData.get("adminId"),
@@ -119,5 +120,57 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getActivityStatistics() {
         Map<String, Object> stats = adminService.getActivityStatistics();
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/activity/recent")
+    public ResponseEntity<List<AdminActivityLog>> getRecentActivities(@RequestParam(defaultValue = "50") int limit) {
+        List<AdminActivityLog> logs = adminService.getRecentActivities(limit);
+        return ResponseEntity.ok(logs);
+    }
+
+    @GetMapping("/activity/admin/{adminId}")
+    public ResponseEntity<List<AdminActivityLog>> getActivitiesByAdmin(
+            @PathVariable String adminId, @RequestParam(defaultValue = "50") int limit) {
+        List<AdminActivityLog> logs = adminService.getActivityLogsByAdminId(adminId);
+        return ResponseEntity.ok(logs.stream().limit(limit).toList());
+    }
+
+    @GetMapping("/activity/action/{action}")
+    public ResponseEntity<List<AdminActivityLog>> getActivitiesByAction(
+            @PathVariable String action, @RequestParam(defaultValue = "50") int limit) {
+        List<AdminActivityLog> logs = adminService.getActivityLogsByActionType(action);
+        return ResponseEntity.ok(logs.stream().limit(limit).toList());
+    }
+
+    @GetMapping("/activity/status/{status}")
+    public ResponseEntity<List<AdminActivityLog>> getActivitiesByStatus(
+            @PathVariable String status, @RequestParam(defaultValue = "50") int limit) {
+        List<AdminActivityLog> logs = adminService.getActivityLogsByStatus(status);
+        return ResponseEntity.ok(logs.stream().limit(limit).toList());
+    }
+
+    @GetMapping("/activity/date-range")
+    public ResponseEntity<List<AdminActivityLog>> getActivitiesByDateRange(
+            @RequestParam String startDate, @RequestParam String endDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate + "T00:00:00");
+            LocalDateTime end = LocalDateTime.parse(endDate + "T23:59:59");
+            List<AdminActivityLog> logs = adminService.getActivityLogsByDateRange(start, end);
+            return ResponseEntity.ok(logs);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/activity/log-success")
+    public ResponseEntity<AdminActivityLog> logSuccessActivity(@RequestBody Map<String, Object> activityData) {
+        activityData.put("status", "SUCCESS");
+        return logActivity(activityData);
+    }
+
+    @PostMapping("/activity/log-failure")
+    public ResponseEntity<AdminActivityLog> logFailureActivity(@RequestBody Map<String, Object> activityData) {
+        activityData.put("status", "FAILURE");
+        return logActivity(activityData);
     }
 } 

@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                // CORRECT: Disable CORS as it is handled by the API Gateway
+                // Disabled - API Gateway handles CORS
                 .cors(cors -> cors.disable()) 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
@@ -39,23 +39,23 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/coupons/available").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/coupons/validate/**").permitAll()
 
-                        // Admin-only endpoints - coupon management
-                        .requestMatchers("/api/coupons/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.POST, "/api/coupons").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.PUT, "/api/coupons/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/coupons/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
-                        .requestMatchers("/api/admin/orders").hasAnyAuthority("CUSTOMER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
+                        // Admin-only endpoints - DEMO MODE: permitAll
+                        .requestMatchers("/api/coupons/admin/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/coupons").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/coupons/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/coupons/**").permitAll()
+                        .requestMatchers("/api/admin/orders").permitAll()
 
-                        // Admin order management
-                        .requestMatchers("/api/orders/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                        // Admin order management - DEMO MODE: permitAll
+                        .requestMatchers("/api/orders/admin/**").permitAll()
                         
-                        // User-specific endpoints for cart and wishlist
-                        .requestMatchers("/api/cart/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
-                        .requestMatchers("/api/wishlist/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
+                        // User-specific endpoints - DEMO MODE: permitAll
+                        .requestMatchers("/api/cart/**").permitAll()
+                        .requestMatchers("/api/wishlist/**").permitAll()
 
-                        // All other order and payment operations require authentication
-                        .requestMatchers("/api/orders/**").hasAnyAuthority("CUSTOMER", "ROLE_ADMIN", "TYPE_SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
-                        .requestMatchers("/api/payments/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
+                        // All other order and payment operations - DEMO MODE: permitAll
+                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/api/payments/**").permitAll()
 
                         // All other requests require authentication
                         .anyRequest().authenticated()

@@ -1,220 +1,97 @@
-<div class="analytics-dashboard">
-  <!-- Header Section -->
-  <div class="dashboard-header">
-    <h1 class="dashboard-title">📊 Analytics Dashboard</h1>
-    <p class="dashboard-subtitle">Comprehensive sales and admin activity analytics</p>
-  </div>
+<div class="analytics-dashboard p-6 min-h-screen bg-gray-50">
+  <h1 class="text-3xl font-extrabold mb-8 text-gray-900 border-b pb-3">Sales Analytics Overview</h1>
 
-  <!-- Date Range Controls -->
-  <div class="date-controls">
-    <div class="control-group">
-      <label for="periodSelect">Quick Select:</label>
-      <select id="periodSelect" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="form-select">
-        <option value="last7days">Last 7 Days</option>
-        <option value="last30days">Last 30 Days</option>
-        <option value="last90days">Last 90 Days</option>
-        <option value="thisMonth">This Month</option>
-        <option value="lastMonth">Last Month</option>
-        <option value="custom">Custom Range</option>
-      </select>
-    </div>
-    
-    <div class="control-group" [ngClass]="{'disabled': selectedPeriod !== 'custom'}">
-      <label for="startDate">Start Date:</label>
-      <input type="date" id="startDate" [(ngModel)]="selectedStartDate" 
-             (change)="onCustomDateChange()" class="form-input"
-             [disabled]="selectedPeriod !== 'custom'">
-    </div>
-    
-    <div class="control-group" [ngClass]="{'disabled': selectedPeriod !== 'custom'}">
-      <label for="endDate">End Date:</label>
-      <input type="date" id="endDate" [(ngModel)]="selectedEndDate" 
-             (change)="onCustomDateChange()" class="form-input"
-             [disabled]="selectedPeriod !== 'custom'">
-    </div>
-    
-    <button (click)="refreshData()" class="btn btn-primary refresh-btn">
-      🔄 Refresh Data
+  <div class="mb-8 flex flex-wrap items-center space-x-4 bg-white p-4 rounded-lg shadow-sm">
+    <label for="date-range-select" class="font-semibold text-gray-700">Select Date Range:</label>
+    <select id="date-range-select" 
+            [(ngModel)]="selectedDateRange" 
+            (change)="onDateRangeChange()"
+            class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+      <option value="last-7-days">Last 7 Days</option>
+      <option value="last-30-days">Last 30 Days</option>
+      <option value="last-90-days">Last 90 Days</option>
+      <option value="last-year">Last Year</option>
+    </select>
+    <span class="text-sm text-gray-500 mt-2 sm:mt-0">
+      Data from: <span class="font-mono text-gray-700">{{ startDate | date:'MMM d, y' }}</span> to <span class="font-mono text-gray-700">{{ endDate | date:'MMM d, y' }}</span>
+    </span>
+    <button (click)="loadDashboardData()" class="ml-auto px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition duration-150 shadow-md">
+      <i class="fas fa-redo-alt mr-2"></i> Refresh Data
     </button>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoadingDashboard" class="loading-overlay">
-    <div class="spinner"></div>
-    <p>Loading analytics data...</p>
+  <div *ngIf="isLoading" class="text-center p-20 bg-white rounded-lg shadow-xl">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+    <p class="text-xl font-medium text-gray-600">Loading analytics data...</p>
   </div>
 
-  <!-- Main Analytics Dashboard -->
-  <div *ngIf="!isLoadingDashboard && analyticsDashboard" class="dashboard-content">
+  <div *ngIf="!isLoading" class="space-y-8">
     
-    <!-- Key Metrics Cards -->
-    <div class="metrics-grid">
-      <div class="metric-card revenue">
-        <div class="metric-icon">💰</div>
-        <div class="metric-content">
-          <h3>Total Revenue</h3>
-          <p class="metric-value">{{ formatCurrency(analyticsDashboard.totalRevenue) }}</p>
-        </div>
-      </div>
-      
-      <div class="metric-card orders">
-        <div class="metric-icon">📦</div>
-        <div class="metric-content">
-          <h3>Total Orders</h3>
-          <p class="metric-value">{{ analyticsDashboard.totalOrders }}</p>
-        </div>
-      </div>
-      
-      <div class="metric-card items">
-        <div class="metric-icon">📚</div>
-        <div class="metric-content">
-          <h3>Items Sold</h3>
-          <p class="metric-value">{{ analyticsDashboard.totalItemsSold }}</p>
-        </div>
-      </div>
-      
-      <div class="metric-card average">
-        <div class="metric-icon">📊</div>
-        <div class="metric-content">
-          <h3>Avg Order Value</h3>
-          <p class="metric-value">{{ formatCurrency(analyticsDashboard.averageOrderValue) }}</p>
-        </div>
-      </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <app-admin-dashboard-cards 
+        *ngFor="let card of cards" 
+        [title]="card.title" 
+        [description]="card.description"
+        
+        [value]="card.isCurrency ? ('₹' + ((card.value | number:'1.2-2') ?? '0.00')) : ((card.value | number:'1.0-0') ?? '0')"
+        
+        [iconClass]="card.iconClass"
+        [colorClass]="card.colorClass">
+      </app-admin-dashboard-cards>
     </div>
 
-    <!-- Charts Section -->
-    <div class="charts-section">
-      <div class="chart-container">
-        <h3>Revenue Trends</h3>
-        <div class="chart-wrapper">
-          <canvas #revenueChart width="400" height="200"></canvas>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <i class="fas fa-chart-line mr-2 text-indigo-500"></i> Yearly Sales Performance
+            </h2>
+            <app-yearly-sales-chart></app-yearly-sales-chart>
         </div>
-      </div>
-      
-      <div class="chart-container">
-        <h3>Admin Activity Distribution</h3>
-        <div class="chart-wrapper">
-          <canvas #activityChart width="400" height="200"></canvas>
-        </div>
-      </div>
-    </div>
 
-    <!-- Top/Least Selling Items -->
-    <div class="items-section">
-      <div class="items-container">
-        <h3>🏆 Top Selling Items</h3>
-        <div class="items-list" *ngIf="analyticsDashboard.topSellingItems.length > 0; else noTopItems">
-          <div class="item-card" *ngFor="let item of analyticsDashboard.topSellingItems; let i = index">
-            <div class="item-rank">{{ i + 1 }}</div>
-            <div class="item-details">
-              <h4>{{ item[0] }}</h4>
-              <p>Quantity: {{ item[1] }}</p>
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <i class="fas fa-fire mr-2 text-red-500"></i> Bestsellers (Top 5)
+            </h2>
+            <div *ngIf="topSellingBooks.length > 0; else noTopBooks">
+                <ul class="space-y-3">
+                    <li *ngFor="let book of topSellingBooks; let i = index" class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0 transition duration-100 hover:bg-gray-50 px-2 rounded-md">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-extrabold text-lg w-6 text-center text-red-500">{{ i + 1 }}</span>
+                            <span class="font-medium text-gray-700 truncate" [title]="book.title">{{ book.title }}</span>
+                        </div>
+                        <span class="text-sm font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">{{ book.quantitySold | number:'1.0-0' }} units</span>
+                    </li>
+                </ul>
             </div>
-          </div>
         </div>
-        <ng-template #noTopItems>
-          <p class="no-data">No top selling items data available</p>
-        </ng-template>
-      </div>
-      
-      <div class="items-container">
-        <h3>📉 Least Selling Items</h3>
-        <div class="items-list" *ngIf="analyticsDashboard.leastSellingItems.length > 0; else noLeastItems">
-          <div class="item-card" *ngFor="let item of analyticsDashboard.leastSellingItems; let i = index">
-            <div class="item-rank">{{ i + 1 }}</div>
-            <div class="item-details">
-              <h4>{{ item[0] }}</h4>
-              <p>Quantity: {{ item[1] }}</p>
-            </div>
-          </div>
-        </div>
-        <ng-template #noLeastItems>
-          <p class="no-data">No least selling items data available</p>
-        </ng-template>
-      </div>
     </div>
-  </div>
-
-  <!-- Admin Activity Section -->
-  <div class="activity-section">
-    <h2>👥 Admin Activity Insights</h2>
     
-    <!-- Activity Stats -->
-    <div class="activity-stats" *ngIf="!isLoadingStats">
-      <div class="stat-card">
-        <h4>🏅 Top Active Admins</h4>
-        <div class="admin-list" *ngIf="topActiveAdmins.length > 0; else noTopAdmins">
-          <div class="admin-item" *ngFor="let admin of topActiveAdmins; let i = index">
-            <span class="admin-rank">{{ i + 1 }}.</span>
-            <span class="admin-name">{{ admin[0] }}</span>
-            <span class="admin-count">{{ admin[1] }} activities</span>
-          </div>
+    <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <i class="fas fa-thumbs-down mr-2 text-blue-500"></i> Slow Movers (Least 5)
+        </h2>
+        <div *ngIf="leastSellingBooks.length > 0; else noLeastBooks">
+            <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <li *ngFor="let book of leastSellingBooks; let i = index" class="bg-gray-50 p-3 rounded-lg border border-gray-200 hover:shadow-md transition duration-150">
+                    <p class="text-xs text-gray-500 mb-1">Rank #{{ i + 1 }}</p>
+                    <p class="font-semibold text-gray-700 truncate" [title]="book.title">{{ book.title }}</p>
+                    <p class="text-sm font-medium text-red-600 mt-1">Sold: {{ book.quantitySold | number:'1.0-0' }}</p>
+                </li>
+            </ul>
         </div>
-        <ng-template #noTopAdmins>
-          <p class="no-data">No admin activity data available</p>
-        </ng-template>
-      </div>
-      
-      <div class="stat-card">
-        <h4>🎯 Most Common Actions</h4>
-        <div class="action-list" *ngIf="commonActions.length > 0; else noCommonActions">
-          <div class="action-item" *ngFor="let action of commonActions; let i = index">
-            <span class="action-icon">{{ getActionTypeIcon(action[0]) }}</span>
-            <span class="action-name">{{ action[0] }}</span>
-            <span class="action-count">{{ action[1] }} times</span>
-          </div>
-        </div>
-        <ng-template #noCommonActions>
-          <p class="no-data">No action data available</p>
-        </ng-template>
-      </div>
     </div>
 
-    <!-- Recent Activities -->
-    <div class="recent-activities">
-      <h3>🕒 Recent Admin Activities</h3>
-      <div class="activities-list" *ngIf="!isLoadingActivities && recentActivities.length > 0; else noRecentActivities">
-        <div class="activity-item" *ngFor="let activity of recentActivities.slice(0, 10)">
-          <div class="activity-header">
-            <span class="activity-icon">{{ getActionTypeIcon(activity.actionType) }}</span>
-            <span class="activity-admin">{{ activity.adminUsername }}</span>
-            <span class="activity-time">{{ formatDateTime(activity.createdAt) }}</span>
-            <span class="status-badge" [ngClass]="getStatusBadgeClass(activity.status)">
-              {{ activity.status }}
-            </span>
-          </div>
-          <div class="activity-details">
-            <p class="activity-action">{{ activity.actionType }}: {{ activity.actionDescription }}</p>
-            <div class="activity-meta" *ngIf="activity.serviceName || activity.endpoint">
-              <span *ngIf="activity.serviceName" class="service-name">{{ activity.serviceName }}</span>
-              <span *ngIf="activity.endpoint" class="endpoint">{{ activity.httpMethod }} {{ activity.endpoint }}</span>
-              <span *ngIf="activity.executionTimeMs" class="execution-time">{{ activity.executionTimeMs }}ms</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <ng-template #noRecentActivities>
-        <div class="no-data" *ngIf="!isLoadingActivities">No recent activities available</div>
-        <div class="loading-spinner" *ngIf="isLoadingActivities">Loading activities...</div>
-      </ng-template>
-    </div>
-
-    <!-- Error Logs -->
-    <div class="error-logs" *ngIf="errorLogs.length > 0">
-      <h3>⚠️ Recent Error Logs</h3>
-      <div class="error-list">
-        <div class="error-item" *ngFor="let error of errorLogs.slice(0, 5)">
-          <div class="error-header">
-            <span class="error-icon">❌</span>
-            <span class="error-admin">{{ error.adminUsername }}</span>
-            <span class="error-time">{{ formatDateTime(error.createdAt) }}</span>
-          </div>
-          <div class="error-details">
-            <p class="error-action">{{ error.actionType }}: {{ error.actionDescription }}</p>
-            <p class="error-message" *ngIf="error.errorMessage">{{ error.errorMessage }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ng-template #noTopBooks>
+        <p class="text-gray-500 italic p-4 border border-dashed rounded-lg text-center">No top selling data available for the selected period.</p>
+    </ng-template>
+    <ng-template #noLeastBooks>
+        <p class="text-gray-500 italic p-4 border border-dashed rounded-lg text-center">No least selling data available for the selected period.</p>
+    </ng-template>
   </div>
-</div> 
+
+  <div *ngIf="!isLoading && !dashboardData" class="text-center p-20 bg-white rounded-lg shadow-xl">
+    <p class="text-2xl font-bold text-red-500 mb-4">Error or No Data</p>
+    <p class="text-lg text-gray-600">Could not load dashboard data. Please check the API connections or try a different date range.</p>
+  </div>
+
+</div>

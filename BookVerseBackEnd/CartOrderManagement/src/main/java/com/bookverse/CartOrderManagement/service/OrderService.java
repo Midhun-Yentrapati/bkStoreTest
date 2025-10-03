@@ -32,16 +32,19 @@ public class OrderService {
     private final CartService cartService;
     private final PaymentService paymentService;
     private final CouponService couponService;
+    private final ExternalDataService externalDataService;
     
     public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, 
                        OrderStatusHistoryRepository statusHistoryRepository,
-                       CartService cartService, PaymentService paymentService, CouponService couponService) {
+                       CartService cartService, PaymentService paymentService, CouponService couponService,
+                       ExternalDataService externalDataService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.statusHistoryRepository = statusHistoryRepository;
         this.cartService = cartService;
         this.paymentService = paymentService;
         this.couponService = couponService;
+        this.externalDataService = externalDataService;
     }
 
     @Transactional(readOnly = true)
@@ -141,10 +144,17 @@ public class OrderService {
             orderItem.setSubtotal(cartItem.getPriceWhenAdded().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             orderItem.setItemStatus(OrderItem.ItemStatus.Pending);
             
-            // Set placeholder book details - these should be fetched from book service in a real implementation
-            orderItem.setTitle("Book #" + cartItem.getBookId());
-            orderItem.setAuthor("Author");
-            orderItem.setImageUrl("placeholder.jpg");
+            // Fetch book details from book service
+            var bookDetails = externalDataService.getBookDetails(cartItem.getBookId());
+            if (bookDetails != null) {
+                orderItem.setTitle((String) bookDetails.get("title"));
+                orderItem.setAuthor((String) bookDetails.get("author"));
+                orderItem.setImageUrl((String) bookDetails.get("imageUrl"));
+            } else {
+                orderItem.setTitle("Book #" + cartItem.getBookId());
+                orderItem.setAuthor("Unknown Author");
+                orderItem.setImageUrl("placeholder.jpg");
+            }
             
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             System.out.println("Created order item: " + savedOrderItem.getId() + " for book: " + cartItem.getBookId());
@@ -283,6 +293,11 @@ public class OrderService {
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());
         dto.setUserId(order.getUserId());
+        
+        // Add customer information from user service
+        dto.setCustomerName(externalDataService.getCustomerName(order.getUserId()));
+        dto.setCustomerEmail(externalDataService.getCustomerEmail(order.getUserId()));
+        
         dto.setBillingAddressId(order.getBillingAddressId());
         dto.setShippingAddressId(order.getShippingAddressId());
         dto.setSubtotal(order.getSubtotal());
@@ -326,6 +341,8 @@ public class OrderService {
         
         return dto;
     }
+    
+
     
     private OrderItemDto convertOrderItemToDto(OrderItem orderItem) {
         OrderItemDto dto = new OrderItemDto();

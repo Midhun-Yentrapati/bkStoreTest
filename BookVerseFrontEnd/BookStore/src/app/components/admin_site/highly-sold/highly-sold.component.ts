@@ -39,26 +39,29 @@ export class HighlySoldComponent implements OnInit, OnDestroy {
     this.errorMessage = null;
     this.hasChartData = false;
 
-    // Use the new getHighlySoldBooks method
-    this.salesSubscription = this.bookService.getHighlySoldBooks(this.limit).subscribe({
-      next: (books: BookWithSales[]) => {
-        this.isLoading = false;
-        if (books && books.length > 0) {
-          this.hasChartData = true;
-          this.chartData = books.map(book => ({
-            label: book.title,
-            value: book.no_of_books_sold
-          }));
-        } else {
-          this.hasChartData = false;
-          this.chartData = [];
+    // Use analytics service for top selling books
+    import('../../../services/analytics.service').then(({ AnalyticsService }) => {
+      const analyticsService = new AnalyticsService(this.bookService['http']);
+      this.salesSubscription = analyticsService.getTopSellingBooksData().subscribe({
+        next: (books: any[]) => {
+          this.isLoading = false;
+          if (books && books.length > 0) {
+            this.hasChartData = true;
+            this.chartData = books.map(book => ({
+              label: book.title || book.name,
+              value: book.quantitySold || book.no_of_books_sold || book.sales || 1
+            }));
+          } else {
+            this.hasChartData = false;
+            this.chartData = [];
+          }
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          this.errorMessage = 'Failed to load top selling books data.';
+          console.error('Top Selling Books Chart Component: Fetch error:', error);
         }
-      },
-      error: (error: any) => {
-        this.isLoading = false;
-        this.errorMessage = 'Failed to load highly sold books data.';
-        console.error('Highly Sold Books Chart Component: Fetch error:', error);
-      }
+      });
     });
   }
 

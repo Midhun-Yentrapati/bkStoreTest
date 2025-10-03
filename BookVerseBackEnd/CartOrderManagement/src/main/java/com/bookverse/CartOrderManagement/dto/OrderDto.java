@@ -13,6 +13,10 @@ public class OrderDto {
     private String id;
     @Schema(description = "User ID", example = "USER-456", required = true)
     private String userId;
+    @Schema(description = "Customer name", example = "John Doe")
+    private String customerName;
+    @Schema(description = "Customer email", example = "john@example.com")
+    private String customerEmail;
     @Schema(description = "Billing address ID", example = "ADDR-789")
     private String billingAddressId;
     @Schema(description = "Shipping address ID", example = "ADDR-790")
@@ -64,6 +68,12 @@ public class OrderDto {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
+
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
 
     public String getBillingAddressId() { return billingAddressId; }
     public void setBillingAddressId(String billingAddressId) { this.billingAddressId = billingAddressId; }

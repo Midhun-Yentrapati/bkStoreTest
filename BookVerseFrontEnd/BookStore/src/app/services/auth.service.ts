@@ -1,9 +1,10 @@
-import { Injectable, signal, inject, afterNextRender } from '@angular/core';
+import { Injectable, signal, inject, afterNextRender, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { UserModel } from '../models/user.model';
 import { Observable, of, throwError } from 'rxjs';
 import { tap, map, catchError, switchMap } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common'; // Import isPlatformBrowser
 
 // Interface for admin users
 interface AdminUser {
@@ -29,34 +30,53 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   
+  // Angular Platform Injectables
+  private platformId = inject(PLATFORM_ID);
+  
+  // Separate signals for customer and admin users
+  currentCustomer = signal<UserModel | null>(null);
+  currentAdmin = signal<AdminUser | null>(null);
+  
+  private _isInitialized = signal(false);
+  isInitialized = this._isInitialized.asReadonly();
+
+  constructor() {
+    // Only attempt to initialize state after the first browser render (when hydration completes)
+    afterNextRender(() => {
+      setTimeout(() => this.initializeAuthState(), 0);
+    });
+    
+    // Fallback for non-SSR environments with delay to ensure DOM is ready
+    if (isPlatformBrowser(this.platformId) && !this._isInitialized()) {
+      setTimeout(() => {
+        if (!this._isInitialized()) {
+          this.initializeAuthState();
+        }
+      }, 100);
+    }
+  }
+  
+  // FIX: Helper function for safe Base64Url decoding (required for JWT payloads)
+  private urlBase64Decode(str: string): string {
+    let output = str.replace(/-/g, '+').replace(/_/g, '/');
+    switch (output.length % 4) {
+        case 0: break;
+        case 2: output += '=='; break;
+        case 3: output += '='; break;
+        default: throw new Error('Illegal base64url string!');
+    }
+    // Safely decode Base64 and handle Unicode characters
+    return decodeURIComponent(atob(output).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+  
   // Utility method to transform backend user data (snake_case) to frontend format (camelCase)
   private transformUserData(backendResponse: any): UserModel {
     if (!backendResponse) return backendResponse;
     
-    // Debug: Log backend response to see actual structure
-    console.log('🔍 Backend response received:', backendResponse);
-    
     // Handle nested response structure - extract user data from response.user
     const backendUser = backendResponse.user || backendResponse;
-    
-    console.log('🔍 Extracted user data:', backendUser);
-    
-    // Debug: Check all possible DOB field names
-    console.log('🔍 DOB field analysis:', {
-      date_of_birth: backendUser.date_of_birth,
-      dateOfBirth: backendUser.dateOfBirth,
-      dob: backendUser.dob,
-      birth_date: backendUser.birth_date,
-      birthDate: backendUser.birthDate
-    });
-    
-    // Debug: Check all possible bio field names
-    console.log('🔍 Bio field analysis:', {
-      bio: backendUser.bio,
-      description: backendUser.description,
-      about: backendUser.about,
-      profile_description: backendUser.profile_description
-    });
     
     const transformed = {
       id: backendUser.id,
@@ -74,64 +94,81 @@ export class AuthService {
       isActive: backendUser.accountStatus === 'ACTIVE' || backendUser.isActive || true // Default to true if undefined
     };
     
-    // Debug: Log transformed data to see what we're setting
-    console.log('✅ Transformed user data:', transformed);
-    
     return transformed;
   }
   
-  // Separate signals for customer and admin users
-  currentCustomer = signal<UserModel | null>(null);
-  currentAdmin = signal<AdminUser | null>(null);
-  
-  private _isInitialized = signal(false);
-  isInitialized = this._isInitialized.asReadonly();
-
-  constructor() {
-    afterNextRender(() => {
-      this.initializeAuthState();
-    });
-    
-    // Fallback for non-SSR environments
-    if (typeof localStorage !== 'undefined') {
-      this.initializeAuthState();
+  // FIX: Helper method to clear all necessary storage keys safely
+  private clearAllStorage(): void {
+    if (isPlatformBrowser(this.platformId)) {
+        localStorage.removeItem('bookverse_token');
+        localStorage.removeItem('bookverse_refresh_token');
+        localStorage.removeItem('bookverse_customer');
+        localStorage.removeItem('bookverse_admin');
+        localStorage.removeItem('bookverse_user'); // Legacy token name
     }
+    // FIX: Clear specific sessionStorage keys used for temporary state
+    if (isPlatformBrowser(this.platformId) && typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('loggedInUsername');
+        sessionStorage.removeItem('sessionId');
+    }
+    this.currentCustomer.set(null);
+    this.currentAdmin.set(null);
   }
 
   private initializeAuthState() {
-    if (typeof localStorage !== 'undefined' && !this._isInitialized()) {
-      // Initialize customer user state
+    if (!this._isInitialized()) {
+      
+      // ENSURE: Only proceed if in browser environment
+      if (!isPlatformBrowser(this.platformId)) {
+        this._isInitialized.set(true);
+        return;
+      }
+      
+      // FIX: Restore user state first, then validate tokens
       const storedCustomer = localStorage.getItem('bookverse_customer');
+      const storedAdmin = localStorage.getItem('bookverse_admin');
+      let hasValidUserState = false;
+      
+      // Restore customer user state
       if (storedCustomer) {
         try {
           const rawCustomer = JSON.parse(storedCustomer);
-          console.log('🔄 Raw data from localStorage:', rawCustomer);
-          
-          // Transform backend format to frontend format
           const customer = this.transformUserData(rawCustomer);
           this.currentCustomer.set(customer);
-          console.log('🔄 Customer auth state restored from localStorage:', customer);
-          console.log('🔄 DOB and Bio from localStorage:', {
-            dateOfBirth: customer.dateOfBirth,
-            bio: customer.bio
-          });
+          hasValidUserState = true;
+          console.log('🔄 Customer auth state restored from localStorage:', customer.username);
         } catch (error) {
-          console.error('❌ Failed to parse stored customer data:', error);
+          console.error('❌ Failed to parse stored customer data. Removing invalid data.', error);
           localStorage.removeItem('bookverse_customer');
         }
       }
       
-      // Initialize admin user state
-      const storedAdmin = localStorage.getItem('bookverse_admin');
+      // Restore admin user state
       if (storedAdmin) {
         try {
           const admin = JSON.parse(storedAdmin);
-          console.log('🔄 Raw admin data from localStorage:', admin);
           this.currentAdmin.set(admin);
+          hasValidUserState = true;
           console.log('🔄 Admin auth state restored from localStorage:', admin.username);
         } catch (error) {
-          console.error('❌ Failed to parse stored admin data:', error);
+          console.error('❌ Failed to parse stored admin data. Removing invalid data.', error);
           localStorage.removeItem('bookverse_admin');
+        }
+      }
+      
+      // Don't clear tokens on validation failure - just log why validation fails
+      if (hasValidUserState) {
+        console.log('✅ User state restored successfully.');
+        const currentToken = this.getToken();
+        if (!currentToken) {
+          console.warn('⚠️ User state exists but no token found. Checking if token was cleared.');
+          // Check if token exists in raw localStorage
+          const rawToken = isPlatformBrowser(this.platformId) ? localStorage.getItem('bookverse_token') : null;
+          console.log(`Raw token in localStorage: ${rawToken ? 'EXISTS' : 'MISSING'}`);
+        } else {
+          console.log(`🔍 Token found: ${currentToken.substring(0, 20)}...`);
+          const isValid = this.isTokenValid();
+          console.log(`🔍 Token validation result: ${isValid}`);
         }
       }
       
@@ -164,17 +201,19 @@ export class AuthService {
     // Use single login endpoint - backend determines user type
     return this.http.post<any>(`${this.authUrl}/login`, loginRequest).pipe(
       tap(response => {
-        console.log('Login response received:', response);
         
         // Check if login was successful
         if (response && response.success) {
           console.log('Login successful, processing response...');
           
           // Store JWT tokens
-          if (typeof localStorage !== 'undefined') {
+          if (isPlatformBrowser(this.platformId)) {
             if (response.accessToken) {
               localStorage.setItem('bookverse_token', response.accessToken);
-              console.log('Access token stored');
+              console.log('Access token stored:', response.accessToken.substring(0, 20) + '...');
+              // Verify token was stored
+              const storedToken = localStorage.getItem('bookverse_token');
+              console.log('Token verification - stored successfully:', !!storedToken);
             }
             if (response.refreshToken) {
               localStorage.setItem('bookverse_refresh_token', response.refreshToken);
@@ -185,16 +224,19 @@ export class AuthService {
           // Handle user based on role from backend response
           if (response.user) {
             const user = response.user;
-            console.log('User data received:', user);
             
             // Check if user is admin based on role
             if (user.userRole && user.userRole !== 'CUSTOMER') {
               // Admin user
               this.currentAdmin.set(user);
               this.currentCustomer.set(null);
-              if (typeof localStorage !== 'undefined') {
+              if (isPlatformBrowser(this.platformId)) {
                 localStorage.setItem('bookverse_admin', JSON.stringify(user));
                 localStorage.removeItem('bookverse_customer');
+                // Store session data for analytics service
+                sessionStorage.setItem('loggedInUserId', user.id || user.employeeId || 'unknown');
+                sessionStorage.setItem('loggedInUsername', user.username || user.fullName || 'unknown');
+                sessionStorage.setItem('sessionId', crypto.randomUUID());
               }
               console.log('Admin login successful for:', user.username || user.fullName);
             } else {
@@ -202,7 +244,7 @@ export class AuthService {
               const transformedUser = this.transformUserData(user);
               this.currentCustomer.set(transformedUser);
               this.currentAdmin.set(null);
-              if (typeof localStorage !== 'undefined') {
+              if (isPlatformBrowser(this.platformId)) {
                 localStorage.setItem('bookverse_customer', JSON.stringify(transformedUser));
                 localStorage.removeItem('bookverse_admin');
               }
@@ -224,7 +266,6 @@ export class AuthService {
         throw new Error('Invalid login response');
       }),
       catchError(err => {
-        console.error('Login error details:', err);
         let errorMessage = 'Login failed';
         
         // Handle backend error structure
@@ -238,7 +279,7 @@ export class AuthService {
           errorMessage = err.message;
         }
         
-        console.error('Final error message:', errorMessage);
+        console.error('Login error details:', errorMessage);
         return throwError(() => new Error(errorMessage));
       })
     );
@@ -259,7 +300,6 @@ export class AuthService {
     mobileNumber: string;
     password: string;
   }): Observable<UserModel> {
-    console.log('Registering new user:', userData);
     
     // Use the customerRegister method which calls the backend registration endpoint
     return this.customerRegister(userData);
@@ -273,7 +313,6 @@ export class AuthService {
     mobileNumber: string;
     password: string;
   }): Observable<UserModel> {
-    console.log('Customer registration attempt for:', userData.username, userData.email);
     
     // Create registration request payload matching backend requirements
     const registrationData = {
@@ -288,31 +327,26 @@ export class AuthService {
     // Make HTTP POST request to backend registration endpoint
     return this.http.post<any>(`${this.authUrl}/register`, registrationData).pipe(
       map(response => {
-        console.log('Customer registration response:', response);
         
         // Check if registration was successful
         if (response && response.success) {
-          console.log('Registration successful, processing response...');
           
           // Store JWT tokens if provided
-          if (typeof localStorage !== 'undefined') {
+          if (isPlatformBrowser(this.platformId)) {
             if (response.accessToken) {
               localStorage.setItem('bookverse_token', response.accessToken);
-              console.log('Access token stored after registration');
             }
             if (response.refreshToken) {
               localStorage.setItem('bookverse_refresh_token', response.refreshToken);
-              console.log('Refresh token stored after registration');
             }
           }
           
           // Set current user if provided
           if (response.user) {
             this.currentCustomer.set(response.user);
-            if (typeof localStorage !== 'undefined') {
+            if (isPlatformBrowser(this.platformId)) {
               localStorage.setItem('bookverse_customer', JSON.stringify(response.user));
             }
-            console.log('User data stored after registration:', response.user.fullName);
             return response.user;
           }
           
@@ -320,12 +354,10 @@ export class AuthService {
           throw new Error('Registration successful but no user data received');
         } else {
           // Registration failed
-          console.error('Registration response indicates failure:', response);
           throw new Error(response?.message || 'Registration failed');
         }
       }),
       catchError(err => {
-        console.error('Customer registration error details:', err);
         let errorMessage = 'Registration failed';
         
         // Handle backend error structure
@@ -343,8 +375,6 @@ export class AuthService {
           errorMessage = err.message;
         }
         
-        console.error('Final registration error message:', errorMessage);
-        
         return throwError(() => new Error(errorMessage));
       })
     );
@@ -361,7 +391,6 @@ export class AuthService {
     department?: string;
     employeeId?: string;
   }): Observable<any> {
-    console.log('Admin registration attempt for:', adminData.username, adminData.email);
     
     // Create admin registration request payload matching backend requirements
     const adminRegistrationData = {
@@ -377,13 +406,12 @@ export class AuthService {
 
     return this.http.post<any>(`${this.authUrl}/admin/register`, adminRegistrationData).pipe(
       tap(response => {
-        console.log('Admin registration successful:', response);
         
         // If registration includes auto-login, handle the response
         if (response.user && response.accessToken) {
           // Store the admin user and token
           this.currentAdmin.set(response.user);
-          if (typeof localStorage !== 'undefined') {
+          if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('bookverse_admin', JSON.stringify(response.user));
             localStorage.setItem('bookverse_token', response.accessToken);
             if (response.refreshToken) {
@@ -393,7 +421,6 @@ export class AuthService {
         }
       }),
       catchError(err => {
-        console.error('Admin registration error details:', err);
         let errorMessage = 'Admin registration failed';
         
         // Handle backend error structure
@@ -411,7 +438,6 @@ export class AuthService {
           errorMessage = err.message;
         }
         
-        console.error('Final admin registration error message:', errorMessage);
         return throwError(() => new Error(errorMessage));
       })
     );
@@ -419,17 +445,8 @@ export class AuthService {
 
   // Test method to check if authentication service is reachable
   testAuthServiceConnection(): Observable<any> {
-    console.log('Testing auth service connection to:', `${this.authUrl}/test`);
     return this.http.get(`${this.authUrl}/test`).pipe(
-      tap(response => console.log('Auth service connection successful:', response)),
       catchError(error => {
-        console.error('Auth service connection failed:', error);
-        console.error('Full error details:', {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          message: error.message
-        });
         return throwError(() => error);
       })
     );
@@ -437,11 +454,8 @@ export class AuthService {
 
   // Test method to check if users service is reachable
   testUsersServiceConnection(): Observable<any> {
-    console.log('Testing users service connection to:', `${this.usersUrl}/test`);
     return this.http.get(`${this.usersUrl}/test`).pipe(
-      tap(response => console.log('Users service connection successful:', response)),
       catchError(error => {
-        console.error('Users service connection failed:', error);
         return throwError(() => error);
       })
     );
@@ -473,10 +487,9 @@ export class AuthService {
       tap(user => {
         // Update signal and localStorage with transformed data
         this.currentCustomer.set(user);
-        if (typeof localStorage !== 'undefined') {
+        if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_customer', JSON.stringify(user));
         }
-        console.log('Profile updated successfully:', user);
       }),
       catchError(err => throwError(() => new Error(err.message || 'Profile update failed')))
     );
@@ -558,43 +571,29 @@ export class AuthService {
     }
     
     // Clear all authentication data from storage
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('bookverse_token');
-      localStorage.removeItem('bookverse_refresh_token');
-      localStorage.removeItem('bookverse_customer');
-      localStorage.removeItem('bookverse_admin');
-      localStorage.removeItem('bookverse_user'); // Legacy token name
-    }
-    
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('loggedInUsername');
-      sessionStorage.clear();
-    }
-    
-    // Reset user state
-    this.currentCustomer.set(null);
-    this.currentAdmin.set(null);
+    this.clearAllStorage();
     
     console.log('Logout completed - all session data cleared');
   }
 
   // Token management methods
   getToken(): string | null {
-    if (typeof localStorage !== 'undefined') {
+    // FIX: Use isPlatformBrowser for safe localStorage access
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('bookverse_token');
     }
     return null;
   }
 
   getRefreshToken(): string | null {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('bookverse_refresh_token');
     }
     return null;
   }
 
   setTokens(accessToken: string, refreshToken?: string): void {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('bookverse_token', accessToken);
       if (refreshToken) {
         localStorage.setItem('bookverse_refresh_token', refreshToken);
@@ -603,7 +602,8 @@ export class AuthService {
   }
 
   clearTokens(): void {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
+      console.log('🗑️ Clearing tokens from localStorage');
       localStorage.removeItem('bookverse_token');
       localStorage.removeItem('bookverse_refresh_token');
     }
@@ -612,6 +612,7 @@ export class AuthService {
   isTokenValid(): boolean {
     const token = this.getToken();
     if (!token) {
+      console.log('🔍 Token validation: No token found');
       return false;
     }
     
@@ -619,16 +620,21 @@ export class AuthService {
       // Basic JWT structure validation
       const parts = token.split('.');
       if (parts.length !== 3) {
+        console.log('🔍 Token validation: Invalid JWT structure');
         return false;
       }
       
-      // Decode payload to check expiration
-      const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
+      // Decode payload to check expiration using the robust helper function
+      const payloadDecoded = this.urlBase64Decode(parts[1]);
+      const payload = JSON.parse(payloadDecoded);
       
-      return payload.exp && payload.exp > currentTime;
+      const currentTime = Math.floor(Date.now() / 1000);
+      const isValid = payload.exp && payload.exp > currentTime;
+      
+      console.log(`🔍 Token validation: ${isValid ? 'Valid' : 'Expired'} (exp: ${payload.exp}, now: ${currentTime})`);
+      return isValid;
     } catch (error) {
-      console.error('Token validation error:', error);
+      console.warn('🔍 Token validation error:', error);
       return false;
     }
   }
@@ -652,10 +658,9 @@ export class AuthService {
 
   // Admin-specific signup method (for compatibility with admin components)
   signup(username: string, email: string, password: string): Observable<boolean> {
-    console.log('Admin signup attempt for:', username, email);
     
     // Check if username or email already exists
-    return this.http.get<any[]>(this.usersUrl).pipe(
+    return this.http.get<UserModel[]>(this.usersUrl).pipe(
       switchMap(users => {
         const existingUser = users.find(u => 
           u.username === username || u.email === email
@@ -682,16 +687,14 @@ export class AuthService {
         return this.http.post<any>(this.usersUrl, newAdminUser);
       }),
       map(newUser => {
-        console.log('Admin registration successful for:', newUser.username);
         // Auto-login the admin user after registration
         this.currentAdmin.set(newUser);
-        if (typeof localStorage !== 'undefined') {
+        if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_admin', JSON.stringify(newUser));
         }
         return true;
       }),
       catchError(err => {
-        console.error('Admin signup error:', err);
         return throwError(() => new Error(err.message || 'Registration failed'));
       })
     );
@@ -699,7 +702,6 @@ export class AuthService {
 
   // Password reset functionality
   forgotPassword(email: string): Observable<boolean> {
-    console.log('Forgot password request for:', email);
     
     // Check if user exists with this email
     return this.http.get<UserModel[]>(this.usersUrl).pipe(
@@ -708,17 +710,14 @@ export class AuthService {
         if (user) {
           // In a real application, this would send an email to the user
           // For this demo, we'll just log the success and return true
-          console.log('Password reset email would be sent to:', email);
           return true;
         } else {
           // For security reasons, we still return true even if user doesn't exist
           // This prevents email enumeration attacks
-          console.log('No user found with email:', email, '(returning true for security)');
           return true;
         }
       }),
       catchError(err => {
-        console.error('Error in forgot password:', err);
         return throwError(() => new Error('Unable to process password reset request'));
       })
     );
@@ -728,19 +727,17 @@ export class AuthService {
   fetchCompleteUserProfile(): Observable<UserModel> {
     return this.http.get<any>(`${this.usersUrl}/profile`).pipe(
       map(response => {
-        console.log('🔍 Fresh profile data fetched:', response);
         const completeUser = this.transformUserData(response);
         
         // Update current user data
         this.currentCustomer.set(completeUser);
-        if (typeof localStorage !== 'undefined') {
+        if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_customer', JSON.stringify(completeUser));
         }
         
         return completeUser;
       }),
       catchError(err => {
-        console.error('❌ Failed to fetch fresh profile data:', err);
         return throwError(() => new Error('Failed to fetch user profile'));
       })
     );
@@ -763,7 +760,6 @@ export class AuthService {
         console.log('Password changed successfully:', response);
       }),
       catchError(err => {
-        console.error('Password change error:', err);
         let errorMessage = 'Password change failed';
         
         if (err.error) {

@@ -23,21 +23,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable())
+            .cors(cors -> cors.disable()) // Disabled - API Gateway handles CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                // --- ADMIN/PROTECTED ENDPOINTS ---
-                .requestMatchers("/api/books/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                // --- ADMIN/PROTECTED ENDPOINTS --- DEMO MODE: permitAll
+                .requestMatchers("/api/books/admin/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/books").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
-                .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
-                .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
-                .requestMatchers("/api/reviews/admin/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.PATCH, "/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/books/**").permitAll()
+                .requestMatchers("/api/reviews/admin/**").permitAll()
                 
-                // --- CUSTOMER ENDPOINTS ---
-                .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
-                .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
-                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
+                // --- CUSTOMER ENDPOINTS --- DEMO MODE: permitAll
+                .requestMatchers(HttpMethod.POST, "/api/reviews/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/reviews/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").permitAll()
 
                 // --- PUBLIC ENDPOINTS ---
                 .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/**").permitAll()

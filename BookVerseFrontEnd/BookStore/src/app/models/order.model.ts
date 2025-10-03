@@ -113,9 +113,12 @@ export interface OrderDto {
 }
 
 // Extended interface for UI display (with book details)
-export interface OrderWithDetails extends Omit<Order, 'items' | 'orderItems'> {
+export interface OrderWithDetails extends Omit<Order, 'items' | 'orderItems' | 'grandTotal'> {
   items: OrderItemWithDetails[]; // Order items with book details
   orderItems?: OrderItemWithDetails[]; // Alternative field name for compatibility
+  customerName?: string; // Customer name from backend
+  customerEmail?: string; // Customer email from backend
+  grandTotal?: number | string; // Allow both number and string for backend compatibility
 }
 
 // Payment interface matching backend structure

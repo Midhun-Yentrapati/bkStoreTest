@@ -62,7 +62,8 @@ export class AdminOrdersComponent implements OnInit {
         // Convert to OrderWithDetails and fetch additional data
         this.orders = orders.map(order => ({
           ...order,
-          items: order.items || order.orderItems || []
+          items: order.orderItems || order.items || [],
+          orderItems: order.orderItems || order.items || []
         }));
         
         this.isLoading = false;
@@ -92,8 +93,9 @@ export class AdminOrdersComponent implements OnInit {
       switch (this.dateFilter) {
         case 'today':
           filtered = filtered.filter(order => {
-            if (order.orderDate) {
-              orderDate.setTime(Date.parse(order.orderDate));
+            const dateToCheck = order.placedAt || order.createdAt;
+            if (dateToCheck) {
+              orderDate.setTime(Date.parse(dateToCheck));
               return orderDate.toDateString() === now.toDateString();
             }
             return false;
@@ -102,8 +104,9 @@ export class AdminOrdersComponent implements OnInit {
         case 'week':
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           filtered = filtered.filter(order => {
-            if (order.orderDate) {
-              orderDate.setTime(Date.parse(order.orderDate));
+            const dateToCheck = order.placedAt || order.createdAt;
+            if (dateToCheck) {
+              orderDate.setTime(Date.parse(dateToCheck));
               return orderDate >= weekAgo;
             }
             return false;
@@ -112,8 +115,9 @@ export class AdminOrdersComponent implements OnInit {
         case 'month':
           const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           filtered = filtered.filter(order => {
-            if (order.orderDate) {
-              orderDate.setTime(Date.parse(order.orderDate));
+            const dateToCheck = order.placedAt || order.createdAt;
+            if (dateToCheck) {
+              orderDate.setTime(Date.parse(dateToCheck));
               return orderDate >= monthAgo;
             }
             return false;
@@ -127,8 +131,9 @@ export class AdminOrdersComponent implements OnInit {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(order => 
         order.id.toLowerCase().includes(query) ||
-        (order.shippingAddress && order.shippingAddress.name?.toLowerCase().includes(query)) ||
-        order.items.some(item => 
+        (order.customerName?.toLowerCase().includes(query)) ||
+        (order.customerEmail?.toLowerCase().includes(query)) ||
+        (order.orderItems || order.items || []).some(item => 
           item.title?.toLowerCase().includes(query) ||
           item.author?.toLowerCase().includes(query)
         )
@@ -140,15 +145,18 @@ export class AdminOrdersComponent implements OnInit {
 
   getStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
-      'pending': 'badge-warning',
-      'confirmed': 'badge-info',
-      'processing': 'badge-primary',
-      'shipped': 'badge-secondary',
-      'delivered': 'badge-success',
-      'cancelled': 'badge-danger',
-      'returned': 'badge-warning'
+      'Pending': 'bg-yellow-100 text-yellow-800',
+      'Confirmed': 'bg-blue-100 text-blue-800',
+      'Shipped': 'bg-purple-100 text-purple-800',
+      'Delivered': 'bg-green-100 text-green-800',
+      'Cancelled': 'bg-red-100 text-red-800',
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'confirmed': 'bg-blue-100 text-blue-800',
+      'shipped': 'bg-purple-100 text-purple-800',
+      'delivered': 'bg-green-100 text-green-800',
+      'cancelled': 'bg-red-100 text-red-800'
     };
-    return statusClasses[status] || 'badge-secondary';
+    return statusClasses[status] || 'bg-gray-100 text-gray-800';
   }
 
   getStatusText(status: string): string {
@@ -157,13 +165,16 @@ export class AdminOrdersComponent implements OnInit {
 
   getPaymentStatusBadgeClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
-      'pending': 'badge-warning',
-      'paid': 'badge-success',
-      'failed': 'badge-danger',
-      'refunded': 'badge-info',
-      'partially_refunded': 'badge-warning'
+      'Pending': 'bg-yellow-100 text-yellow-800',
+      'Paid': 'bg-green-100 text-green-800',
+      'Failed': 'bg-red-100 text-red-800',
+      'Refunded': 'bg-blue-100 text-blue-800',
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'paid': 'bg-green-100 text-green-800',
+      'failed': 'bg-red-100 text-red-800',
+      'refunded': 'bg-blue-100 text-blue-800'
     };
-    return statusClasses[status] || 'badge-secondary';
+    return statusClasses[status] || 'bg-gray-100 text-gray-800';
   }
 
   viewOrderDetails(order: OrderWithDetails): void {
@@ -248,21 +259,32 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   getTotalItems(order: OrderWithDetails): number {
-    return order.items.reduce((total, item) => total + item.quantity, 0);
+    const items = order.orderItems || order.items || [];
+    return items.reduce((total, item) => total + (item.quantity || 0), 0);
   }
 
   getOrderTotal(order: OrderWithDetails): number {
-    return order.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Use grandTotal from backend if available, otherwise calculate from items
+    if (order.grandTotal !== undefined && order.grandTotal !== null) {
+      return typeof order.grandTotal === 'number' ? order.grandTotal : parseFloat(String(order.grandTotal));
+    }
+    const items = order.orderItems || order.items || [];
+    return items.reduce((total, item) => total + ((item.price || 0) * (item.quantity || 0)), 0);
   }
 
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   }
 
   getOrderCountByStatus(status: string): number {

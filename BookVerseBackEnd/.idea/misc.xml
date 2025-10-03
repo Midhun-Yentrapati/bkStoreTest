@@ -9,6 +9,8 @@
         <option value="$PROJECT_DIR$/eureka-server/eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/user-authentication-service/pom.xml" />
         <option value="$PROJECT_DIR$/book-catalog/pom.xml" />
+        <option value="$PROJECT_DIR$/admin&amp;backoffice/pom.xml" />
+        <option value="$PROJECT_DIR$/CartOrderManagement/pom.xml" />
       </list>
     </option>
   </component>

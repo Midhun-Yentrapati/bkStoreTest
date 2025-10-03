@@ -77,6 +77,12 @@ public class AdminService {
         return adminActivityLogRepository.findRecentActivities(since);
     }
 
+    public List<AdminActivityLog> getRecentActivities(int limit) {
+        LocalDateTime since = LocalDateTime.now().minusDays(7); // Last 7 days
+        List<AdminActivityLog> activities = adminActivityLogRepository.findRecentActivities(since);
+        return activities.stream().limit(limit).toList();
+    }
+
     public List<Object[]> getTopActiveAdmins() {
         LocalDateTime since = LocalDateTime.now().minusDays(30); // Last 30 days
         return adminActivityLogRepository.findTopActiveAdmins(since);

@@ -117,7 +117,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        if (path.startsWith("/api/books") && HttpMethod.GET.name().equalsIgnoreCase(method)) {
+        if (path.startsWith("/api/books") && (HttpMethod.GET.name().equalsIgnoreCase(method) || HttpMethod.POST.name().equalsIgnoreCase(method))) {
+            return true;
+        }
+
+        if (path.startsWith("/api/books/") && (HttpMethod.PUT.name().equalsIgnoreCase(method) || HttpMethod.PATCH.name().equalsIgnoreCase(method) || HttpMethod.DELETE.name().equalsIgnoreCase(method))) {
             return true;
         }
 

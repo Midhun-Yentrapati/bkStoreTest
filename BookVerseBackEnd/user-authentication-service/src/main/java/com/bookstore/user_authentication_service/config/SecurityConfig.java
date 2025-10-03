@@ -42,12 +42,12 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/webjars/**").permitAll()
                 
-                // Admin endpoints
-                .requestMatchers("/api/auth/admin/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_ADMIN")
-                .requestMatchers("/api/users/admin/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_MANAGER")
+                // Admin endpoints - DEMO MODE: permitAll
+                .requestMatchers("/api/auth/admin/**").permitAll()
+                .requestMatchers("/api/users/admin/**").permitAll()
                 
-                // Authenticated endpoints
-                .requestMatchers("/api/users/**").authenticated()
+                // User endpoints - DEMO MODE: permitAll for demonstration
+                .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/auth/logout", "/api/auth/refresh").authenticated()
                 
                 // All other requests require authentication

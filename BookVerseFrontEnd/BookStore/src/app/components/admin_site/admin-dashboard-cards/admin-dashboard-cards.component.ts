@@ -11,6 +11,10 @@ import { Component, Input, Output,EventEmitter } from '@angular/core';
 export class AdminDashboardCardsComponent {
   @Input() title : string = '';
   @Input() description : string = '';
+  // FIX: Added missing Input properties
+  @Input() value: string = '';
+  @Input() iconClass: string = '';
+  @Input() colorClass: string = '';
   @Output() cardClicked = new EventEmitter<string>();
 
   onCardClick() : void{

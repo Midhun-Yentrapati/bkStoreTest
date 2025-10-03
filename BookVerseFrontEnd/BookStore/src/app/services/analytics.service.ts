@@ -123,8 +123,9 @@ export interface CategoryPerformance {
   providedIn: 'root'
 })
 export class AnalyticsService {
-  private apiUrl = 'http://localhost:8090/api/analytics'; // API Gateway URL
-  private adminApiUrl = 'http://localhost:8090/api/admin'; // API Gateway URL
+  private apiUrl = 'http://localhost:8090/api/analytics'; // API Gateway URL for Admin/Analytics Service
+  private adminApiUrl = 'http://localhost:8090/api/admin'; // API Gateway URL for Admin Activity
+  private bookApiUrl = 'http://localhost:8090/api/books'; // API Gateway URL for Book Catalog Service
 
   constructor(private http: HttpClient) {}
 
@@ -158,13 +159,32 @@ export class AnalyticsService {
   }
 
   // Enhanced Analytics Methods
-  getTotalRevenue(startDate?: string, endDate?: string): Observable<number> {
-    let params = new HttpParams();
-    if (startDate) params = params.set('startDate', startDate);
-    if (endDate) params = params.set('endDate', endDate);
+  getDashboardStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/dashboard-stats`).pipe(
+      catchError(this.handleError<any>('getDashboardStats', {
+        totalOrders: 0,
+        pendingOrders: 0,
+        deliveredOrders: 0,
+        totalRevenue: 0
+      }))
+    );
+  }
 
-    return this.http.get<number>(`${this.apiUrl}/stats/total-revenue`, { params }).pipe(
-      catchError(this.handleError<number>('getTotalRevenue', 0))
+  getSalesTrendsData(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/sales-trends`).pipe(
+      catchError(this.handleError<any>('getSalesTrendsData', { yearlyRevenue: {} }))
+    );
+  }
+
+  getTopSellingBooksData(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/top-selling-books`).pipe(
+      catchError(this.handleError<any[]>('getTopSellingBooksData', []))
+    );
+  }
+
+  getLeastSellingBooksData(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/least-selling-books`).pipe(
+      catchError(this.handleError<any[]>('getLeastSellingBooksData', []))
     );
   }
 
@@ -183,7 +203,8 @@ export class AnalyticsService {
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<TopSellingBook[]>(`${this.apiUrl}/books/top-selling`, { params }).pipe(
+    // CORRECTED URL: Points to Book Catalog service
+    return this.http.get<TopSellingBook[]>(`${this.bookApiUrl}/highly-sold`, { params }).pipe(
       catchError(this.handleError<TopSellingBook[]>('getTopSellingBooks', []))
     );
   }
@@ -193,7 +214,8 @@ export class AnalyticsService {
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<TopSellingBook[]>(`${this.apiUrl}/books/least-selling`, { params }).pipe(
+    // CORRECTED URL: Points to Book Catalog service
+    return this.http.get<TopSellingBook[]>(`${this.bookApiUrl}/least-sold`, { params }).pipe(
       catchError(this.handleError<TopSellingBook[]>('getLeastSellingBooks', []))
     );
   }
@@ -223,6 +245,7 @@ export class AnalyticsService {
       .set('startDate', startDate)
       .set('endDate', endDate);
 
+    // This method hits the combined stats endpoint on the Admin/Analytics service
     return this.http.get<AnalyticsDashboard>(`${this.apiUrl}/dashboard`, { params }).pipe(
       catchError(this.handleError<AnalyticsDashboard>('getAnalyticsDashboard', {
         totalRevenue: 0,
@@ -334,7 +357,14 @@ export class AnalyticsService {
 
     this.logActivity(activityData).subscribe({
       next: (log) => console.log('Activity logged:', log),
-      error: (error) => console.error('Failed to log activity:', error)
+      error: (error) => {
+        console.error('logActivity failed:', error);
+        // Fallback: try direct API call
+        this.http.post(`${this.adminApiUrl}/activity/log`, activityData).subscribe({
+          next: (result) => console.log('Direct activity log successful:', result),
+          error: (directError) => console.error('Direct activity log also failed:', directError)
+        });
+      }
     });
   }
 
@@ -364,4 +394,4 @@ export class AnalyticsService {
       return of(result as T);
     };
   }
-} 
+}

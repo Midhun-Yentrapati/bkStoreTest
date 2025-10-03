@@ -85,4 +85,32 @@ public class AnalyticsService {
 
         return dashboard;
     }
+
+    public Map<String, Object> getSalesTrendData(String period, String startDate, String endDate) {
+        Map<String, Object> trendData = new HashMap<>();
+        
+        // Mock implementation - replace with actual logic
+        trendData.put("labels", List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun"));
+        trendData.put("datasets", List.of(Map.of(
+            "label", "Sales Revenue",
+            "data", List.of(10000, 15000, 12000, 18000, 22000, 25000)
+        )));
+        
+        return trendData;
+    }
+
+    public List<Map<String, Object>> getCategoryPerformance(String startDate, String endDate) {
+        // Mock implementation - replace with actual logic
+        return List.of(
+            Map.of("categoryName", "Fiction", "totalSales", 150, "totalRevenue", 45000),
+            Map.of("categoryName", "Non-Fiction", "totalSales", 120, "totalRevenue", 38000),
+            Map.of("categoryName", "Science", "totalSales", 80, "totalRevenue", 28000)
+        );
+    }
+
+    public byte[] exportAnalyticsData(String startDate, String endDate, String format) {
+        // Mock implementation - replace with actual export logic
+        String csvData = "Date,Revenue,Orders\n" + startDate + ",10000,50\n" + endDate + ",15000,75";
+        return csvData.getBytes();
+    }
 }

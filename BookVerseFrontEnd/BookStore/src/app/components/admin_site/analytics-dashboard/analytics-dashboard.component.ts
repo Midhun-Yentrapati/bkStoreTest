@@ -1,401 +1,162 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AnalyticsService, DailySalesSummary, AdminActivityLog, AnalyticsDashboard } from '../../../services/analytics.service';
-import { Subscription } from 'rxjs';
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  BarController,
-  LineController,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
+import { AnalyticsService, AnalyticsDashboard, TopSellingBook } from '../../../services/analytics.service';
+import { AdminDashboardCardsComponent } from '../admin-dashboard-cards/admin-dashboard-cards.component';
+import { YearlySalesChartComponent } from '../yearly-sales-chart/yearly-sales-chart.component';
+import { forkJoin } from 'rxjs';
+
+// Interface for the card data (used for UI display)
+interface DashboardCard {
+  title: string;
+  value: number;
+  description: string;
+  isCurrency: boolean;
+  iconClass: string;
+  colorClass: string;
+}
 
 @Component({
   selector: 'app-analytics-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  // Add DatePipe and DecimalPipe for template formatting
+  imports: [CommonModule, FormsModule, AdminDashboardCardsComponent, YearlySalesChartComponent, DecimalPipe, DatePipe], 
   templateUrl: './analytics-dashboard.component.html',
-  styleUrl: './analytics-dashboard.component.css'
+  styleUrls: ['./analytics-dashboard.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyticsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('revenueChart', { static: false }) revenueChartCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('activityChart', { static: false }) activityChartCanvas!: ElementRef<HTMLCanvasElement>;
+export class AnalyticsDashboardComponent implements OnInit {
+  
+  isLoading = true;
+  selectedDateRange = 'last-30-days'; // Default range
+  startDate: string = this.getStartDate(this.selectedDateRange);
+  endDate: string = this.getEndDate();
 
-  // Analytics Data
-  analyticsDashboard: AnalyticsDashboard | null = null;
-  recentSalesSummaries: DailySalesSummary[] = [];
-  recentActivities: AdminActivityLog[] = [];
-  topActiveAdmins: any[] = [];
-  commonActions: any[] = [];
-  errorLogs: AdminActivityLog[] = [];
+  dashboardData: AnalyticsDashboard | null = null;
+  topSellingBooks: TopSellingBook[] = [];
+  leastSellingBooks: TopSellingBook[] = [];
 
-  // Date Range Selection
-  selectedStartDate: string = '';
-  selectedEndDate: string = '';
-  selectedPeriod: string = 'last7days';
+  // Initialized cards for the numbered statistics
+  cards: DashboardCard[] = [
+    { title: 'Total Revenue', value: 0, description: 'Revenue in selected period', isCurrency: true, iconClass: 'fas fa-wallet', colorClass: 'bg-green-100 text-green-800' },
+    { title: 'Total Orders', value: 0, description: 'Number of orders placed', isCurrency: false, iconClass: 'fas fa-shopping-bag', colorClass: 'bg-blue-100 text-blue-800' },
+    { title: 'Items Sold', value: 0, description: 'Total quantity of books sold', isCurrency: false, iconClass: 'fas fa-book', colorClass: 'bg-yellow-100 text-yellow-800' },
+    { title: 'Avg Order Value', value: 0, description: 'Average value of an order', isCurrency: true, iconClass: 'fas fa-dollar-sign', colorClass: 'bg-red-100 text-red-800' },
+  ];
 
-  // Loading States
-  isLoadingDashboard = false;
-  isLoadingActivities = false;
-  isLoadingStats = false;
-
-  // Charts
-  revenueChart: any = null;
-  activityChart: any = null;
-
-  // Subscriptions
-  private subscriptions: Subscription[] = [];
-
-  constructor(private analyticsService: AnalyticsService) {
-    // Register Chart.js components
-    Chart.register(
-      CategoryScale,
-      LinearScale,
-      PointElement,
-      LineElement,
-      BarElement,
-      BarController,
-      LineController,
-      Title,
-      Tooltip,
-      Legend,
-      Filler
-    );
-
-    // Set default date range (last 7 days)
-    this.setDateRange();
-  }
+  constructor(private analyticsService: AnalyticsService) {}
 
   ngOnInit(): void {
-    this.loadAnalyticsDashboard();
-    this.loadRecentActivities();
-    this.loadActivityStats();
+    this.loadDashboardData();
   }
 
-  ngAfterViewInit(): void {
-    // Initialize charts after view is initialized
-    setTimeout(() => {
-      this.initializeCharts();
-    }, 100);
+  /**
+   * Called when the date range selection changes.
+   */
+  onDateRangeChange(): void {
+    this.startDate = this.getStartDate(this.selectedDateRange);
+    this.endDate = this.getEndDate();
+    this.loadDashboardData();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    if (this.revenueChart) {
-      this.revenueChart.destroy();
-    }
-    if (this.activityChart) {
-      this.activityChart.destroy();
-    }
-  }
+  /**
+   * Fetches data for the dashboard from multiple backend endpoints concurrently.
+   * - Core stats via /api/analytics/dashboard
+   * - Top/Least books via /api/books/highly-sold & /api/books/least-sold
+   */
+  loadDashboardData(): void {
+    this.isLoading = true;
 
-  setDateRange(): void {
-    const today = new Date();
-    const endDate = today.toISOString().split('T')[0];
-    
-    let startDate: Date;
-    switch (this.selectedPeriod) {
-      case 'last7days':
-        startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case 'last30days':
-        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case 'last90days':
-        startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
-        break;
-      case 'thisMonth':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        break;
-      case 'lastMonth':
-        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        this.selectedEndDate = lastMonth.toISOString().split('T')[0];
-        break;
-      default:
-        startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    }
+    // Use forkJoin to manage multiple API calls efficiently and concurrently
+    forkJoin({
+      // Fetches Revenue, Orders, Items Sold, AOV from Admin/Analytics Service
+      dashboard: this.analyticsService.getAnalyticsDashboard(this.startDate, this.endDate),
+      // Fetches Top Selling Books from Book Catalog Service
+      topBooks: this.analyticsService.getTopSellingBooks(5, this.startDate, this.endDate),
+      // Fetches Least Selling Books from Book Catalog Service
+      leastBooks: this.analyticsService.getLeastSellingBooks(5, this.startDate, this.endDate)
+    }).subscribe({
+      next: (results) => {
+        // The structure of the AnalyticsDashboard interface aligns with the backend Map<String, Object> 
+        // returned by AnalyticsController.getAnalyticsDashboard
+        this.dashboardData = results.dashboard; 
+        
+        // This relies on the Angular service mapping the generic backend 'Object[]' response
+        // for top/least selling items to the TopSellingBook[] interface.
+        this.topSellingBooks = results.topBooks.map(item => ({
+            bookId: item.bookId,
+            title: item.title,
+            author: item.author || 'N/A',
+            quantitySold: item.quantitySold,
+            revenue: item.revenue || 0,
+            category: item.category || 'N/A',
+            averageRating: item.averageRating || 0,
+        } as TopSellingBook));
 
-    this.selectedStartDate = startDate.toISOString().split('T')[0];
-    if (this.selectedPeriod !== 'lastMonth') {
-      this.selectedEndDate = endDate;
-    }
-  }
-
-  onPeriodChange(): void {
-    this.setDateRange();
-    this.refreshData();
-  }
-
-  onCustomDateChange(): void {
-    if (this.selectedStartDate && this.selectedEndDate) {
-      this.selectedPeriod = 'custom';
-      this.refreshData();
-    }
-  }
-
-  refreshData(): void {
-    this.loadAnalyticsDashboard();
-    this.loadSalesSummariesByDateRange();
-    this.updateCharts();
-  }
-
-  loadAnalyticsDashboard(): void {
-    this.isLoadingDashboard = true;
-    const subscription = this.analyticsService.getAnalyticsDashboard(
-      this.selectedStartDate, 
-      this.selectedEndDate
-    ).subscribe({
-      next: (dashboard) => {
-        this.analyticsDashboard = dashboard;
-        this.isLoadingDashboard = false;
+        this.leastSellingBooks = results.leastBooks.map(item => ({
+          bookId: item.bookId,
+          title: item.title,
+          author: item.author || 'N/A',
+          quantitySold: item.quantitySold,
+          revenue: item.revenue || 0,
+          category: item.category || 'N/A',
+          averageRating: item.averageRating || 0,
+        } as TopSellingBook));
+        
+        this.updateCards();
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading analytics dashboard:', error);
-        this.isLoadingDashboard = false;
+        this.isLoading = false;
+        // Optionally set default/error state values
+        this.dashboardData = {totalRevenue: 0, totalOrders: 0, totalItemsSold: 0, averageOrderValue: 0, topSellingItems: [], leastSellingItems: []};
+        this.topSellingBooks = [];
+        this.leastSellingBooks = [];
+        this.updateCards();
       }
     });
-    this.subscriptions.push(subscription);
   }
 
-  loadSalesSummariesByDateRange(): void {
-    const subscription = this.analyticsService.getDailySalesSummariesByDateRange(
-      this.selectedStartDate, 
-      this.selectedEndDate
-    ).subscribe({
-      next: (summaries) => {
-        this.recentSalesSummaries = summaries;
-        this.updateRevenueChart();
-      },
-      error: (error) => {
-        console.error('Error loading sales summaries:', error);
-      }
-    });
-    this.subscriptions.push(subscription);
+  /**
+   * Maps the fetched analytics data to the dashboard cards.
+   */
+  updateCards(): void {
+    if (!this.dashboardData) return;
+
+    // Map properties from the AnalyticsDashboard interface to the card values
+    this.cards[0].value = this.dashboardData.totalRevenue;
+    this.cards[1].value = this.dashboardData.totalOrders;
+    this.cards[2].value = this.dashboardData.totalItemsSold;
+    this.cards[3].value = this.dashboardData.averageOrderValue;
   }
 
-  loadRecentActivities(): void {
-    this.isLoadingActivities = true;
-    const subscription = this.analyticsService.getRecentActivities().subscribe({
-      next: (activities) => {
-        this.recentActivities = activities;
-        this.isLoadingActivities = false;
-        this.updateActivityChart();
-      },
-      error: (error) => {
-        console.error('Error loading recent activities:', error);
-        this.isLoadingActivities = false;
-      }
-    });
-    this.subscriptions.push(subscription);
+  // Utility to generate dates for the API calls (YYYY-MM-DD format)
+  private getEndDate(): string {
+    return new Date().toISOString().split('T')[0];
   }
 
-  loadActivityStats(): void {
-    this.isLoadingStats = true;
-    
-    // Load multiple stats in parallel
-    const topAdminsSubscription = this.analyticsService.getTopActiveAdmins().subscribe({
-      next: (admins: any[]) => this.topActiveAdmins = admins,
-      error: (error: any) => console.error('Error loading top admins:', error)
-    });
+  private getStartDate(range: string): string {
+    const today = new Date();
+    const date = new Date(today);
 
-    const commonActionsSubscription = this.analyticsService.getMostCommonActions().subscribe({
-      next: (actions: any[]) => this.commonActions = actions,
-      error: (error: any) => console.error('Error loading common actions:', error)
-    });
-
-    const errorLogsSubscription = this.analyticsService.getLogsWithErrors().subscribe({
-      next: (logs: any[]) => {
-        this.errorLogs = logs;
-        this.isLoadingStats = false;
-      },
-      error: (error: any) => {
-        console.error('Error loading error logs:', error);
-        this.isLoadingStats = false;
-      }
-    });
-
-    this.subscriptions.push(topAdminsSubscription, commonActionsSubscription, errorLogsSubscription);
-  }
-
-  initializeCharts(): void {
-    this.initializeRevenueChart();
-    this.initializeActivityChart();
-  }
-
-  initializeRevenueChart(): void {
-    if (this.revenueChartCanvas && this.revenueChartCanvas.nativeElement) {
-      const ctx = this.revenueChartCanvas.nativeElement.getContext('2d');
-      if (ctx) {
-        this.revenueChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Daily Revenue',
-              data: [],
-              borderColor: '#4F46E5',
-              backgroundColor: 'rgba(79, 70, 229, 0.1)',
-              fill: true,
-              tension: 0.4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Revenue Trends'
-              },
-              legend: {
-                display: true
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  callback: function(value) {
-                    return '₹' + value.toLocaleString();
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
-    }
-  }
-
-  initializeActivityChart(): void {
-    if (this.activityChartCanvas && this.activityChartCanvas.nativeElement) {
-      const ctx = this.activityChartCanvas.nativeElement.getContext('2d');
-      if (ctx) {
-        this.activityChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Admin Activities',
-              data: [],
-              backgroundColor: '#10B981',
-              borderColor: '#059669',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Admin Activity Distribution'
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
-      }
-    }
-  }
-
-  updateCharts(): void {
-    this.updateRevenueChart();
-    this.updateActivityChart();
-  }
-
-  updateRevenueChart(): void {
-    if (this.revenueChart && this.recentSalesSummaries.length > 0) {
-      const labels = this.recentSalesSummaries.map(summary => 
-        new Date(summary.salesDate).toLocaleDateString()
-      );
-      const data = this.recentSalesSummaries.map(summary => summary.totalRevenue);
-
-      this.revenueChart.data.labels = labels;
-      this.revenueChart.data.datasets[0].data = data;
-      this.revenueChart.update();
-    }
-  }
-
-  updateActivityChart(): void {
-    if (this.activityChart && this.commonActions.length > 0) {
-      const labels = this.commonActions.map(action => action[0]); // Action type
-      const data = this.commonActions.map(action => action[1]); // Count
-
-      this.activityChart.data.labels = labels;
-      this.activityChart.data.datasets[0].data = data;
-      this.activityChart.update();
-    }
-  }
-
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  formatDateTime(dateString: string): string {
-    return new Date(dateString).toLocaleString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR'
-    }).format(amount);
-  }
-
-  getStatusBadgeClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'success':
-        return 'badge-success';
-      case 'error':
-      case 'failed':
-        return 'badge-error';
-      case 'warning':
-        return 'badge-warning';
+    switch (range) {
+      case 'last-7-days':
+        date.setDate(today.getDate() - 7);
+        break;
+      case 'last-30-days':
+        date.setDate(today.getDate() - 30);
+        break;
+      case 'last-90-days':
+        date.setDate(today.getDate() - 90);
+        break;
+      case 'last-year':
+        date.setFullYear(today.getFullYear() - 1);
+        break;
       default:
-        return 'badge-info';
+        date.setDate(today.getDate() - 30);
+        break;
     }
+    return date.toISOString().split('T')[0];
   }
-
-  getActionTypeIcon(actionType: string): string {
-    switch (actionType.toLowerCase()) {
-      case 'login':
-        return '🔐';
-      case 'logout':
-        return '🚪';
-      case 'create':
-        return '➕';
-      case 'update':
-        return '✏️';
-      case 'delete':
-        return '🗑️';
-      case 'view':
-        return '👁️';
-      default:
-        return '📋';
-    }
-  }
-} 
+}

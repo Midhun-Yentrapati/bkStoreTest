@@ -50,6 +50,19 @@ public class NotificationController {
         return notification != null ? ResponseEntity.ok(notification) : ResponseEntity.notFound().build();
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<AdminNotification> updateNotification(@PathVariable String id, @RequestBody Map<String, Object> updates) {
+        try {
+            if (updates.containsKey("isRead") && (Boolean) updates.get("isRead")) {
+                AdminNotification notification = notificationService.markAsRead(id);
+                return notification != null ? ResponseEntity.ok(notification) : ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable String id) {
         boolean deleted = notificationService.deleteNotification(id);

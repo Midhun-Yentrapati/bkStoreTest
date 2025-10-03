@@ -24,7 +24,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.disable()) // API Gateway handles CORS
+            .cors(cors -> cors.disable()) // Disabled - API Gateway handles CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints - health checks and documentation only
@@ -35,11 +35,11 @@ public class SecurityConfig {
                 // Public notification creation endpoint (for order notifications from customers)
                 .requestMatchers(HttpMethod.POST, "/api/admin/notifications").permitAll()
                 
-                // Admin endpoints - require ADMIN or SUPER_ADMIN role
-                .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                // Admin endpoints - DEMO MODE: permitAll for demonstration
+                .requestMatchers("/api/admin/**").permitAll()
                 
-                // Analytics endpoints - require ADMIN role or analytics permissions
-                .requestMatchers("/api/analytics/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                // Analytics endpoints - DEMO MODE: permitAll for demonstration
+                .requestMatchers("/api/analytics/**").permitAll()
                 
                 // All other requests require authentication
                 .anyRequest().authenticated()

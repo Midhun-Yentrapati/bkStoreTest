@@ -13,6 +13,16 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
+    // Wait for auth service to initialize
+    if (!this.authService.isInitialized()) {
+      // Redirect to login but don't clear storage
+      this.router.navigate(['/login'], { 
+        queryParams: { returnUrl: state.url },
+        queryParamsHandling: 'merge'
+      });
+      return false;
+    }
+    
     const isLoggedIn = this.authService.isLoggedIn();
     
     if (!isLoggedIn) {

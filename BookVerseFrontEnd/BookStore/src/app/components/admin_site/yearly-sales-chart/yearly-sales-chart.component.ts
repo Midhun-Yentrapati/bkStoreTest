@@ -88,22 +88,38 @@ export class YearlySalesChartComponent implements OnInit, AfterViewInit, OnDestr
   
   loadOrdersData(): void {
     this.isLoading = true;
-    this.ordersSubscription = this.orderService.getAllOrders().subscribe({
-      next: (orders: Order[]) => {
-        this.orders = orders;
-        this.processYearlyData();
-        this.isLoading = false;
-        
-        // Use setTimeout to ensure DOM is updated after isLoading changes
-        setTimeout(() => {
-          this.createChart();
-        }, 200);
-      },
-      error: (error) => {
-        console.error('Error loading orders:', error);
-        this.isLoading = false;
-      }
+    
+    // Use analytics service for sales trends
+    import('../../../services/analytics.service').then(({ AnalyticsService }) => {
+      const analyticsService = new AnalyticsService(this.orderService['http']);
+      this.ordersSubscription = analyticsService.getSalesTrendsData().subscribe({
+        next: (trendsData: any) => {
+          this.processAnalyticsData(trendsData);
+          this.isLoading = false;
+          
+          setTimeout(() => {
+            this.createChart();
+          }, 200);
+        },
+        error: (error) => {
+          console.error('Error loading sales trends:', error);
+          this.isLoading = false;
+        }
+      });
     });
+  }
+  
+  processAnalyticsData(trendsData: any): void {
+    const yearlyRevenue = trendsData.yearlyRevenue || {};
+    const currentYear = new Date().getFullYear();
+    const yearsToShow = this.getYearsToShow();
+    
+    this.chartData = yearsToShow.map(year => ({
+      year,
+      sales: yearlyRevenue[year] || 0
+    }));
+    
+    this.calculateStatistics();
   }
   
   processYearlyData(): void {

@@ -112,26 +112,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userRole != null) {
             log.info("[AUTH DEBUG] Processing userRole: '{}'", userRole);
             switch (userRole) {
-                case "SUPER_ADMIN":
+                case "ROLE_SUPER_ADMIN":
                     log.info("[AUTH DEBUG] Adding SUPER_ADMIN roles");
                     authorities.add(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"));
                     authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
                     authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
                     break;
-                case "ADMIN":
+                case "ROLE_ADMIN":
                     log.info("[AUTH DEBUG] Adding ADMIN roles");
                     authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
                     authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
                     break;
-                case "MANAGER":
+                case "ROLE_MANAGER":
                     log.info("[AUTH DEBUG] Adding MANAGER role");
                     authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
                     break;
-                case "MODERATOR":
+                case "ROLE_MODERATOR":
                     log.info("[AUTH DEBUG] Adding MODERATOR role");
                     authorities.add(new SimpleGrantedAuthority("ROLE_MODERATOR"));
                     break;
-                case "SUPPORT":
+                case "ROLE_SUPPORT":
                     log.info("[AUTH DEBUG] Adding SUPPORT role");
                     authorities.add(new SimpleGrantedAuthority("ROLE_SUPPORT"));
                     break;

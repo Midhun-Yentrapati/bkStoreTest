@@ -18,7 +18,7 @@ export interface AdminNotification {
   providedIn: 'root'
 })
 export class AdminNotificationsService {
-  private apiUrl = 'http://localhost:8084/api/admin/notifications'; // Direct to admin service
+  private apiUrl = 'http://localhost:8090/api/admin/notifications'; // Via API Gateway
 
   constructor(private http: HttpClient) {}
 
