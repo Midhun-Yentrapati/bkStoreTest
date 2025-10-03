@@ -39,9 +39,12 @@ export interface AdminUser {
   id: string;
   username: string;
   email: string;
-  passwordHash: string;
-  role?: 'admin';
-  fullName?: string;
-  userRole?: string;
-  isActive: boolean; // Made required to avoid undefined issues
+  fullName: string;
+  userType: string;
+  userRole: string;
+  employeeId?: string;
+  department?: string;
+  isActive: boolean;
+  createdAt?: string;
+  lastUpdated?: string;
 }

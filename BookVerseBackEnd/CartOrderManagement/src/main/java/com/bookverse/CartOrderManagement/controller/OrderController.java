@@ -39,9 +39,20 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 
+    //@PostMapping
+    //public ResponseEntity<Order> createOrder(@RequestBody OrderDto orderDto) {
+    //    return ResponseEntity.ok(orderService.createOrder(orderDto));
+    //}
+    
+    //new Method #only fetching problem
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(orderService.createOrder(orderDto));
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
+        Order createdOrder = orderService.createOrder(orderDto);
+        
+        // Convert the created Order entity to an OrderDto before returning
+        OrderDto responseDto = orderService.getOrderById(createdOrder.getId());
+        
+        return ResponseEntity.ok(responseDto);
     }
 
     @PutMapping("/{orderId}/status")
@@ -59,7 +70,6 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/cancel")
-    @CrossOrigin(origins = "*")
     public ResponseEntity<?> cancelOrder(@PathVariable String orderId) {
         try {
             System.out.println("Cancel order request received for orderId: " + orderId);

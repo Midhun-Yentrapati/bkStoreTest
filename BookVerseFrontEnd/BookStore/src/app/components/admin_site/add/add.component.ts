@@ -392,10 +392,8 @@ export class AddComponent implements OnInit {
         }))
       };
 
-      // Debug: Log the data being sent
-      console.log('BookCreateRequest being sent:', JSON.stringify(bookData, null, 2));
-      console.log('Selected Categories:', this.selectedCategories);
-      console.log('Selected Images:', this.selectedImages);
+      // Log basic info
+      console.log('Creating book:', bookData.title);
 
       this.bookService.createBookWithRelations(bookData).subscribe({
         next: (response: any) => {

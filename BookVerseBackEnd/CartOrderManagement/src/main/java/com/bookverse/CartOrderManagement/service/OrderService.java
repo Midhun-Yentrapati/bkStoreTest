@@ -61,20 +61,6 @@ public class OrderService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
-    
-    //
-
-    
-    @Transactional(readOnly = true)
-    public List<OrderDto> getOrdersById(String userId) {
-        // Call the new method that fetches everything
-        List<Order> orders = orderRepository.findByUserIdWithDetails(userId);
-        
-        // The DTO conversion will now work without any extra queries or errors
-        return orders.stream()
-                     .map(this::convertToDto) // Assuming your convertToDto method exists
-                     .collect(Collectors.toList());
-    }
 
     @Transactional
     public Order createOrder(OrderDto orderDto) {
@@ -111,7 +97,7 @@ public class OrderService {
         System.out.println("Order created with ID: " + savedOrder.getId() + ", GrandTotal: " + savedOrder.getGrandTotal());
         
         // Create initial status history
-        createStatusHistory(savedOrder.getId(), null, Order.OrderStatus.Pending, "Order created", "SYSTEM");
+        createStatusHistory(savedOrder, null, Order.OrderStatus.Pending, "Order created", "SYSTEM");
         
         // Create payment record for the order
         try {
@@ -148,7 +134,7 @@ public class OrderService {
         for (CartItem cartItem : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setId(UUID.randomUUID().toString());
-            orderItem.setOrderId(order.getId());
+            orderItem.setOrder(order);  // Set the order entity instead of just orderId
             orderItem.setBookId(cartItem.getBookId());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getPriceWhenAdded());
@@ -258,9 +244,18 @@ public class OrderService {
     
     private void createStatusHistory(String orderId, Order.OrderStatus previousStatus, 
                                    Order.OrderStatus newStatus, String reason, String updatedBy) {
+        // Fetch the order entity to set the relationship properly
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ItemNotFoundException("Order not found with id: " + orderId));
+        
+        createStatusHistory(order, previousStatus, newStatus, reason, updatedBy);
+    }
+    
+    private void createStatusHistory(Order order, Order.OrderStatus previousStatus, 
+                                   Order.OrderStatus newStatus, String reason, String updatedBy) {
         OrderStatusHistory statusHistory = new OrderStatusHistory();
         statusHistory.setId(UUID.randomUUID().toString());
-        statusHistory.setOrderId(orderId);
+        statusHistory.setOrder(order);  // Set the order entity instead of just orderId
         statusHistory.setPreviousStatus(previousStatus);
         statusHistory.setNewStatus(newStatus);
         statusHistory.setReason(reason);
@@ -268,7 +263,7 @@ public class OrderService {
         statusHistory.setNotes(reason);
         
         statusHistoryRepository.save(statusHistory);
-        System.out.println("Created status history for order: " + orderId + " - " + previousStatus + " -> " + newStatus);
+        System.out.println("Created status history for order: " + order.getId() + " - " + previousStatus + " -> " + newStatus);
     }
     
     private void createPaymentForOrder(Order order) {
@@ -335,7 +330,7 @@ public class OrderService {
     private OrderItemDto convertOrderItemToDto(OrderItem orderItem) {
         OrderItemDto dto = new OrderItemDto();
         dto.setId(orderItem.getId());
-        dto.setOrderId(orderItem.getOrderId());
+        dto.setOrderId(orderItem.getOrder() != null ? orderItem.getOrder().getId() : null);
         dto.setBookId(orderItem.getBookId());
         dto.setTitle(orderItem.getTitle());
         dto.setAuthor(orderItem.getAuthor());
@@ -350,7 +345,7 @@ public class OrderService {
     private OrderStatusHistoryDto convertStatusHistoryToDto(OrderStatusHistory statusHistory) {
         return new OrderStatusHistoryDto(
                 statusHistory.getId(),
-                statusHistory.getOrderId(),
+                statusHistory.getOrder() != null ? statusHistory.getOrder().getId() : null,
                 statusHistory.getPreviousStatus(),
                 statusHistory.getNewStatus(),
                 statusHistory.getReason(),
@@ -359,6 +354,7 @@ public class OrderService {
                 statusHistory.getCreatedAt()
         );
     }
+    
     
     @Transactional(readOnly = true)
     public OrderDto getOrderById(String orderId) {

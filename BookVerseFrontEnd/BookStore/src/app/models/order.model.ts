@@ -46,6 +46,7 @@ export interface Order {
   subtotal: number;
   discountAmount?: number;
   couponId?: string;
+  couponCode?: string; // Added from backend DTO
   taxAmount?: number;
   shippingAmount?: number;
   platformFee?: number;
@@ -65,7 +66,7 @@ export interface Order {
   // Additional fields
   notes?: string;
   
-  // Timestamps
+  // Timestamps - all available from backend
   createdAt: string;
   updatedAt: string;
   placedAt?: string;
@@ -145,11 +146,28 @@ export interface PaymentDetails {
   gatewayResponse?: any;
 }
 
+// Enhanced OrderStatusHistory to match backend
 export interface OrderStatusHistory {
+  id?: string;
+  orderId?: string;
   status: string;
+  previousStatus?: string;
   timestamp: string;
   note?: string;
   updatedBy?: string;
+  updatedByRole?: string;
+  reason?: string;
+  isSystemUpdate?: boolean;
+}
+
+// Enhanced OrderStatusHistoryDto for backend communication
+export interface OrderStatusHistoryDto {
+  orderId: string;
+  status: string;
+  previousStatus?: string;
+  note?: string;
+  updatedBy?: string;
+  reason?: string;
 }
 
 export interface OrderSummary {
@@ -161,4 +179,70 @@ export interface OrderSummary {
   finalAmount: number;
   totalPayable: number;
   itemCount: number;
+}
+
+// Enhanced order analytics interface
+export interface OrderAnalytics {
+  totalOrders: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  ordersByStatus: { [key: string]: number };
+  ordersByPaymentMethod: { [key: string]: number };
+  topSellingItems: { bookId: string; title: string; quantity: number; revenue: number }[];
+  monthlyTrends: { month: string; orders: number; revenue: number }[];
+  customerRetention: {
+    newCustomers: number;
+    returningCustomers: number;
+    retentionRate: number;
+  };
+}
+
+// Order utility functions
+export class OrderUtils {
+  static getStatusColor(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'warning';
+      case 'confirmed': return 'info';
+      case 'shipped': return 'primary';
+      case 'delivered': return 'success';
+      case 'cancelled': return 'danger';
+      default: return 'secondary';
+    }
+  }
+
+  static getPaymentStatusColor(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'warning';
+      case 'paid': return 'success';
+      case 'failed': return 'danger';
+      case 'refunded': return 'info';
+      default: return 'secondary';
+    }
+  }
+
+  static canCancelOrder(order: Order): boolean {
+    const cancelableStatuses = ['Pending', 'Confirmed'];
+    return cancelableStatuses.includes(order.orderStatus || '');
+  }
+
+  static getDeliveryEstimate(order: Order): string {
+    if (order.estimatedDelivery) {
+      return new Date(order.estimatedDelivery).toLocaleDateString();
+    }
+    // Default estimate based on order date
+    const orderDate = new Date(order.createdAt);
+    const estimatedDate = new Date(orderDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+    return estimatedDate.toLocaleDateString();
+  }
+
+  static calculateOrderProgress(order: Order): number {
+    const statusProgress: { [key: string]: number } = {
+      'Pending': 25,
+      'Confirmed': 50,
+      'Shipped': 75,
+      'Delivered': 100,
+      'Cancelled': 0
+    };
+    return statusProgress[order.orderStatus || 'Pending'] || 0;
+  }
 } 

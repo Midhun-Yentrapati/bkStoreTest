@@ -165,7 +165,7 @@
                         'bg-yellow-100 text-yellow-800': user.userRole === 'MODERATOR',
                         'bg-orange-100 text-orange-800': user.userRole === 'SUPPORT'
                       }">
-                  {{ getUserRoleText(user.userRole ?? 'CUSTOMER') }}
+                  {{ getUserRoleText(user.userRole || 'CUSTOMER') }}
                 </span>
               </td>
 

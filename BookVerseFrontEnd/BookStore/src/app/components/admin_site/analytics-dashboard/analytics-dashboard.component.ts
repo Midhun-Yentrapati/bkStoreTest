@@ -203,21 +203,21 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy, AfterView
     
     // Load multiple stats in parallel
     const topAdminsSubscription = this.analyticsService.getTopActiveAdmins().subscribe({
-      next: (admins) => this.topActiveAdmins = admins,
-      error: (error) => console.error('Error loading top admins:', error)
+      next: (admins: any[]) => this.topActiveAdmins = admins,
+      error: (error: any) => console.error('Error loading top admins:', error)
     });
 
     const commonActionsSubscription = this.analyticsService.getMostCommonActions().subscribe({
-      next: (actions) => this.commonActions = actions,
-      error: (error) => console.error('Error loading common actions:', error)
+      next: (actions: any[]) => this.commonActions = actions,
+      error: (error: any) => console.error('Error loading common actions:', error)
     });
 
     const errorLogsSubscription = this.analyticsService.getLogsWithErrors().subscribe({
-      next: (logs) => {
+      next: (logs: any[]) => {
         this.errorLogs = logs;
         this.isLoadingStats = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading error logs:', error);
         this.isLoadingStats = false;
       }

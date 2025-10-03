@@ -19,7 +19,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory-alerts")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @Tag(name = "Inventory Alerts", description = "Inventory alert management operations")
 public class InventoryAlertController {
 

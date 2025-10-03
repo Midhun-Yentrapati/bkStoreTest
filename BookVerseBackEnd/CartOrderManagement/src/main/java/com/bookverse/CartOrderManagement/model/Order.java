@@ -1,10 +1,14 @@
 package com.bookverse.CartOrderManagement.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,6 +23,7 @@ import java.util.Set;
 @Table(name = "orders")
 @Data
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order {
     
     @Id
@@ -109,12 +114,20 @@ public class Order {
     // Relationships
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<OrderItem> orderItems = new HashSet<>(); // <-- CHANGE HERE
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<OrderStatusHistory> statusHistory = new HashSet<>(); // <-- CHANGE HERE
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Payment> payments = new HashSet<>(); // <-- CHANGE HERE
     
     @ManyToOne(fetch = FetchType.LAZY)

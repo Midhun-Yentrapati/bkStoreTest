@@ -44,16 +44,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/coupons").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.PUT, "/api/coupons/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "/api/coupons/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
+                        .requestMatchers("/api/admin/orders").hasAnyAuthority("CUSTOMER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
 
                         // Admin order management
-                        .requestMatchers("/api/orders/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "MANAGER")
+                        .requestMatchers("/api/orders/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
                         
                         // User-specific endpoints for cart and wishlist
                         .requestMatchers("/api/cart/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
                         .requestMatchers("/api/wishlist/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
 
                         // All other order and payment operations require authentication
-                        .requestMatchers("/api/orders/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
+                        .requestMatchers("/api/orders/**").hasAnyAuthority("CUSTOMER", "ROLE_ADMIN", "TYPE_SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
                         .requestMatchers("/api/payments/**").hasAnyAuthority("CUSTOMER", "ADMIN", "SUPER_ADMIN", "MANAGER", "ROLE_CUSTOMER", "TYPE_CUSTOMER")
 
                         // All other requests require authentication

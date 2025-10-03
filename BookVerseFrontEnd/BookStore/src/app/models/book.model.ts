@@ -87,6 +87,7 @@ export interface BookImageRequest {
   altText?: string;
   displayOrder: number;
 }
+
 export interface CategoryInfo {
     id: number;
     name: string;
@@ -114,6 +115,30 @@ export interface BookWithSales extends BookModel {
     no_of_books_sold: number;
 }
 
+// Enhanced analytics interfaces to match backend
+export interface BookAnalytics {
+    totalSalesRevenue: number;
+    averageRating: number;
+    totalReviews: number;
+    salesTrend: 'up' | 'down' | 'stable';
+    popularityRank?: number;
+    inventoryStatus: 'in_stock' | 'low_stock' | 'out_of_stock';
+    lastSoldDate?: string;
+    topSellingCategory?: string;
+}
+
+export interface EnhancedBookModel extends BookModel {
+    analytics?: BookAnalytics;
+    relatedBooks?: BookModel[];
+    reviews?: CustomerRating[];
+    inventory?: {
+        displayStock: number;
+        actualStock: number;
+        reservedStock?: number;
+        lowStockThreshold?: number;
+    };
+}
+
 // Utility functions for safe property access
 export class BookUtils {
   static getFirstImageUrl(book: BookModel): string {
@@ -133,5 +158,27 @@ export class BookUtils {
 
   static hasMultipleImages(book: BookModel): boolean {
     return (book.image_urls?.length || 0) > 1 || (book.images?.length || 0) > 1;
+  }
+
+  static getInventoryStatus(book: BookModel): 'in_stock' | 'low_stock' | 'out_of_stock' {
+    const stock = book.stockActual || book.stock_actual || 0;
+    if (stock <= 0) return 'out_of_stock';
+    if (stock <= 5) return 'low_stock';
+    return 'in_stock';
+  }
+
+  static getDiscountPercentage(book: BookModel): number {
+    if (!book.mrp || book.mrp <= book.price) return 0;
+    return Math.round(((book.mrp - book.price) / book.mrp) * 100);
+  }
+
+  static formatSalesCategory(category: string): string {
+    switch (category) {
+      case 'BEST_SELLING': return 'Best Seller';
+      case 'NEWLY_LAUNCHED': return 'New Release';
+      case 'SPECIAL_OFFERS': return 'Special Offer';
+      case 'FEATURED': return 'Featured';
+      default: return category;
+    }
   }
 }

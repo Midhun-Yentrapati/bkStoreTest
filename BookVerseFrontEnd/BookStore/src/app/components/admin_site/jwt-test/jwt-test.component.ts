@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { AuthService } from '../../../services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-jwt-test',
@@ -76,65 +76,90 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class JwtTestComponent {
   authService = inject(AuthService);
-
+  private http = inject(HttpClient);
   
   testResults = '';
-  hasToken = false;
-  tokenPreview = '';
-  
-  ngOnInit() {
-    this.checkTokenStatus();
+
+  get hasToken(): boolean {
+    return !!localStorage.getItem('bookverse_token') || 
+           !!localStorage.getItem('bookverse_admin_token') ||
+           !!localStorage.getItem('bookverse_customer_token');
   }
-  
-  private checkTokenStatus() {
-    if (typeof localStorage !== 'undefined') {
-      const token = localStorage.getItem('bookverse_token');
-      this.hasToken = !!token;
-      if (token) {
-        // Show first and last 10 characters of token
-        this.tokenPreview = token.substring(0, 10) + '...' + token.substring(token.length - 10);
-      }
-    }
+
+  get tokenPreview(): string {
+    const token = localStorage.getItem('bookverse_token') || 
+                 localStorage.getItem('bookverse_admin_token') ||
+                 localStorage.getItem('bookverse_customer_token');
+    return token ? `${token.substring(0, 20)}...` : 'None';
   }
-  
+
   testPublicEndpoint() {
     this.addResult('Testing public endpoint...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addResult('✅ Public endpoint success (mock):', JSON.stringify({status: 'UP', service: 'auth-service'}, null, 2));
-    }, 500);
+    this.http.get('http://localhost:8090/api/test/health').subscribe({
+      next: (response) => {
+        this.addResult('✅ Public endpoint success:', response);
+      },
+      error: (error) => {
+        this.addResult('❌ Public endpoint failed:', error.message);
+      }
+    });
   }
   
   testAuthEndpoint() {
     this.addResult('Testing auth context endpoint...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addResult('✅ Auth context success (mock):', JSON.stringify({authenticated: true, user: 'test-user'}, null, 2));
-    }, 500);
+    this.http.get('http://localhost:8090/api/users/profile').subscribe({
+      next: (response) => {
+        this.addResult('✅ Auth context success:', response);
+      },
+      error: (error) => {
+        this.addResult('❌ Auth context failed:', error.message);
+      }
+    });
   }
   
   testJwtClaims() {
-    this.addResult('Testing JWT claims endpoint...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addResult('✅ JWT claims success (mock):', JSON.stringify({sub: 'user-id', userRole: 'ADMIN', exp: Date.now()}, null, 2));
-    }, 500);
+    this.addResult('Testing JWT claims...');
+    const token = localStorage.getItem('bookverse_token') || 
+                 localStorage.getItem('bookverse_admin_token') ||
+                 localStorage.getItem('bookverse_customer_token');
+    
+    if (!token) {
+      this.addResult('❌ No token found in storage');
+      return;
+    }
+
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        this.addResult('❌ Invalid token format');
+        return;
+      }
+      
+      const payload = JSON.parse(atob(parts[1]));
+      this.addResult('✅ JWT claims extracted successfully:', payload);
+    } catch (error) {
+      this.addResult('❌ Failed to decode JWT:', error);
+    }
   }
   
   testAdminEndpoint() {
     this.addResult('Testing admin endpoint...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addResult('✅ Admin endpoint success (mock):', JSON.stringify({customers: [], total: 0}, null, 2));
-    }, 500);
+    this.http.get('http://localhost:8090/api/admin/users').subscribe({
+      next: (response) => {
+        this.addResult('✅ Admin endpoint success:', response);
+      },
+      error: (error) => {
+        this.addResult('❌ Admin endpoint failed:', error.message);
+      }
+    });
   }
   
-  private addResult(message: string, data?: string) {
+  private addResult(message: string, data?: any) {
     const timestamp = new Date().toLocaleTimeString();
-    this.testResults += `[${timestamp}] ${message}\n`;
+    let formattedData = '';
     if (data) {
-      this.testResults += `${data}\n`;
+      formattedData = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
-    this.testResults += '\n';
+    this.testResults += `[${timestamp}] ${message}${formattedData ? '\n' + formattedData : ''}\n\n`;
   }
 }

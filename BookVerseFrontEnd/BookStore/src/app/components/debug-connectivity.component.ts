@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
-
 
 @Component({
   selector: 'app-debug-connectivity',
@@ -35,6 +35,12 @@ import { AuthService } from '../services/auth.service';
           class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
           Test Auth Service Direct (8081)
         </button>
+        
+        <button 
+          (click)="testBookCatalogService()" 
+          class="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600">
+          Test Book Catalog Service
+        </button>
       </div>
       
       <div class="mt-6">
@@ -54,7 +60,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class DebugConnectivityComponent {
   private authService = inject(AuthService);
-
+  private http = inject(HttpClient);
   
   logs: string[] = [];
 
@@ -66,34 +72,61 @@ export class DebugConnectivityComponent {
 
   testEurekaServer() {
     this.addLog('🔍 Testing Eureka Server...');
-    // Mock implementation - TODO: Use proper service
-    setTimeout(() => {
-      this.addLog('✅ Eureka Server is UP (mock): {"status":"UP","components":{"eureka":{"status":"UP"}}}');
-    }, 1000);
+    this.http.get('http://localhost:8761/actuator/health').subscribe({
+      next: (response) => {
+        this.addLog(`✅ Eureka Server is UP: ${JSON.stringify(response)}`);
+      },
+      error: (error) => {
+        this.addLog(`❌ Eureka Server test failed: ${error.message}`);
+      }
+    });
   }
 
   testApiGateway() {
     this.addLog('🔍 Testing API Gateway...');
-    // Mock implementation - TODO: Use proper service
-    setTimeout(() => {
-      this.addLog('✅ API Gateway is UP (mock): {"status":"UP"}');
-      this.addLog('📋 Gateway Routes (mock): [{"route_id":"user-auth","uri":"http://localhost:8081"},{"route_id":"admin-service","uri":"http://localhost:8084"}]');
-    }, 1000);
+    this.http.get('http://localhost:8090/gateway/api/endpoints').subscribe({
+      next: (response) => {
+        this.addLog(`✅ API Gateway is UP: ${JSON.stringify(response)}`);
+      },
+      error: (error) => {
+        this.addLog(`❌ API Gateway test failed: ${error.message}`);
+      }
+    });
   }
 
   testAuthService() {
     this.addLog('🔍 Testing Auth Service via API Gateway...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addLog('✅ Auth Service via Gateway is UP (mock): {"status":"UP","service":"user-authentication-service"}');
-    }, 1000);
+    this.http.get('http://localhost:8090/api/test/health').subscribe({
+      next: (response) => {
+        this.addLog(`✅ Auth Service via Gateway is UP: ${JSON.stringify(response)}`);
+      },
+      error: (error) => {
+        this.addLog(`❌ Auth Service via Gateway test failed: ${error.message}`);
+      }
+    });
   }
 
   testDirectAuthService() {
     this.addLog('🔍 Testing Auth Service directly...');
-    // Mock implementation - TODO: Use AuthService
-    setTimeout(() => {
-      this.addLog('✅ Auth Service direct is UP (mock): {"status":"UP","port":8081}');
-    }, 1000);
+    this.http.get('http://localhost:8081/api/test/health').subscribe({
+      next: (response) => {
+        this.addLog(`✅ Auth Service direct is UP: ${JSON.stringify(response)}`);
+      },
+      error: (error) => {
+        this.addLog(`❌ Auth Service direct test failed: ${error.message}`);
+      }
+    });
+  }
+
+  testBookCatalogService() {
+    this.addLog('🔍 Testing Book Catalog Service...');
+    this.http.get('http://localhost:8090/api/books/health').subscribe({
+      next: (response) => {
+        this.addLog(`✅ Book Catalog Service is UP: ${JSON.stringify(response)}`);
+      },
+      error: (error) => {
+        this.addLog(`❌ Book Catalog Service test failed: ${error.message}`);
+      }
+    });
   }
 }

@@ -1,55 +1,40 @@
 package com.bookstore.api_gateway.config;
 
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 public class GatewayConfig {
 
-	@Bean
-    public CorsWebFilter corsWebFilter() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        corsConfig.setMaxAge(3600L);
-        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        corsConfig.addAllowedHeader("*");
-        corsConfig.setAllowCredentials(true);
+    private static final Logger log = LoggerFactory.getLogger(GatewayConfig.class);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);
-
-        return new CorsWebFilter(source);
-    }
-
+    /**
+     * This GlobalFilter logs incoming requests and their Authorization headers.
+     * It helps in debugging authentication issues by showing what the gateway is receiving
+     * before forwarding the request to a downstream service.
+     */
     @Bean
-    public AuthHeaderGatewayFilterFactory authHeaderGatewayFilterFactory() {
-        return new AuthHeaderGatewayFilterFactory();
-    }
+    @Order(-1) // Ensure this filter runs early in the filter chain.
+    public GlobalFilter authHeaderLogger() {
+        return (exchange, chain) -> {
+            HttpHeaders headers = exchange.getRequest().getHeaders();
+            String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
 
-    public static class AuthHeaderGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
+            log.info("[API GATEWAY] Inbound Request: {} {}", exchange.getRequest().getMethod(), exchange.getRequest().getURI());
 
-        @Override
-        public GatewayFilter apply(Object config) {
-            return (exchange, chain) -> {
-                // Log the incoming request headers for debugging
-                HttpHeaders headers = exchange.getRequest().getHeaders();
-                String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
-                
-                System.out.println("[API GATEWAY] Processing request: " + exchange.getRequest().getURI());
-                System.out.println("[API GATEWAY] Authorization header: " + (authHeader != null ? "Bearer ***" : "null"));
-                
-                // The gateway should automatically forward all headers including Authorization
-                // This filter is mainly for logging and debugging
-                return chain.filter(exchange);
-            };
-        }
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                log.info("[API GATEWAY] Authorization header found and is being forwarded.");
+            } else {
+                log.warn("[API GATEWAY] No Authorization header found for request: {}", exchange.getRequest().getURI());
+            }
+
+            // Continue the filter chain. The headers are passed along by default.
+            return chain.filter(exchange);
+        };
     }
 }

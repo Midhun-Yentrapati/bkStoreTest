@@ -46,6 +46,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String roles = request.getHeader("X-User-Roles");
                 String userType = request.getHeader("X-User-Type");
                 
+                // Fallback: decode JWT roles if gateway headers are not present
+                if (userId == null || username == null || roles == null) {
+                    String token = authHeader.substring(7);
+                    try {
+                        // Very lightweight parsing: split JWT to get payload and decode base64 JSON
+                        String[] parts = token.split("\\.");
+                        if (parts.length == 3) {
+                            String payloadJson = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
+                            // Extract common claim names for roles and subject
+                            // This is a minimal JSON parse to avoid extra dependencies
+                            if (username == null) {
+                                username = extractJsonValue(payloadJson, "sub");
+                            }
+                            if (userId == null) {
+                                userId = extractJsonValue(payloadJson, "userId");
+                                if (userId == null) userId = extractJsonValue(payloadJson, "uid");
+                            }
+                            if (roles == null) {
+                                String realmRoles = extractJsonArrayAsCsv(payloadJson, "roles");
+                                if (realmRoles == null) realmRoles = extractJsonArrayAsCsv(payloadJson, "authorities");
+                                if (realmRoles == null) realmRoles = extractJsonArrayAsCsv(payloadJson, "scope");
+                                roles = realmRoles;
+                            }
+                            if (userType == null) {
+                                userType = extractJsonValue(payloadJson, "userType");
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.warn("Failed to parse JWT for fallback role extraction: {}", e.getMessage());
+                    }
+                }
+                
                 if (userId != null && username != null && roles != null) {
                     // Validate that user has admin privileges
                     if (!"ADMIN".equals(userType) && !roles.contains("ADMIN") && !roles.contains("SUPER_ADMIN") && !roles.contains("MANAGER")) {
@@ -64,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     log.debug("Admin authentication set for user: {} with roles: {}", username, roles);
                 } else {
-                    log.warn("Missing required headers for admin authentication");
+                    log.warn("Missing required headers/claims for admin authentication");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
@@ -89,5 +121,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                path.startsWith("/v3/api-docs/") ||
                path.startsWith("/swagger-resources/") ||
                path.startsWith("/webjars/");
+    }
+
+    // Minimal JSON helpers to avoid adding dependencies
+    private String extractJsonValue(String json, String key) {
+        try {
+            String pattern = "\"" + key + "\"\s*:\s*\""; // "key":"
+            int idx = json.indexOf(pattern);
+            if (idx >= 0) {
+                int start = idx + pattern.length();
+                int end = json.indexOf("\"", start);
+                if (end > start) {
+                    return json.substring(start, end);
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    private String extractJsonArrayAsCsv(String json, String key) {
+        try {
+            String pattern = "\"" + key + "\"\\s*:\\s*\\[([^\\]]+)\\]"; 
+            int idx = json.indexOf(pattern);
+            if (idx >= 0) {
+                int start = idx + pattern.length();
+                int end = json.indexOf("]", start);
+                if (end > start) {
+                    String arrayContent = json.substring(start, end);
+                    // Remove quotes and whitespace, join by comma
+                    String[] items = Arrays.stream(arrayContent.split(","))
+                            .map(s -> s.replace("\"", "").trim())
+                            .filter(s -> !s.isEmpty())
+                            .toArray(String[]::new);
+                    return String.join(",", items);
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 } 

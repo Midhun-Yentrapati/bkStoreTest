@@ -23,45 +23,34 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable()) // API Gateway handles CORS
+            .cors(cors -> cors.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                // Public endpoints - book browsing, categories, health checks
-                .requestMatchers(HttpMethod.GET, "/api/books").permitAll() // GET all books
-                .requestMatchers(HttpMethod.GET, "/api/books/{id}").permitAll() // GET book by ID
-                .requestMatchers(HttpMethod.GET, "/api/books/search/**").permitAll() // Book search
-                .requestMatchers(HttpMethod.GET, "/api/books/sales-category/**").permitAll() // Books by sales category
-                .requestMatchers(HttpMethod.GET, "/api/books/{id}/similar").permitAll() // Similar books
-                .requestMatchers(HttpMethod.GET, "/api/books/category/**").permitAll() // Books by category
-                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll() // Categories (read-only)
-                .requestMatchers("/api/books/health").permitAll() // Health check
-                .requestMatchers("/actuator/**").permitAll()
-                
-                // Documentation endpoints
-                .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                
-                // Admin-only endpoints - book management
+                // --- ADMIN/PROTECTED ENDPOINTS ---
                 .requestMatchers("/api/books/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
-                .requestMatchers("/api/books/{id}/images").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
-                
-                // Protected endpoints - require authentication for modifications
-                .requestMatchers(HttpMethod.POST, "/api/books").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                .requestMatchers(HttpMethod.POST, "/api/books").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
                 .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
                 .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER")
+                .requestMatchers("/api/reviews/admin/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
                 
-                // Review endpoints - authenticated users can create/modify their own reviews
-                .requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/api/reviews/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll() // Anyone can read reviews
-                
-                // All other requests require authentication
+                // --- CUSTOMER ENDPOINTS ---
+                .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyAuthority("ROLE_CUSTOMER", "CUSTOMER", "ROLE_ADMIN", "ADMIN", "ROLE_SUPER_ADMIN", "SUPER_ADMIN", "ROLE_MANAGER", "MANAGER")
+
+                // --- PUBLIC ENDPOINTS ---
+                .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reviews/book/**", "/api/reviews/search/**").permitAll()
+                .requestMatchers("/api/books/health", "/actuator/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                // All other requests must be authenticated
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
-} 
+}

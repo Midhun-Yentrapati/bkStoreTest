@@ -1,20 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookModel, BookUtils } from '../../../models/book.model';
+import { BookModel, BookUtils, CustomerRating } from '../../../models/book.model';
 import { BookService } from '../../../services/book.service';
 import { CartService } from '../../../services/cart.service';
 import { WishlistService } from '../../../services/wishlist.service';
 import { NotificationService } from '../../../services/notification.service';
+import { ReviewService } from '../../../services/review.service';
+import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { ReviewListComponent } from '../review-list/review-list.component';
 import { ReviewFormComponent } from '../review-form/review-form.component';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
 import { ShareModalComponent } from '../share-modal/share-modal.component';
+import { HorizontalBookSectionComponent } from '../horizontal-book-section/horizontal-book-section.component';
 
 @Component({
   selector: 'app-book-detail',
-  imports: [CommonModule, ReviewListComponent, ReviewFormComponent, ShareModalComponent],
+  imports: [CommonModule, ReviewListComponent, ReviewFormComponent, ShareModalComponent, HorizontalBookSectionComponent],
   templateUrl: './book-detail.component.html',
   styleUrl: './book-detail.component.css'
 })
@@ -35,11 +38,20 @@ export class BookDetailComponent implements OnInit {
   // Share modal properties
   showShareModal = false;
 
+  // Review properties
+  bookReviews: CustomerRating[] = [];
+  userReview: CustomerRating | null = null;
+  loadingReviews = false;
+  submittingReview = false;
+  reviewSubmissionSuccess = false;
+
   constructor( 
     private bookService: BookService,
     private cartService: CartService,
     private wishlistService: WishlistService,
     private notificationService: NotificationService,
+    private reviewService: ReviewService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
    ) { }
@@ -47,6 +59,7 @@ export class BookDetailComponent implements OnInit {
    ngOnInit(): void {
     this.id = String(this.route.snapshot.paramMap.get('id'));
     this.loadBookData();
+    this.loadReviews();
    }
 
    // Image gallery methods
@@ -97,7 +110,7 @@ export class BookDetailComponent implements OnInit {
     this.loadingSimilarBooks = true;
     this.bookService.getSimilarBooks(this.book.id).subscribe({
       next: (books: BookModel[]) => {
-        this.similarBooks = books.filter((b: BookModel) => b.id !== this.book.id).slice(0, 6);
+        this.similarBooks = books.filter((b: BookModel) => b.id !== this.book.id).slice(0, 10);
         this.loadingSimilarBooks = false;
       },
       error: (error: any) => {
@@ -211,18 +224,7 @@ export class BookDetailComponent implements OnInit {
     });
   }
 
-  // Review handling methods
-  onReviewSubmit(reviewData: { rating: number; review: string }): void {
-    console.log('Review submitted:', reviewData);
-    // In a real implementation, you would call a review service here
-    // For now, just show a success message
-    this.notificationService.success('Review Submitted', 'Thank you for your review!');
-  }
-
-  onReviewCancel(): void {
-    console.log('Review cancelled');
-  }
-
+  
   // Share modal methods
   openShareModal(): void {
     this.showShareModal = true;
@@ -282,4 +284,110 @@ export class BookDetailComponent implements OnInit {
       return dateString.toString();
     }
   }
+
+  // Review Methods
+  loadReviews(): void {
+    this.loadingReviews = true;
+    
+    // Load book reviews (public endpoint)
+    this.reviewService.getBookReviews(this.id).subscribe({
+      next: (reviews) => {
+        this.bookReviews = reviews;
+        this.loadingReviews = false;
+        console.log('Reviews loaded:', reviews.length);
+      },
+      error: (error) => {
+        console.error('Error loading reviews:', error);
+        this.bookReviews = []; // Set empty array on error
+        this.loadingReviews = false;
+      }
+    });
+
+    // Load user's existing review if logged in (requires auth)
+    if (this.authService.isLoggedIn()) {
+      this.reviewService.getUserReview(this.id).subscribe({
+        next: (review) => {
+          this.userReview = review;
+          console.log('User review loaded:', review);
+        },
+        error: (error) => {
+          console.log('No user review found or error loading user review:', error.status);
+          this.userReview = null;
+        }
+      });
+    } else {
+      console.log('User not logged in, skipping user review load');
+      this.userReview = null;
+    }
+  }
+
+  onReviewSubmit(reviewData: { rating: number; review: string }): void {
+    this.submittingReview = true;
+    this.reviewSubmissionSuccess = false;
+
+    if (this.userReview) {
+      // Update existing review
+      this.reviewService.updateReview(this.userReview.id!, reviewData.rating, reviewData.review).subscribe({
+        next: (success) => {
+          this.submittingReview = false;
+          this.reviewSubmissionSuccess = success;
+          if (success) {
+            this.notificationService.success('Review Updated', 'Review updated successfully!');
+            this.loadReviews(); // Reload reviews
+                      } else {
+              this.notificationService.error('Update Failed', 'Failed to update review. Please try again.');
+            }
+          },
+          error: (error) => {
+            console.error('Error updating review:', error);
+            this.submittingReview = false;
+            this.notificationService.error('Update Failed', 'Failed to update review. Please try again.');
+          }
+        });
+      } else {
+        // Submit new review
+        this.reviewService.submitReview(this.id, reviewData.rating, reviewData.review).subscribe({
+          next: (success) => {
+            this.submittingReview = false;
+            this.reviewSubmissionSuccess = success;
+            if (success) {
+              this.notificationService.success('Review Submitted', 'Review submitted successfully!');
+              this.loadReviews(); // Reload reviews
+            } else {
+              this.notificationService.error('Submission Failed', 'Failed to submit review. Please try again.');
+            }
+          },
+          error: (error) => {
+            console.error('Error submitting review:', error);
+            this.submittingReview = false;
+            this.notificationService.error('Submission Failed', 'Failed to submit review. Please try again.');
+          }
+        });
+      }
+    }
+
+    onReviewCancel(): void {
+      this.reviewSubmissionSuccess = false;
+    }
+
+    deleteUserReview(): void {
+      if (!this.userReview) return;
+
+      if (confirm('Are you sure you want to delete your review?')) {
+        this.reviewService.deleteReview(this.userReview.id!).subscribe({
+          next: (success) => {
+            if (success) {
+              this.notificationService.success('Review Deleted', 'Review deleted successfully!');
+              this.loadReviews(); // Reload reviews
+            } else {
+              this.notificationService.error('Delete Failed', 'Failed to delete review. Please try again.');
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting review:', error);
+            this.notificationService.error('Delete Failed', 'Failed to delete review. Please try again.');
+          }
+        });
+      }
+    }
 }

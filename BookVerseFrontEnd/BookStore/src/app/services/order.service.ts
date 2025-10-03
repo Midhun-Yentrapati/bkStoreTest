@@ -304,9 +304,9 @@ export class OrderService {
   }
 
   updatePaymentStatus(orderId: string, paymentStatus: Order['paymentStatus'], paymentDetails?: PaymentDetails): Observable<Order> {
-    // Use backend endpoint: PUT /api/orders/{orderId}/payment-status?paymentStatus={status}
+    // Use backend endpoint: PUT /api/orders/{orderId}/payment-status?status={status}
     return this.http.put<Order>(`${this.apiUrl}/${orderId}/payment-status`, null, {
-      params: { paymentStatus: paymentStatus! }
+      params: { status: paymentStatus! }
     }).pipe(
       catchError(error => {
         console.error('Error updating payment status:', error);

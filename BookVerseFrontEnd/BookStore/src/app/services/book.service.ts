@@ -68,31 +68,8 @@ export class BookService {
     const stringId = this.toStringId(id);
     const backendBook = this.mapFrontendBookToBackend(book);
     
-    // 🔍 DEBUG: Log service-level request details
-    console.group('🔧 BOOK SERVICE: updateBook() Method Called');
-    console.log('📍 Service Method: updateBook');
-    console.log('🆔 Book ID (original):', id);
-    console.log('🆔 Book ID (string):', stringId);
-    console.log('📤 Frontend Book Data:', book);
-    console.log('🔄 Mapped Backend Data:', backendBook);
-    console.log('📋 JSON Payload:', JSON.stringify(backendBook, null, 2));
-    console.log('🔍 JSON Validation Check:');
-    console.log('  - categoryIds type:', typeof backendBook.categoryIds, backendBook.categoryIds);
-    console.log('  - images type:', typeof backendBook.images, backendBook.images);
-    console.log('  - publicationDate type:', typeof backendBook.publicationDate, backendBook.publicationDate);
-    console.log('  - salesCategory type:', typeof backendBook.salesCategory, backendBook.salesCategory);
-    
-    // Test JSON stringification
-    try {
-      const testJson = JSON.stringify(backendBook);
-      console.log('✅ JSON stringification successful, length:', testJson.length);
-    } catch (error) {
-      console.error('❌ JSON stringification failed:', error);
-    }
-    console.log('🌐 Request URL:', `${this.booksUrl}/${stringId}`);
-    console.log('📡 HTTP Method: PUT');
-    console.log('⏰ Request Time:', new Date().toISOString());
-    console.groupEnd();
+    // Log basic request info
+    console.log('Updating book:', stringId);
     
     return this.http.put<any>(`${this.booksUrl}/${stringId}`, backendBook).pipe(
       map(updatedBook => {
@@ -726,121 +703,7 @@ export class BookService {
     );
   }
 
-  // Review Management Methods
-  
-  /**
-   * Add a review to a book
-   * @param bookId - Book ID
-   * @param review - Review data
-   * @returns Observable of updated book
-   */
-  addReview(bookId: string, review: { rating: number; review: string; userId?: string; userName?: string }): Observable<BookModel> {
-    return this.getBookById(bookId).pipe(
-      switchMap(book => {
-        if (!book.customerRatings) {
-          book.customerRatings = [];
-        }
-        
-        const newReview = {
-          userId: review.userId || 'anonymous',
-          userName: review.userName || 'Anonymous User',
-          rating: review.rating,
-          review: review.review,
-          createdAt: new Date().toISOString()
-        };
-        
-        book.customerRatings.push(newReview);
-        return this.updateBook(bookId, book);
-      }),
-      catchError(this.handleError<BookModel>('addReview'))
-    );
-  }
-  
-  /**
-   * Delete a review from a book
-   * @param bookId - Book ID
-   * @param userId - User ID who wrote the review
-   * @returns Observable of updated book
-   */
-  deleteReview(bookId: string | number, userId: string): Observable<BookModel> {
-    return this.getBookById(bookId).pipe(
-      switchMap(book => {
-        if (book.customerRatings) {
-          book.customerRatings = book.customerRatings.filter(r => r.userId !== userId);
-        }
-        return this.updateBook(bookId, book);
-      }),
-      catchError(this.handleError<BookModel>('deleteReview'))
-    );
-  }
-  
-  /**
-   * Update a review for a book
-   * @param bookId - Book ID
-   * @param userId - User ID who wrote the review
-   * @param updatedReview - Updated review data
-   * @returns Observable of updated book
-   */
-  updateReview(bookId: string, userId: string, updatedReview: { rating: number; review: string }): Observable<BookModel> {
-    return this.getBookById(bookId).pipe(
-      switchMap(book => {
-        if (book.customerRatings) {
-          const reviewIndex = book.customerRatings.findIndex(r => r.userId === userId);
-          if (reviewIndex !== -1) {
-            book.customerRatings[reviewIndex] = {
-              ...book.customerRatings[reviewIndex],
-              rating: updatedReview.rating,
-              review: updatedReview.review,
-              createdAt: new Date().toISOString() // Update timestamp
-            };
-          }
-        }
-        return this.updateBook(bookId, book);
-      }),
-      catchError(this.handleError<BookModel>('updateReview'))
-    );
-  }
-  
-  /**
-   * Get all reviews for a specific book
-   * @param bookId - Book ID
-   * @returns Observable of customer ratings array
-   */
-  getBookReviews(bookId: string): Observable<CustomerRating[]> {
-    return this.getBookById(bookId).pipe(
-      map(book => book.customerRatings || []),
-      catchError(this.handleError<CustomerRating[]>('getBookReviews', []))
-    );
-  }
-  
-  /**
-   * Get average rating for a book
-   * @param bookId - Book ID
-   * @returns Observable of average rating
-   */
-  getBookAverageRating(bookId: string): Observable<number> {
-    return this.getBookReviews(bookId).pipe(
-      map(reviews => {
-        if (reviews.length === 0) return 0;
-        const total = reviews.reduce((sum, review) => sum + review.rating, 0);
-        return Math.round((total / reviews.length) * 10) / 10;
-      }),
-      catchError(this.handleError<number>('getBookAverageRating', 0))
-    );
-  }
-
-  /**
-   * Get user's review for a specific book
-   * @param bookId - Book ID
-   * @param userId - User ID
-   * @returns Observable of customer rating or null
-   */
-  getUserReviewForBook(bookId: string, userId: string): Observable<CustomerRating | null> {
-    return this.getBookReviews(bookId).pipe(
-      map(reviews => reviews.find(r => r.userId === userId) || null),
-      catchError(this.handleError<CustomerRating | null>('getUserReviewForBook', null))
-    );
-  }
+  // Note: Review management is now handled by ReviewService using proper backend API endpoints
 
 
 }

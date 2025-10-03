@@ -14,6 +14,21 @@ export interface DailySalesSummary {
   topSellingItemQuantity: number;
   leastSellingItem: string;
   leastSellingItemQuantity: number;
+  // Additional fields from backend
+  cancelledOrders?: number;
+  deliveredOrders?: number;
+  pendingOrders?: number;
+  refundedOrders?: number;
+  topSellingCategory?: string;
+  topSellingBookId?: string;
+  topSellingBookTitle?: string;
+  leastSellingBookId?: string;
+  leastSellingBookTitle?: string;
+  newCustomers?: number;
+  returningCustomers?: number;
+  conversionRate?: number;
+  peakHour?: number;
+  peakHourOrders?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -47,6 +62,61 @@ export interface AnalyticsDashboard {
   averageOrderValue: number;
   topSellingItems: any[];
   leastSellingItems: any[];
+  // Additional comprehensive analytics
+  salesTrend?: {
+    daily: { date: string; revenue: number; orders: number }[];
+    weekly: { week: string; revenue: number; orders: number }[];
+    monthly: { month: string; revenue: number; orders: number }[];
+  };
+  customerAnalytics?: {
+    totalCustomers: number;
+    newCustomers: number;
+    returningCustomers: number;
+    retentionRate: number;
+    topSpenders: { customerId: string; name: string; totalSpent: number }[];
+  };
+  productAnalytics?: {
+    totalProducts: number;
+    lowStockProducts: number;
+    outOfStockProducts: number;
+    topCategories: { category: string; sales: number; revenue: number }[];
+  };
+  orderAnalytics?: {
+    ordersByStatus: { status: string; count: number }[];
+    ordersByPaymentMethod: { method: string; count: number; revenue: number }[];
+    averageDeliveryTime: number;
+    cancellationRate: number;
+  };
+}
+
+// Enhanced analytics interfaces
+export interface SalesTrendData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor?: string;
+    backgroundColor?: string;
+  }[];
+}
+
+export interface TopSellingBook {
+  bookId: string;
+  title: string;
+  author: string;
+  quantitySold: number;
+  revenue: number;
+  category: string;
+  averageRating?: number;
+}
+
+export interface CategoryPerformance {
+  categoryId: string;
+  categoryName: string;
+  totalSales: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  topBooks: TopSellingBook[];
 }
 
 @Injectable({
@@ -87,64 +157,64 @@ export class AnalyticsService {
     );
   }
 
-  // Statistics Methods
-  getTotalRevenueInRange(startDate: string, endDate: string): Observable<number> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  // Enhanced Analytics Methods
+  getTotalRevenue(startDate?: string, endDate?: string): Observable<number> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
     return this.http.get<number>(`${this.apiUrl}/stats/total-revenue`, { params }).pipe(
-      catchError(this.handleError<number>('getTotalRevenueInRange', 0))
+      catchError(this.handleError<number>('getTotalRevenue', 0))
     );
   }
 
-  getTotalOrdersInRange(startDate: string, endDate: string): Observable<number> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  getTotalOrders(startDate?: string, endDate?: string): Observable<number> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
     return this.http.get<number>(`${this.apiUrl}/stats/total-orders`, { params }).pipe(
-      catchError(this.handleError<number>('getTotalOrdersInRange', 0))
+      catchError(this.handleError<number>('getTotalOrders', 0))
     );
   }
 
-  getTotalItemsSoldInRange(startDate: string, endDate: string): Observable<number> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  getTopSellingBooks(limit: number = 10, startDate?: string, endDate?: string): Observable<TopSellingBook[]> {
+    let params = new HttpParams().set('limit', limit.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<number>(`${this.apiUrl}/stats/total-items-sold`, { params }).pipe(
-      catchError(this.handleError<number>('getTotalItemsSoldInRange', 0))
+    return this.http.get<TopSellingBook[]>(`${this.apiUrl}/books/top-selling`, { params }).pipe(
+      catchError(this.handleError<TopSellingBook[]>('getTopSellingBooks', []))
     );
   }
 
-  getAverageOrderValueInRange(startDate: string, endDate: string): Observable<number> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  getLeastSellingBooks(limit: number = 10, startDate?: string, endDate?: string): Observable<TopSellingBook[]> {
+    let params = new HttpParams().set('limit', limit.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<number>(`${this.apiUrl}/stats/average-order-value`, { params }).pipe(
-      catchError(this.handleError<number>('getAverageOrderValueInRange', 0))
+    return this.http.get<TopSellingBook[]>(`${this.apiUrl}/books/least-selling`, { params }).pipe(
+      catchError(this.handleError<TopSellingBook[]>('getLeastSellingBooks', []))
     );
   }
 
-  getTopSellingItemsInRange(startDate: string, endDate: string): Observable<any[]> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  getCategoryPerformance(startDate?: string, endDate?: string): Observable<CategoryPerformance[]> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<any[]>(`${this.apiUrl}/stats/top-selling-items`, { params }).pipe(
-      catchError(this.handleError<any[]>('getTopSellingItemsInRange', []))
+    return this.http.get<CategoryPerformance[]>(`${this.apiUrl}/categories/performance`, { params }).pipe(
+      catchError(this.handleError<CategoryPerformance[]>('getCategoryPerformance', []))
     );
   }
 
-  getLeastSellingItemsInRange(startDate: string, endDate: string): Observable<any[]> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+  getSalesTrend(period: 'daily' | 'weekly' | 'monthly' = 'daily', startDate?: string, endDate?: string): Observable<SalesTrendData> {
+    let params = new HttpParams().set('period', period);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<any[]>(`${this.apiUrl}/stats/least-selling-items`, { params }).pipe(
-      catchError(this.handleError<any[]>('getLeastSellingItemsInRange', []))
+    return this.http.get<SalesTrendData>(`${this.apiUrl}/sales-trend`, { params }).pipe(
+      catchError(this.handleError<SalesTrendData>('getSalesTrend', { labels: [], datasets: [] }))
     );
   }
 
@@ -172,80 +242,80 @@ export class AnalyticsService {
     );
   }
 
-  getAllActivityLogs(): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs`).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getAllActivityLogs', []))
+  logSuccessActivity(activityData: Partial<AdminActivityLog>): Observable<AdminActivityLog> {
+    return this.http.post<AdminActivityLog>(`${this.adminApiUrl}/activity/log-success`, activityData).pipe(
+      catchError(this.handleError<AdminActivityLog>('logSuccessActivity'))
     );
   }
 
-  getActivityLogsByAdminId(adminId: string): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/admin/${adminId}`).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getActivityLogsByAdminId', []))
+  logFailureActivity(activityData: Partial<AdminActivityLog>): Observable<AdminActivityLog> {
+    return this.http.post<AdminActivityLog>(`${this.adminApiUrl}/activity/log-failure`, activityData).pipe(
+      catchError(this.handleError<AdminActivityLog>('logFailureActivity'))
     );
   }
 
-  getActivityLogsByActionType(actionType: string): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/action/${actionType}`).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getActivityLogsByActionType', []))
-    );
-  }
-
-  getActivityLogsByStatus(status: string): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/status/${status}`).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getActivityLogsByStatus', []))
-    );
-  }
-
-  getActivityLogsByDateRange(startDate: string, endDate: string): Observable<AdminActivityLog[]> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
-
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/date-range`, { params }).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getActivityLogsByDateRange', []))
-    );
-  }
-
-  getRecentActivities(): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/recent`).pipe(
+  getRecentActivities(limit: number = 50): Observable<AdminActivityLog[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/recent`, { params }).pipe(
       catchError(this.handleError<AdminActivityLog[]>('getRecentActivities', []))
     );
   }
 
-  getTopActiveAdmins(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.adminApiUrl}/activity/stats/top-admins`).pipe(
-      catchError(this.handleError<any[]>('getTopActiveAdmins', []))
+  getActivitiesByAdmin(adminId: string, limit: number = 50): Observable<AdminActivityLog[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/admin/${adminId}`, { params }).pipe(
+      catchError(this.handleError<AdminActivityLog[]>('getActivitiesByAdmin', []))
     );
   }
 
-  getMostCommonActions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.adminApiUrl}/activity/stats/common-actions`).pipe(
-      catchError(this.handleError<any[]>('getMostCommonActions', []))
+  getActivitiesByAction(action: string, limit: number = 50): Observable<AdminActivityLog[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/action/${action}`, { params }).pipe(
+      catchError(this.handleError<AdminActivityLog[]>('getActivitiesByAction', []))
     );
   }
 
-  getLogsWithErrors(): Observable<AdminActivityLog[]> {
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/errors`).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getLogsWithErrors', []))
+  getActivitiesByStatus(status: string, limit: number = 50): Observable<AdminActivityLog[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/status/${status}`, { params }).pipe(
+      catchError(this.handleError<AdminActivityLog[]>('getActivitiesByStatus', []))
     );
   }
 
-  getSlowOperations(minDurationMs: number): Observable<AdminActivityLog[]> {
-    const params = new HttpParams().set('minDurationMs', minDurationMs.toString());
+  getActivitiesByDateRange(startDate: string, endDate: string): Observable<AdminActivityLog[]> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
 
-    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/slow-operations`, { params }).pipe(
-      catchError(this.handleError<AdminActivityLog[]>('getSlowOperations', []))
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/date-range`, { params }).pipe(
+      catchError(this.handleError<AdminActivityLog[]>('getActivitiesByDateRange', []))
     );
   }
 
   getActivityStatistics(): Observable<any> {
-    return this.http.get<any>(`${this.adminApiUrl}/activity/stats`).pipe(
+    return this.http.get<any>(`${this.adminApiUrl}/activity/statistics`).pipe(
       catchError(this.handleError<any>('getActivityStatistics', {}))
+    );
+  }
+
+  // Enhanced utility methods
+  exportAnalyticsData(startDate: string, endDate: string, format: 'csv' | 'excel' = 'csv'): Observable<Blob> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate)
+      .set('format', format);
+
+    return this.http.get(`${this.apiUrl}/export`, { 
+      params, 
+      responseType: 'blob' 
+    }).pipe(
+      catchError(this.handleError<Blob>('exportAnalyticsData'))
     );
   }
 
   // Utility method to log admin actions automatically
   logAdminAction(actionType: string, actionDescription: string, resourceId?: string, resourceType?: string): void {
+    // Get admin info from auth service or session storage
     const adminId = sessionStorage.getItem('loggedInUserId') || 'unknown';
     const adminUsername = sessionStorage.getItem('loggedInUsername') || 'unknown';
     const sessionId = sessionStorage.getItem('sessionId') || '';
@@ -268,6 +338,26 @@ export class AnalyticsService {
     });
   }
 
+  // Legacy methods for backward compatibility
+  getTopActiveAdmins(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.adminApiUrl}/activity/stats/top-admins`).pipe(
+      catchError(this.handleError<any[]>('getTopActiveAdmins', []))
+    );
+  }
+
+  getMostCommonActions(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.adminApiUrl}/activity/stats/common-actions`).pipe(
+      catchError(this.handleError<any[]>('getMostCommonActions', []))
+    );
+  }
+
+  getLogsWithErrors(): Observable<AdminActivityLog[]> {
+    return this.http.get<AdminActivityLog[]>(`${this.adminApiUrl}/activity/logs/errors`).pipe(
+      catchError(this.handleError<AdminActivityLog[]>('getLogsWithErrors', []))
+    );
+  }
+
+  // Error handling
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed:`, error);

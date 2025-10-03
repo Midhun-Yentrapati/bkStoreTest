@@ -89,9 +89,16 @@ function isPublicBookEndpoint(url: string): boolean {
   // Allow public book browsing endpoints
   const publicBookPatterns = [
     '/api/books',
-    '/api/categories',
-    '/api/reviews'
+    '/api/categories'
   ];
+  
+  // Check for specific public review endpoints (only specific GET operations)
+  if (url.includes('/api/reviews')) {
+    // Only allow public GET requests for reading reviews, not user-specific operations
+    return url.match(/\/api\/reviews\/book\/\d+$/) !== null || // GET /api/reviews/book/{id}
+           url.match(/\/api\/reviews\/book\/\d+\/page/) !== null || // GET /api/reviews/book/{id}/page
+           url.match(/\/api\/reviews\/book\/\d+\/stats/) !== null; // GET /api/reviews/book/{id}/stats
+  }
   
   return publicBookPatterns.some(pattern => {
     if (pattern === '/api/books') {

@@ -1,36 +1,40 @@
 <!-- book-detail.component.html -->
-<div class="container-fluid" *ngIf="book; else loading">
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <div class="container">
-      <div class="row align-items-center min-vh-75">
-        <div class="col-lg-5 mb-4 mb-lg-0">
-          <!-- Image Gallery -->
-          <div class="book-gallery">
+<div class="book-detail-container" *ngIf="book; else loading">
+  
+  <!-- Main Book Section - Images Left, Details Right -->
+  <section class="main-book-section">
+    <div class="container-fluid">
+      <div class="row g-4">
+        
+        <!-- Left Side - Image Gallery -->
+        <div class="col-lg-5 col-md-6">
+          <div class="image-gallery-section">
             <!-- Main Image Display -->
             <div class="main-image-container">
               <img 
                 [src]="getCurrentImage()" 
                 [alt]="book.title" 
-                class="book-hero-image"
+                class="book-main-image"
                 (click)="openImageModal()">
+              
+              <!-- Image Overlay Controls -->
               <div class="image-overlay">
-                <div class="gallery-actions">
+                <div class="gallery-controls">
                   <button 
-                    class="nav-btn prev-btn"
+                    class="control-btn prev-btn"
                     (click)="previousImage()"
                     *ngIf="hasMultipleImages()"
                     [attr.aria-label]="'Previous image'">
                     <span class="material-icons">chevron_left</span>
                   </button>
                   <button 
-                    class="zoom-btn"
+                    class="control-btn zoom-btn"
                     (click)="openImageModal()"
                     [attr.aria-label]="'View full size'">
                     <span class="material-icons">zoom_in</span>
                   </button>
                   <button 
-                    class="nav-btn next-btn"
+                    class="control-btn next-btn"
                     (click)="nextImage()"
                     *ngIf="hasMultipleImages()"
                     [attr.aria-label]="'Next image'">
@@ -46,11 +50,11 @@
             </div>
             
             <!-- Thumbnail Navigation -->
-            <div class="thumbnail-container" *ngIf="hasMultipleImages()">
-              <div class="thumbnails-wrapper">
+            <div class="thumbnail-navigation" *ngIf="hasMultipleImages()">
+              <div class="thumbnails-grid">
                 <button
                   *ngFor="let imageUrl of book.image_urls; let i = index"
-                  class="thumbnail-btn"
+                  class="thumbnail-item"
                   [class.active]="i === selectedImageIndex"
                   (click)="selectImage(i)"
                   [attr.aria-label]="'View image ' + (i + 1)">
@@ -61,126 +65,88 @@
           </div>
         </div>
         
-        <div class="col-lg-7">
-          <div class="book-details-content">
-            <div class="mb-3">
-              <span class="badge category-badge me-2" *ngFor="let category of getCategoryNames()">
+        <!-- Right Side - Book Details -->
+        <div class="col-lg-7 col-md-6">
+          <div class="book-details-panel">
+            
+            <!-- Category Badges -->
+            <div class="category-section">
+              <span class="category-badge" *ngFor="let category of getCategoryNames()">
                 {{ category }}
               </span>
-              <span class="badge sales-category-badge ms-2" *ngIf="book.salesCategory">
+              <span class="sales-badge" *ngIf="book.salesCategory">
                 {{ formatSalesCategory(book.salesCategory) }}
               </span>
             </div>
             
-            <h1 class="book-title">{{ book.title }}</h1>
-            <p class="book-author">by <span class="author-name">{{ book.author }}</span></p>
+            <!-- Title and Author -->
+            <div class="title-section">
+              <h1 class="book-title">{{ book.title }}</h1>
+              <p class="book-author">by <span class="author-name">{{ book.author }}</span></p>
+            </div>
             
             <!-- Rating Section -->
-            <div class="rating-section mb-3" *ngIf="book.averageRating && book.reviewCount">
+            <div class="rating-section" *ngIf="book.averageRating && book.reviewCount">
               <div class="rating-display">
-                <div class="stars">
+                <div class="stars-container">
                   <span *ngFor="let star of getStarArray(book.averageRating)" 
                         class="star" 
                         [class.filled]="star <= book.averageRating">
                     ★
                   </span>
                 </div>
-                <span class="rating-value">{{ book.averageRating | number:'1.1-1' }}</span>
-                <span class="rating-count">({{ book.reviewCount }} {{ book.reviewCount === 1 ? 'review' : 'reviews' }})</span>
-              </div>
-            </div>
-            
-            <div class="price-section mb-4">
-              <span class="current-price">₹{{ book.price | number:'1.2-2' }}</span>
-              <span class="original-price" *ngIf="book.mrp && book.mrp > book.price">₹{{ book.mrp | number:'1.2-2' }}</span>
-              <span class="discount-badge" *ngIf="book.mrp && book.mrp > book.price">
-                {{ getDiscountPercentage() }}% OFF
-              </span>
-              <span class="price-currency">INR</span>
-            </div>
-            
-            <p class="book-description">{{ book.description }}</p>
-            
-            <!-- Book Details Section -->
-            <div class="book-info-grid mb-4">
-              <div class="info-item" *ngIf="book.isbn">
-                <span class="info-label">ISBN:</span>
-                <span class="info-value">{{ book.isbn }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.publisher">
-                <span class="info-label">Publisher:</span>
-                <span class="info-value">{{ book.publisher }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.publicationDate">
-                <span class="info-label">Publication Date:</span>
-                <span class="info-value">{{ formatDate(book.publicationDate) }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.language">
-                <span class="info-label">Language:</span>
-                <span class="info-value">{{ book.language }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.format">
-                <span class="info-label">Format:</span>
-                <span class="info-value">{{ book.format }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.edition">
-                <span class="info-label">Edition:</span>
-                <span class="info-value">{{ book.edition }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.pages">
-                <span class="info-label">Pages:</span>
-                <span class="info-value">{{ book.pages }}</span>
-              </div>
-              <div class="info-item" *ngIf="book.weight">
-                <span class="info-label">Weight:</span>
-                <span class="info-value">{{ book.weight }} kg</span>
-              </div>
-              <div class="info-item" *ngIf="book.dimensions">
-                <span class="info-label">Dimensions:</span>
-                <span class="info-value">{{ book.dimensions }}</span>
-              </div>
-            </div>
-            
-            <!-- Sales Stats (for featured books) -->
-            <div class="sales-stats mb-4" *ngIf="book.noOfBooksSold || book.totalRevenue">
-              <div class="stats-grid">
-                <div class="stat-item" *ngIf="book.noOfBooksSold">
-                  <span class="stat-number">{{ book.noOfBooksSold | number }}</span>
-                  <span class="stat-label">Books Sold</span>
-                </div>
-                <div class="stat-item" *ngIf="book.totalRevenue">
-                  <span class="stat-number">₹{{ book.totalRevenue | number:'1.0-0' }}</span>
-                  <span class="stat-label">Total Revenue</span>
+                <div class="rating-info">
+                  <span class="rating-value">{{ book.averageRating | number:'1.1-1' }}</span>
+                  <span class="rating-count">({{ book.reviewCount }} {{ book.reviewCount === 1 ? 'review' : 'reviews' }})</span>
                 </div>
               </div>
+            </div>
+            
+            <!-- Price Section -->
+            <div class="price-section">
+              <div class="price-main">
+                <span class="current-price">₹{{ book.price | number:'1.2-2' }}</span>
+                <span class="price-currency">INR</span>
+              </div>
+              <div class="price-details" *ngIf="book.mrp && book.mrp > book.price">
+                <span class="original-price">₹{{ book.mrp | number:'1.2-2' }}</span>
+                <span class="discount-badge">{{ getDiscountPercentage() }}% OFF</span>
+              </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="description-section">
+              <p class="book-description">{{ book.description }}</p>
             </div>
             
             <!-- Stock Information -->
-            <div class="stock-info mb-4">
+            <div class="stock-section">
               <div class="stock-indicator" [ngClass]="{
                 'stock-available': book.stock_actual > 5,
                 'stock-low': book.stock_actual > 0 && book.stock_actual <= 5,
                 'stock-out': book.stock_actual <= 0
               }">
-                <span class="material-icons" [ngClass]="{
+                <span class="material-icons stock-icon" [ngClass]="{
                   'text-success': book.stock_actual > 5,
                   'text-warning': book.stock_actual > 0 && book.stock_actual <= 5,
                   'text-danger': book.stock_actual <= 0
                 }">
                   {{ book.stock_actual > 5 ? 'check_circle' : book.stock_actual > 0 ? 'warning' : 'cancel' }}
                 </span>
-                <span *ngIf="book.stock_actual > 5" class="stock-text">In Stock</span>
-                <span *ngIf="book.stock_actual > 0 && book.stock_actual <= 5" class="stock-text">
-                  Only {{ book.stock_actual }} left
-                </span>
-                <span *ngIf="book.stock_actual <= 0" class="stock-text">Out of Stock</span>
+                <div class="stock-info">
+                  <span *ngIf="book.stock_actual > 5" class="stock-text">In Stock</span>
+                  <span *ngIf="book.stock_actual > 0 && book.stock_actual <= 5" class="stock-text">
+                    Only {{ book.stock_actual }} left
+                  </span>
+                  <span *ngIf="book.stock_actual <= 0" class="stock-text">Out of Stock</span>
+                </div>
               </div>
             </div>
             
             <!-- Action Buttons -->
-            <div class="action-buttons">
+            <div class="action-section">
               <button 
-                class="btn btn-primary btn-cart" 
+                class="btn btn-primary btn-add-cart" 
                 (click)="addToCart()" 
                 [disabled]="addingToCart || book.stock_actual <= 0">
                 <span class="material-icons">shopping_cart</span>
@@ -206,7 +172,6 @@
                 </button>
               </ng-template>
               
-              <!-- Share Button -->
               <button 
                 class="btn btn-share" 
                 (click)="openShareModal()" 
@@ -216,89 +181,187 @@
               </button>
             </div>
             
-            <!-- Features -->
-            <div class="features-section mt-4">
-              <div class="feature-item">
-                <span class="material-icons">local_shipping</span>
-                <span>Free shipping on orders over ₹500</span>
-              </div>
-              <div class="feature-item">
-                <span class="material-icons">keyboard_return</span>
-                <span>30-day return policy</span>
-              </div>
-              <div class="feature-item">
-                <span class="material-icons">security</span>
-                <span>Secure payment</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- Book Reviews Section -->
-  <div class="reviews-section bg-gray-50 py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8">
-          <h3 class="mb-4">Customer Reviews</h3>
-          <app-review-list [reviews]="book.customerRatings || []" [bookTitle]="book.title"></app-review-list>
-        </div>
-        <div class="col-lg-4">
-          <h4 class="mb-3">Write a Review</h4>
-          <app-review-form 
-            [bookTitle]="book.title"
-            [existingRating]="0"
-            [existingReview]="''"
-            (reviewSubmit)="onReviewSubmit($event)"
-            (cancel)="onReviewCancel()">
-          </app-review-form>
-        </div>
-      </div>
-    </div>
-  </div>
+  </section>
 
-  <!-- Similar Books Section -->
-  <div class="similar-books-section">
-    <div class="container">
-      <div class="section-header text-center mb-5">
-        <h2 class="section-title">You Might Also Like</h2>
-        <p class="section-subtitle">Discover more books similar to {{ book.title }}</p>
+  <!-- Additional Information Sections Below -->
+  <div class="additional-info-sections">
+    
+    <!-- Book Information Grid -->
+    <section class="book-info-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Book Information</h2>
+        </div>
+        <div class="book-info-grid">
+          <div class="info-card" *ngIf="book.isbn">
+            <div class="info-label">ISBN</div>
+            <div class="info-value">{{ book.isbn }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.publisher">
+            <div class="info-label">Publisher</div>
+            <div class="info-value">{{ book.publisher }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.publicationDate">
+            <div class="info-label">Publication Date</div>
+            <div class="info-value">{{ formatDate(book.publicationDate) }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.language">
+            <div class="info-label">Language</div>
+            <div class="info-value">{{ book.language }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.format">
+            <div class="info-label">Format</div>
+            <div class="info-value">{{ book.format }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.edition">
+            <div class="info-label">Edition</div>
+            <div class="info-value">{{ book.edition }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.pages">
+            <div class="info-label">Pages</div>
+            <div class="info-value">{{ book.pages }}</div>
+          </div>
+          <div class="info-card" *ngIf="book.weight">
+            <div class="info-label">Weight</div>
+            <div class="info-value">{{ book.weight }} kg</div>
+          </div>
+          <div class="info-card" *ngIf="book.dimensions">
+            <div class="info-label">Dimensions</div>
+            <div class="info-value">{{ book.dimensions }}</div>
+          </div>
+        </div>
       </div>
-      
-      <div class="row" *ngIf="!loadingSimilarBooks && similarBooks.length > 0">
-        <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4" *ngFor="let similarBook of similarBooks">
-          <div class="similar-book-card" (click)="navigateToBook(similarBook.id)">
-            <div class="similar-book-image">
-              <img [src]="similarBook.image_urls?.[0] || 'https://placehold.co/150x200?text=No+Image'" [alt]="similarBook.title">
-              <div class="book-overlay">
-                <span class="material-icons">visibility</span>
-              </div>
+    </section>
+
+    <!-- Sales Stats (if available) -->
+    <section class="sales-stats-section" *ngIf="book.noOfBooksSold || book.totalRevenue">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Performance Stats</h2>
+        </div>
+        <div class="stats-container">
+          <div class="stat-card" *ngIf="book.noOfBooksSold">
+            <div class="stat-icon">
+              <span class="material-icons">trending_up</span>
             </div>
-            <div class="similar-book-info">
-              <h6 class="similar-book-title">{{ similarBook.title }}</h6>
-              <p class="similar-book-author">{{ similarBook.author }}</p>
-              <div class="similar-book-price">₹{{ similarBook.price | number:'1.2-2' }}</div>
+            <div class="stat-info">
+              <div class="stat-number">{{ book.noOfBooksSold | number }}</div>
+              <div class="stat-label">Books Sold</div>
+            </div>
+          </div>
+          <div class="stat-card" *ngIf="book.totalRevenue">
+            <div class="stat-icon">
+              <span class="material-icons">monetization_on</span>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">₹{{ book.totalRevenue | number:'1.0-0' }}</div>
+              <div class="stat-label">Total Revenue</div>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="text-center py-5" *ngIf="loadingSimilarBooks">
-        <div class="spinner" role="status">
-          <span class="visually-hidden">Loading similar books...</span>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <span class="material-icons">local_shipping</span>
+            </div>
+            <div class="feature-content">
+              <h4>Free Shipping</h4>
+              <p>On orders over ₹500</p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <span class="material-icons">keyboard_return</span>
+            </div>
+            <div class="feature-content">
+              <h4>Easy Returns</h4>
+              <p>30-day return policy</p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <span class="material-icons">security</span>
+            </div>
+            <div class="feature-content">
+              <h4>Secure Payment</h4>
+              <p>100% secure transactions</p>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <div class="text-center py-5" *ngIf="!loadingSimilarBooks && similarBooks.length === 0">
-        <p class="text-muted">No similar books found.</p>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <app-review-list [reviews]="bookReviews" [bookTitle]="book.title"></app-review-list>
+          </div>
+          <div class="col-lg-4">
+            <div class="review-form-container">
+              <h4 class="review-form-title">Write a Review</h4>
+              <app-review-form 
+                [bookTitle]="book.title"
+                [existingRating]="userReview?.rating || 0"
+                [existingReview]="userReview?.review || userReview?.comment || ''"
+                [isSubmitting]="submittingReview"
+                [submissionSuccess]="reviewSubmissionSuccess"
+                (reviewSubmit)="onReviewSubmit($event)"
+                (cancel)="onReviewCancel()">
+              </app-review-form>
+              
+              <div *ngIf="userReview" class="delete-review-section">
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteUserReview()">
+                  <span class="material-icons">delete</span>
+                  Delete My Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Similar Books Section -->
+    <section class="similar-books-section">
+      <div class="container">
+        <app-horizontal-book-section
+          *ngIf="!loadingSimilarBooks && similarBooks.length > 0"
+          [books]="similarBooks"
+          [sectionTitle]="'You Might Also Like'">
+        </app-horizontal-book-section>
+        
+        <div class="loading-state" *ngIf="loadingSimilarBooks">
+          <div class="spinner" role="status">
+            <span class="visually-hidden">Loading similar books...</span>
+          </div>
+          <p>Loading similar books...</p>
+        </div>
+        
+        <div class="empty-state" *ngIf="!loadingSimilarBooks && similarBooks.length === 0">
+          <div class="empty-icon">
+            <span class="material-icons">library_books</span>
+          </div>
+          <p>No similar books found.</p>
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
 
-<!-- Image Modal -->
+<!-- Image Modal (unchanged) -->
 <div class="image-modal" *ngIf="showImageModal" (click)="closeImageModal()">
   <div class="modal-backdrop"></div>
   <div class="modal-content" (click)="$event.stopPropagation()">
@@ -344,11 +407,11 @@
 
 <ng-template #loading>
   <div class="loading-container">
-    <div class="text-center">
+    <div class="loading-content">
       <div class="spinner" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <h5 class="text-muted">Loading book details...</h5>
+      <h5>Loading book details...</h5>
     </div>
   </div>
 </ng-template>
