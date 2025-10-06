@@ -37,7 +37,6 @@ import { TermsOfServiceComponent } from './components/customer_site/terms-of-ser
 import { CouponManagementComponent } from './components/admin_site/coupon-management/coupon-management.component';
 import { ManageReviewsComponent } from './components/admin_site/manage-reviews/manage-reviews.component';
 import { AnalyticsDashboardComponent } from './components/admin_site/analytics-dashboard/analytics-dashboard.component';
-import { AnalyticsTestComponent } from './components/admin_site/analytics-test/analytics-test.component';
 
 export const routes: Routes = [
   // Client-side routes
@@ -94,7 +93,6 @@ export const routes: Routes = [
       { path: 'coupons', component: CouponManagementComponent },
       { path: 'reviews', component: ManageReviewsComponent },
       { path: 'analytics', component: AnalyticsDashboardComponent },
-      { path: 'analytics-test', component: AnalyticsTestComponent },
       { path: 'jwt-test', loadComponent: () => import('./components/admin_site/jwt-test/jwt-test.component').then(m => m.JwtTestComponent) }
     ]
   },

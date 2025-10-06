@@ -9,7 +9,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cart")
 @Tag(name = "Cart Management", description = "Operations related to shopping cart management")
+@Slf4j
+@Validated
 public class CartController {
     
     private final CartService cartService;
@@ -33,7 +40,8 @@ public class CartController {
     })
     public ResponseEntity<List<CartItem>> getCartItemsByPath(
             @Parameter(description = "User ID", required = true, example = "user_123") 
-            @PathVariable String userId) {
+            @PathVariable @NotBlank String userId) {
+        log.info("Fetching cart items for user: {}", userId.replaceAll("[\\r\\n]", ""));
         return ResponseEntity.ok(cartService.getCartItems(userId));
     }
 
@@ -45,38 +53,44 @@ public class CartController {
     })
     public ResponseEntity<List<CartItem>> getCartItems(
             @Parameter(description = "User ID", required = true, example = "user_123") 
-            @RequestParam String userId) {
+            @RequestParam @NotBlank String userId) {
+        log.info("Fetching cart items for user via query param");
         return ResponseEntity.ok(cartService.getCartItems(userId));
     }
 
     @PostMapping
-    public ResponseEntity<CartItem> addToCart(@RequestBody CartItemDto cartItemDto) {
+    public ResponseEntity<CartItem> addToCart(@Valid @RequestBody CartItemDto cartItemDto) {
+        log.info("Adding item to cart for user");
         return ResponseEntity.ok(cartService.addToCart(cartItemDto));
     }
 
     @PostMapping("/move-from-wishlist")
     public ResponseEntity<CartItem> moveFromWishlistToCart(
-            @RequestParam String userId,
-            @RequestParam String bookId,
-            @RequestParam Integer quantity) {
+            @RequestParam @NotBlank String userId,
+            @RequestParam @NotBlank String bookId,
+            @RequestParam @Positive Integer quantity) {
+        log.info("Moving item from wishlist to cart");
         return ResponseEntity.ok(cartService.moveFromWishlistToCart(userId, bookId, quantity));
     }
 
     @PutMapping("/{cartItemId}")
     public ResponseEntity<CartItem> updateCartItem(
-            @PathVariable String cartItemId,
-            @RequestParam Integer quantity) {
+            @PathVariable @NotBlank String cartItemId,
+            @RequestParam @Positive Integer quantity) {
+        log.info("Updating cart item quantity");
         return ResponseEntity.ok(cartService.updateCartItem(cartItemId, quantity));
     }
 
     @DeleteMapping("/{cartItemId}")
-    public ResponseEntity<Void> removeFromCart(@PathVariable String cartItemId) {
+    public ResponseEntity<Void> removeFromCart(@PathVariable @NotBlank String cartItemId) {
+        log.info("Removing item from cart");
         cartService.removeFromCart(cartItemId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/user/{userId}/clear")
-    public ResponseEntity<Void> clearCart(@PathVariable String userId) {
+    public ResponseEntity<Void> clearCart(@PathVariable @NotBlank String userId) {
+        log.info("Clearing cart for user");
         cartService.clearCart(userId);
         return ResponseEntity.ok().build();
     }

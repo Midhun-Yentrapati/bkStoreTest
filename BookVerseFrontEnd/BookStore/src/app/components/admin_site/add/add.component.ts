@@ -394,18 +394,37 @@ export class AddComponent implements OnInit {
 
       // Log basic info
       console.log('Creating book:', bookData.title);
+      console.log('Submitting book with data:', bookData);
 
       this.bookService.createBookWithRelations(bookData).subscribe({
         next: (response: any) => {
           console.log('Book created successfully:', response);
           this.successMessage = 'Book created successfully!';
+          this.errorMessage = '';
           this.resetForms();
           this.isSubmitting = false;
         },
         error: (err: any) => {
           console.error('Failed to create book', err);
+          console.error('Error status:', err.status);
           console.error('Error details:', err.error);
-          this.errorMessage = `Failed to create book: ${err.error?.message || err.message || 'Unknown error'}`;
+          
+          let errorMsg = 'Failed to create book';
+          
+          if (err.status === 401) {
+            errorMsg = 'Authentication failed. Please login again.';
+          } else if (err.status === 403) {
+            errorMsg = 'Access denied. Admin privileges required.';
+          } else if (err.status === 400) {
+            errorMsg = `Validation error: ${err.error?.message || 'Invalid data provided'}`;
+          } else if (err.error?.message) {
+            errorMsg = err.error.message;
+          } else if (err.message) {
+            errorMsg = err.message;
+          }
+          
+          this.errorMessage = errorMsg;
+          this.successMessage = '';
           this.isSubmitting = false;
         }
       });

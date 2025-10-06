@@ -1,35 +1,28 @@
 package com.bookverse.CartOrderManagement.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
 
-@Schema(description = "Cart item data transfer object")
+@Data
 public class CartItemDto {
-    @Schema(description = "Cart item ID", example = "cart_123")
-    private String id;
-    @Schema(description = "User ID who owns the cart", example = "user_123", required = true)
+    
+    @NotBlank(message = "User ID is required")
+    @Size(max = 255, message = "User ID must not exceed 255 characters")
     private String userId;
-    @Schema(description = "Book ID to add to cart", example = "book_456", required = true)
+    
+    @NotBlank(message = "Book ID is required")
+    @Size(max = 255, message = "Book ID must not exceed 255 characters")
     private String bookId;
-    @Schema(description = "Quantity of books", example = "2", required = true)
+    
+    @NotNull(message = "Quantity is required")
+    @Positive(message = "Quantity must be positive")
+    @Max(value = 100, message = "Quantity cannot exceed 100")
     private Integer quantity;
-    @Schema(description = "Price when item was added to cart", example = "29.99", required = true)
+    
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
+    @Digits(integer = 10, fraction = 2, message = "Price must have at most 10 integer digits and 2 decimal places")
     private BigDecimal priceWhenAdded;
-
-    public CartItemDto() {}
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-
-    public String getBookId() { return bookId; }
-    public void setBookId(String bookId) { this.bookId = bookId; }
-
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
-
-    public BigDecimal getPriceWhenAdded() { return priceWhenAdded; }
-    public void setPriceWhenAdded(BigDecimal priceWhenAdded) { this.priceWhenAdded = priceWhenAdded; }
 }

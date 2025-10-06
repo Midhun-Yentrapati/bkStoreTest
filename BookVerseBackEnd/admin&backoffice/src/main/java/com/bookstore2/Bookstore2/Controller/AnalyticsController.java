@@ -15,6 +15,15 @@ public class AnalyticsController {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String ORDER_SERVICE_URL = "http://localhost:8090/api/orders";
     private final String BOOK_SERVICE_URL = "http://localhost:8090/api/books";
+    
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        Map<String, String> status = new HashMap<>();
+        status.put("status", "UP");
+        status.put("service", "admin-backoffice-service");
+        status.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.ok(status);
+    }
 
     @GetMapping("/dashboard")
     public ResponseEntity<Map<String, Object>> getDashboard(@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) {
@@ -53,11 +62,13 @@ public class AnalyticsController {
             
         } catch (Exception e) {
             System.out.println("Error fetching dashboard stats: " + e.getMessage());
+            e.printStackTrace();
             // Fallback data
             stats.put("totalOrders", 0);
             stats.put("pendingOrders", 0);
             stats.put("deliveredOrders", 0);
             stats.put("totalRevenue", BigDecimal.ZERO);
+            stats.put("error", "Failed to fetch data from order service");
         }
         
         return ResponseEntity.ok(stats);

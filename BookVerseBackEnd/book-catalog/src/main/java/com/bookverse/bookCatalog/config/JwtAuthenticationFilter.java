@@ -30,15 +30,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("Processing request: {} {}", request.getMethod(), request.getRequestURI());
+        log.info("Processing request: {} {}", request.getMethod(), request.getRequestURI().replaceAll("[\r\n]", ""));
 
         String authHeader = request.getHeader("Authorization");
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-User-Roles");
 
-        log.debug("Authorization Header: {}", authHeader);
-        log.debug("X-User-Id Header: {}", userId);
-        log.debug("X-User-Roles Header: {}", roles);
+        log.debug("Authorization Header present: {}", authHeader != null);
+        log.debug("X-User-Id Header present: {}", userId != null);
+        log.debug("X-User-Roles Header present: {}", roles != null);
 
         if (isPublicEndpoint(request)) {
             log.debug("Endpoint is public. Skipping JWT authentication.");
@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    log.debug("Authentication successful for user: {} with roles: {}", userId, authorities);
+                    log.debug("Authentication successful for user with {} roles", authorities.size());
                 } else {
                     log.debug("X-User headers not found. Falling back to JWT decoding.");
                     // Fallback JWT decoding logic...
@@ -75,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String[] tokenParts = token.split("\\.");
                         if (tokenParts.length == 3) {
                             String payload = new String(java.util.Base64.getUrlDecoder().decode(tokenParts[1]));
-                            log.debug("JWT payload: {}", payload);
+                            log.debug("JWT payload decoded successfully");
                             
                             if (payload.contains("\"userRole\"")) {
                                 String userRole = extractValueFromJson(payload, "userRole");
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                             new UsernamePasswordAuthenticationToken(userNameFromToken, null, authorities);
                                     
                                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                                    log.debug("Authentication successful from JWT for user: {} with role: {}", userNameFromToken, roleWithPrefix);
+                                    log.debug("Authentication successful from JWT");
                                 } else {
                                      log.warn("JWT payload missing 'userRole' or 'username'.");
                                 }
@@ -99,11 +99,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             }
                         }
                     } catch (Exception jwtError) {
-                        log.error("Error decoding JWT token: {}", jwtError.getMessage());
+                        log.error("Error decoding JWT token");
                     }
                 }
             } catch (Exception e) {
-                log.error("Error processing authentication token: {}", e.getMessage());
+                log.error("Error processing authentication token");
                 SecurityContextHolder.clearContext();
             }
         } else {
@@ -117,20 +117,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        if (path.startsWith("/api/books") && (HttpMethod.GET.name().equalsIgnoreCase(method) || HttpMethod.POST.name().equalsIgnoreCase(method))) {
+        // Allow all GET requests to books and categories
+        if (HttpMethod.GET.name().equalsIgnoreCase(method)) {
+            if (path.startsWith("/api/books") || path.startsWith("/api/categories") || 
+                path.startsWith("/api/reviews/book/")) {
+                return true;
+            }
+        }
+
+        // Allow OPTIONS requests for CORS
+        if (HttpMethod.OPTIONS.name().equalsIgnoreCase(method)) {
             return true;
         }
 
-        if (path.startsWith("/api/books/") && (HttpMethod.PUT.name().equalsIgnoreCase(method) || HttpMethod.PATCH.name().equalsIgnoreCase(method) || HttpMethod.DELETE.name().equalsIgnoreCase(method))) {
-            return true;
-        }
-
-        return path.startsWith("/api/categories") ||
-               path.startsWith("/actuator") ||
+        return path.startsWith("/actuator") ||
                path.startsWith("/swagger-ui") ||
                path.startsWith("/v3/api-docs") ||
-               path.equals("/api/books/health") ||
-               (path.startsWith("/api/reviews/book/") && !path.contains("/user/"));
+               path.equals("/api/books/health");
     }
     
     // extractValueFromJson method remains the same
@@ -157,7 +160,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return json.substring(startIndex, endIndex);
             }
         } catch (Exception e) {
-            log.error("Error extracting value from JSON: {}", e.getMessage());
+            log.error("Error extracting value from JSON");
             return null;
         }
     }

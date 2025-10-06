@@ -13,10 +13,10 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   let token: string | null = null;
   if (isPlatformBrowser(platformId)) {
     token = localStorage.getItem('bookverse_token');
-    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
+    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? 'present' : 'null');
     if (!token) {
       token = authService.getToken();
-      console.log('[AUTH INTERCEPTOR] Token from service:', token ? `${token.substring(0, 20)}...` : 'null');
+      console.log('[AUTH INTERCEPTOR] Token from service:', token ? 'present' : 'null');
     }
   } else {
     token = authService.getToken();
@@ -49,7 +49,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });
     
-    console.log('[AUTH INTERCEPTOR] Request headers:', authReq.headers.get('Authorization'));
+    console.log('[AUTH INTERCEPTOR] Authorization header added');
     
     return next(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
@@ -80,7 +80,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 function getTokenFromStorage(platformId: Object): string | null {
   if (isPlatformBrowser(platformId)) {
     const token = localStorage.getItem('bookverse_token');
-    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
+    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? 'present' : 'null');
     return token;
   }
   return null;
@@ -113,25 +113,26 @@ function isPublicEndpoint(url: string): boolean {
 }
 
 function isPublicBookEndpoint(url: string): boolean {
-  // Allow public book browsing endpoints
-  const publicBookPatterns = [
-    '/api/books',
-    '/api/categories'
-  ];
-  
-  // Check for specific public review endpoints (only specific GET operations)
-  if (url.includes('/api/reviews')) {
-    // Only allow public GET requests for reading reviews, not user-specific operations
-    return url.match(/\/api\/reviews\/book\/\d+$/) !== null || // GET /api/reviews/book/{id}
-           url.match(/\/api\/reviews\/book\/\d+\/page/) !== null || // GET /api/reviews/book/{id}/page
-           url.match(/\/api\/reviews\/book\/\d+\/stats/) !== null; // GET /api/reviews/book/{id}/stats
+  // Only allow GET requests to books and categories as public
+  // POST, PUT, DELETE require authentication
+  if (url.includes('/api/books') && !url.includes('/api/books/admin')) {
+    // Only GET requests are public for books
+    return false; // Let all book operations require auth
   }
   
-  return publicBookPatterns.some(pattern => {
-    if (pattern === '/api/books') {
-      // Allow public book browsing but not admin book operations
-      return url.includes('/api/books') && !url.includes('/api/books/admin');
-    }
-    return url.includes(pattern);
-  });
+  if (url.includes('/api/categories')) {
+    // Only GET requests are public for categories
+    return false; // Let all category operations require auth
+  }
+  
+  // Allow public review endpoints
+  if (url.includes('/api/reviews/book/') && !url.includes('/user/')) {
+    return true;
+  }
+  
+  if (url.includes('/api/reviews/search')) {
+    return true;
+  }
+  
+  return false;
 }

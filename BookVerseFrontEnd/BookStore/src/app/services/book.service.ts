@@ -49,17 +49,29 @@ export class BookService {
   // Create new book
   createBook(book: Omit<BookModel, 'id'>): Observable<BookModel> {
     const backendBook = this.mapFrontendBookToBackend(book);
+    console.log('Creating book with data:', backendBook);
     return this.http.post<any>(this.booksUrl, backendBook).pipe(
       map(createdBook => this.mapBackendBookToFrontend(createdBook)),
-      catchError(this.handleError<BookModel>('createBook'))
+      catchError(error => {
+        console.error('Book creation failed:', error);
+        throw error;
+      })
     );
   }
 
   // Create new book with relations (categories and images)
   createBookWithRelations(bookData: any): Observable<BookModel> {
+    console.log('Creating book with relations:', bookData);
     return this.http.post<any>(this.booksUrl, bookData).pipe(
-      map(createdBook => this.mapBackendBookToFrontend(createdBook)),
-      catchError(this.handleError<BookModel>('createBookWithRelations'))
+      map(createdBook => {
+        console.log('Book created successfully:', createdBook);
+        return this.mapBackendBookToFrontend(createdBook);
+      }),
+      catchError(error => {
+        console.error('Book creation with relations failed:', error);
+        console.error('Error details:', error.error);
+        throw error;
+      })
     );
   }
 
@@ -520,8 +532,11 @@ export class BookService {
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(`${operation} failed: ${error.message}`);
-      return of(result as T);
+      console.error(`${operation} failed:`, error);
+      console.error('Error status:', error.status);
+      console.error('Error message:', error.message);
+      console.error('Error body:', error.error);
+      throw error; // Re-throw to allow component to handle
     };
   }
 

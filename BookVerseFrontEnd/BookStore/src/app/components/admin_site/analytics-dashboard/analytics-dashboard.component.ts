@@ -66,38 +66,50 @@ export class AnalyticsDashboardComponent implements OnInit {
    */
   loadDashboardData(): void {
     this.isLoading = true;
+    console.log('Loading dashboard data for period:', this.startDate, 'to', this.endDate);
 
     // Use forkJoin to manage multiple API calls efficiently and concurrently
     forkJoin({
-      // Fetches Revenue, Orders, Items Sold, AOV from Admin/Analytics Service
-      dashboard: this.analyticsService.getAnalyticsDashboard(this.startDate, this.endDate),
-      // Fetches Top Selling Books from Book Catalog Service
-      topBooks: this.analyticsService.getTopSellingBooks(5, this.startDate, this.endDate),
-      // Fetches Least Selling Books from Book Catalog Service
-      leastBooks: this.analyticsService.getLeastSellingBooks(5, this.startDate, this.endDate)
+      // Fetches basic stats from Admin/Analytics Service
+      dashboardStats: this.analyticsService.getDashboardStats(),
+      // Fetches sales trends from Admin/Analytics Service
+      salesTrends: this.analyticsService.getSalesTrendsData(),
+      // Fetches Top Selling Books from Admin/Analytics Service
+      topBooks: this.analyticsService.getTopSellingBooksData(),
+      // Fetches Least Selling Books from Admin/Analytics Service
+      leastBooks: this.analyticsService.getLeastSellingBooksData()
     }).subscribe({
       next: (results) => {
-        // The structure of the AnalyticsDashboard interface aligns with the backend Map<String, Object> 
-        // returned by AnalyticsController.getAnalyticsDashboard
-        this.dashboardData = results.dashboard; 
+        console.log('Dashboard data loaded:', results);
         
-        // This relies on the Angular service mapping the generic backend 'Object[]' response
-        // for top/least selling items to the TopSellingBook[] interface.
-        this.topSellingBooks = results.topBooks.map(item => ({
-            bookId: item.bookId,
-            title: item.title,
-            author: item.author || 'N/A',
-            quantitySold: item.quantitySold,
+        // Map dashboard stats
+        const stats = results.dashboardStats;
+        this.dashboardData = {
+          totalRevenue: stats.totalRevenue || 0,
+          totalOrders: stats.totalOrders || 0,
+          totalItemsSold: stats.pendingOrders + stats.deliveredOrders || 0,
+          averageOrderValue: stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders) : 0,
+          topSellingItems: results.topBooks || [],
+          leastSellingItems: results.leastBooks || []
+        };
+        
+        // Map top selling books
+        this.topSellingBooks = (results.topBooks || []).map((item: any) => ({
+            bookId: item.bookId || item.id,
+            title: item.title || 'Unknown Title',
+            author: item.author || 'Unknown Author',
+            quantitySold: item.quantitySold || 0,
             revenue: item.revenue || 0,
             category: item.category || 'N/A',
             averageRating: item.averageRating || 0,
         } as TopSellingBook));
 
-        this.leastSellingBooks = results.leastBooks.map(item => ({
-          bookId: item.bookId,
-          title: item.title,
-          author: item.author || 'N/A',
-          quantitySold: item.quantitySold,
+        // Map least selling books
+        this.leastSellingBooks = (results.leastBooks || []).map((item: any) => ({
+          bookId: item.bookId || item.id,
+          title: item.title || 'Unknown Title',
+          author: item.author || 'Unknown Author',
+          quantitySold: item.quantitySold || 0,
           revenue: item.revenue || 0,
           category: item.category || 'N/A',
           averageRating: item.averageRating || 0,
@@ -109,8 +121,15 @@ export class AnalyticsDashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading analytics dashboard:', error);
         this.isLoading = false;
-        // Optionally set default/error state values
-        this.dashboardData = {totalRevenue: 0, totalOrders: 0, totalItemsSold: 0, averageOrderValue: 0, topSellingItems: [], leastSellingItems: []};
+        // Set default/error state values
+        this.dashboardData = {
+          totalRevenue: 0, 
+          totalOrders: 0, 
+          totalItemsSold: 0, 
+          averageOrderValue: 0, 
+          topSellingItems: [], 
+          leastSellingItems: []
+        };
         this.topSellingBooks = [];
         this.leastSellingBooks = [];
         this.updateCards();

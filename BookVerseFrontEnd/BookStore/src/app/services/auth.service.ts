@@ -117,9 +117,11 @@ export class AuthService {
 
   private initializeAuthState() {
     if (!this._isInitialized()) {
+      console.log('🚀 Initializing auth state...');
       
       // ENSURE: Only proceed if in browser environment
       if (!isPlatformBrowser(this.platformId)) {
+        console.log('⚠️ Not in browser environment, skipping auth initialization');
         this._isInitialized.set(true);
         return;
       }
@@ -173,6 +175,18 @@ export class AuthService {
       }
       
       this._isInitialized.set(true);
+      console.log('✅ Auth state initialization completed');
+      
+      // Log final state for debugging
+      const finalToken = this.getToken();
+      const finalCustomer = this.currentCustomer();
+      const finalAdmin = this.currentAdmin();
+      console.log('📊 Final auth state:', {
+        hasToken: !!finalToken,
+        hasCustomer: !!finalCustomer,
+        hasAdmin: !!finalAdmin,
+        isLoggedIn: this.isLoggedIn()
+      });
     }
   }
 
@@ -184,63 +198,60 @@ export class AuthService {
     if (typeof credentialsOrEmail === 'string' && password) {
       // Admin login format (email, password)
       loginRequest = {
-        usernameOrEmail: credentialsOrEmail,  // Fixed: use usernameOrEmail instead of identifier
+        usernameOrEmail: credentialsOrEmail,
         password: password
       };
     } else {
       // Customer login format (credentials object)
       const credentials = credentialsOrEmail;
       loginRequest = {
-        usernameOrEmail: credentials.identifier,  // Fixed: map identifier to usernameOrEmail
+        usernameOrEmail: credentials.identifier,
         password: credentials.password
       };
     }
     
     console.log('Unified login attempt for:', loginRequest.usernameOrEmail);
     
-    // Use single login endpoint - backend determines user type
     return this.http.post<any>(`${this.authUrl}/login`, loginRequest).pipe(
       tap(response => {
+        console.log('Login response received:', response);
         
-        // Check if login was successful
-        if (response && response.success) {
+        // Handle successful response - check for token OR success message
+        if (response && (response.token || response.accessToken || response.message === 'Authentication successful')) {
           console.log('Login successful, processing response...');
           
-          // Store JWT tokens
-          if (isPlatformBrowser(this.platformId)) {
-            if (response.accessToken) {
-              localStorage.setItem('bookverse_token', response.accessToken);
-              console.log('Access token stored:', response.accessToken.substring(0, 20) + '...');
-              // Verify token was stored
-              const storedToken = localStorage.getItem('bookverse_token');
-              console.log('Token verification - stored successfully:', !!storedToken);
+          // Store token if present (check multiple possible token field names)
+          const token = response.token || response.accessToken;
+          if (token && isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('bookverse_token', token);
+            console.log('✅ Access token stored:', token.substring(0, 20) + '...');
+            
+            const refreshToken = response.refreshToken || response.refresh_token;
+            if (refreshToken) {
+              localStorage.setItem('bookverse_refresh_token', refreshToken);
+              console.log('✅ Refresh token stored');
             }
-            if (response.refreshToken) {
-              localStorage.setItem('bookverse_refresh_token', response.refreshToken);
-              console.log('Refresh token stored');
-            }
+            
+            // Verify token was stored correctly
+            const verifyToken = localStorage.getItem('bookverse_token');
+            console.log('🔍 Token verification after storage:', verifyToken ? 'SUCCESS' : 'FAILED');
+          } else if (!token) {
+            console.warn('⚠️ No token found in response, but login was successful');
+            console.log('Response structure:', Object.keys(response));
           }
           
-          // Handle user based on role from backend response
+          // Handle user data if present
           if (response.user) {
             const user = response.user;
-            
-            // Check if user is admin based on role
             if (user.userRole && user.userRole !== 'CUSTOMER') {
-              // Admin user
               this.currentAdmin.set(user);
               this.currentCustomer.set(null);
               if (isPlatformBrowser(this.platformId)) {
                 localStorage.setItem('bookverse_admin', JSON.stringify(user));
                 localStorage.removeItem('bookverse_customer');
-                // Store session data for analytics service
-                sessionStorage.setItem('loggedInUserId', user.id || user.employeeId || 'unknown');
-                sessionStorage.setItem('loggedInUsername', user.username || user.fullName || 'unknown');
-                sessionStorage.setItem('sessionId', crypto.randomUUID());
               }
               console.log('Admin login successful for:', user.username || user.fullName);
             } else {
-              // Customer user - transform data before storing
               const transformedUser = this.transformUserData(user);
               this.currentCustomer.set(transformedUser);
               this.currentAdmin.set(null);
@@ -250,25 +261,29 @@ export class AuthService {
               }
               console.log('Customer login successful for:', transformedUser.fullName || transformedUser.username);
             }
-          } else {
-            console.warn('No user data in response');
           }
+        } else if (response && response.message && response.message.includes('failed')) {
+          // Only throw error if response explicitly indicates failure
+          console.error('Login failed:', response.message);
+          throw new Error(response.message);
         } else {
-          console.error('Login response indicates failure:', response);
-          throw new Error(response?.message || 'Login failed');
+          console.error('Login response indicates failure or is malformed:', response);
+          throw new Error(response?.message || 'Login failed due to invalid response');
         }
       }),
       map(response => {
-        // Return the user data for the component
-        if (response && response.success && response.user) {
+        if (response && response.user) {
           return response.user;
+        }
+        // If no user object but authentication was successful, return a basic user object
+        if (response && response.message === 'Authentication successful') {
+          return { message: 'Authentication successful' };
         }
         throw new Error('Invalid login response');
       }),
       catchError(err => {
         let errorMessage = 'Login failed';
         
-        // Handle backend error structure
         if (err.error) {
           if (err.error.message) {
             errorMessage = err.error.message;
@@ -285,23 +300,7 @@ export class AuthService {
     );
   }
 
-  register(userData: any): Observable<UserModel>;
-  register(userData: {
-    fullName: string;
-    username: string;
-    email: string;
-    mobileNumber: string;
-    password: string;
-  }): Observable<UserModel>;
-  register(userData: any | {
-    fullName: string;
-    username: string;
-    email: string;
-    mobileNumber: string;
-    password: string;
-  }): Observable<UserModel> {
-    
-    // Use the customerRegister method which calls the backend registration endpoint
+  register(userData: any): Observable<UserModel> {
     return this.customerRegister(userData);
   }
 
@@ -314,60 +313,49 @@ export class AuthService {
     password: string;
   }): Observable<UserModel> {
     
-    // Create registration request payload matching backend requirements
     const registrationData = {
       fullName: userData.fullName,
       username: userData.username,
       email: userData.email,
       mobileNumber: userData.mobileNumber,
       password: userData.password,
-      confirmPassword: userData.password // Backend requires confirmPassword field
+      confirmPassword: userData.password
     };
     
-    // Make HTTP POST request to backend registration endpoint
     return this.http.post<any>(`${this.authUrl}/register`, registrationData).pipe(
       map(response => {
-        
-        // Check if registration was successful
-        if (response && response.success) {
+        // --- START: MODIFIED CODE ---
+        // Correctly handle the backend response with "token" and "user"
+        if (response && response.token && response.user) {
           
-          // Store JWT tokens if provided
           if (isPlatformBrowser(this.platformId)) {
-            if (response.accessToken) {
-              localStorage.setItem('bookverse_token', response.accessToken);
-            }
+            localStorage.setItem('bookverse_token', response.token);
             if (response.refreshToken) {
               localStorage.setItem('bookverse_refresh_token', response.refreshToken);
             }
           }
           
-          // Set current user if provided
-          if (response.user) {
-            this.currentCustomer.set(response.user);
-            if (isPlatformBrowser(this.platformId)) {
-              localStorage.setItem('bookverse_customer', JSON.stringify(response.user));
-            }
-            return response.user;
+          const transformedUser = this.transformUserData(response.user);
+          this.currentCustomer.set(transformedUser);
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('bookverse_customer', JSON.stringify(transformedUser));
           }
-          
-          // If no user data in response, throw error
-          throw new Error('Registration successful but no user data received');
+          return transformedUser;
+
         } else {
-          // Registration failed
           throw new Error(response?.message || 'Registration failed');
         }
+        // --- END: MODIFIED CODE ---
       }),
       catchError(err => {
         let errorMessage = 'Registration failed';
         
-        // Handle backend error structure
         if (err.error) {
           if (err.error.message) {
             errorMessage = err.error.message;
           } else if (err.error.errorDetails) {
             errorMessage = err.error.errorDetails;
           } else if (err.error.validationErrors) {
-            // Handle validation errors from backend
             const validationErrors = Object.values(err.error.validationErrors).join(', ');
             errorMessage = `Validation failed: ${validationErrors}`;
           }
@@ -392,7 +380,6 @@ export class AuthService {
     employeeId?: string;
   }): Observable<any> {
     
-    // Create admin registration request payload matching backend requirements
     const adminRegistrationData = {
       username: adminData.username,
       email: adminData.email,
@@ -407,9 +394,7 @@ export class AuthService {
     return this.http.post<any>(`${this.authUrl}/admin/register`, adminRegistrationData).pipe(
       tap(response => {
         
-        // If registration includes auto-login, handle the response
         if (response.user && response.accessToken) {
-          // Store the admin user and token
           this.currentAdmin.set(response.user);
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('bookverse_admin', JSON.stringify(response.user));
@@ -423,14 +408,12 @@ export class AuthService {
       catchError(err => {
         let errorMessage = 'Admin registration failed';
         
-        // Handle backend error structure
         if (err.error) {
           if (err.error.message) {
             errorMessage = err.error.message;
           } else if (err.error.errorDetails) {
             errorMessage = err.error.errorDetails;
           } else if (err.error.validationErrors) {
-            // Handle validation errors from backend
             const validationErrors = Object.values(err.error.validationErrors).join(', ');
             errorMessage = `Validation failed: ${validationErrors}`;
           }
@@ -467,7 +450,6 @@ export class AuthService {
       return throwError(() => new Error('No user logged in'));
     }
 
-    // Create clean user DTO without timestamps (let backend handle them)
     const userDTO = {
       fullName: userData.fullName,
       username: userData.username,
@@ -478,14 +460,9 @@ export class AuthService {
       profilePicture: userData.profilePicture
     };
 
-    // Use correct backend endpoint for profile update
     return this.http.put<any>(`${this.usersUrl}/profile`, userDTO).pipe(
-      map(backendUser => {
-        // Transform backend response using shared utility
-        return this.transformUserData(backendUser);
-      }),
+      map(backendUser => this.transformUserData(backendUser)),
       tap(user => {
-        // Update signal and localStorage with transformed data
         this.currentCustomer.set(user);
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_customer', JSON.stringify(user));
@@ -495,23 +472,20 @@ export class AuthService {
     );
   }
 
-  // for username 
   checkUsernameAvailability(username: string): Observable<boolean> {
     return this.http.get<UserModel[]>(this.usersUrl).pipe(
       map(users => !users.some(u => u.username === username)),
-      catchError(() => of(true)) // Assume available on error
+      catchError(() => of(true))
     );
   }
 
-  // for email
   checkEmailAvailability(email: string): Observable<boolean> {
     return this.http.get<UserModel[]>(this.usersUrl).pipe(
       map(users => !users.some(u => u.email === email)),
-      catchError(() => of(true)) // Assume available on error
+      catchError(() => of(true))
     );
   }
 
-  // New helper methods for role-based authentication
   isCustomerLoggedIn(): boolean {
     return !!this.currentCustomer();
   }
@@ -528,7 +502,6 @@ export class AuthService {
     return this.currentAdmin();
   }
 
-  // Role-specific logout methods
   logoutCustomer(): void {
     console.log('Logging out customer user.');
     this.performLogout();
@@ -547,14 +520,11 @@ export class AuthService {
     this.router.navigate(['/']);
   }
 
-  // Comprehensive logout that clears all session data
   private performLogout(): void {
     console.log('Performing complete logout...');
     
-    // Call backend logout endpoint if token exists
     const token = this.getToken();
     if (token) {
-      // Make logout API call to invalidate session on backend
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -570,17 +540,20 @@ export class AuthService {
       });
     }
     
-    // Clear all authentication data from storage
     this.clearAllStorage();
     
     console.log('Logout completed - all session data cleared');
   }
 
-  // Token management methods
   getToken(): string | null {
-    // FIX: Use isPlatformBrowser for safe localStorage access
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('bookverse_token');
+      const token = localStorage.getItem('bookverse_token');
+      if (token) {
+        console.log(`🔍 Retrieved token: ${token.substring(0, 20)}...`);
+      } else {
+        console.log('🔍 No token found in localStorage');
+      }
+      return token;
     }
     return null;
   }
@@ -595,9 +568,15 @@ export class AuthService {
   setTokens(accessToken: string, refreshToken?: string): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('bookverse_token', accessToken);
+      console.log('✅ Token manually set:', accessToken.substring(0, 20) + '...');
       if (refreshToken) {
         localStorage.setItem('bookverse_refresh_token', refreshToken);
+        console.log('✅ Refresh token manually set');
       }
+      
+      // Verify storage
+      const verifyToken = localStorage.getItem('bookverse_token');
+      console.log('🔍 Token verification after manual set:', verifyToken ? 'SUCCESS' : 'FAILED');
     }
   }
 
@@ -606,6 +585,10 @@ export class AuthService {
       console.log('🗑️ Clearing tokens from localStorage');
       localStorage.removeItem('bookverse_token');
       localStorage.removeItem('bookverse_refresh_token');
+      
+      // Verify clearing
+      const verifyToken = localStorage.getItem('bookverse_token');
+      console.log('🔍 Token verification after clearing:', verifyToken ? 'STILL EXISTS' : 'CLEARED');
     }
   }
 
@@ -617,14 +600,12 @@ export class AuthService {
     }
     
     try {
-      // Basic JWT structure validation
       const parts = token.split('.');
       if (parts.length !== 3) {
         console.log('🔍 Token validation: Invalid JWT structure');
         return false;
       }
       
-      // Decode payload to check expiration using the robust helper function
       const payloadDecoded = this.urlBase64Decode(parts[1]);
       const payload = JSON.parse(payloadDecoded);
       
@@ -640,7 +621,22 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.isCustomerLoggedIn() || this.isAdminLoggedIn();
+    // Check both token validity AND user state
+    const hasValidToken = this.isTokenValid();
+    const hasUserState = this.isCustomerLoggedIn() || this.isAdminLoggedIn();
+    
+    console.log(`🔍 Login check - Token valid: ${hasValidToken}, User state: ${hasUserState}`);
+    
+    // If we have user state but no token, try to restore from storage
+    if (hasUserState && !hasValidToken) {
+      const storedToken = this.getToken();
+      if (storedToken) {
+        console.log('🔄 Found stored token, re-validating...');
+        return this.isTokenValid();
+      }
+    }
+    
+    return hasValidToken && hasUserState;
   }
 
   getCurrentUserDisplayName(): string {
@@ -656,10 +652,8 @@ export class AuthService {
     return '';
   }
 
-  // Admin-specific signup method (for compatibility with admin components)
   signup(username: string, email: string, password: string): Observable<boolean> {
     
-    // Check if username or email already exists
     return this.http.get<UserModel[]>(this.usersUrl).pipe(
       switchMap(users => {
         const existingUser = users.find(u => 
@@ -680,14 +674,13 @@ export class AuthService {
           id: newUserId,
           username,
           email,
-          passwordHash: password, // AdminUsers use passwordHash instead of password
+          passwordHash: password,
           role: 'admin'
         };
         
         return this.http.post<any>(this.usersUrl, newAdminUser);
       }),
       map(newUser => {
-        // Auto-login the admin user after registration
         this.currentAdmin.set(newUser);
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_admin', JSON.stringify(newUser));
@@ -700,20 +693,14 @@ export class AuthService {
     );
   }
 
-  // Password reset functionality
   forgotPassword(email: string): Observable<boolean> {
     
-    // Check if user exists with this email
     return this.http.get<UserModel[]>(this.usersUrl).pipe(
       map(users => {
         const user = users.find(u => u.email === email);
         if (user) {
-          // In a real application, this would send an email to the user
-          // For this demo, we'll just log the success and return true
           return true;
         } else {
-          // For security reasons, we still return true even if user doesn't exist
-          // This prevents email enumeration attacks
           return true;
         }
       }),
@@ -723,13 +710,11 @@ export class AuthService {
     );
   }
 
-  // Public method to fetch complete user profile (for components)
   fetchCompleteUserProfile(): Observable<UserModel> {
     return this.http.get<any>(`${this.usersUrl}/profile`).pipe(
       map(response => {
         const completeUser = this.transformUserData(response);
         
-        // Update current user data
         this.currentCustomer.set(completeUser);
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('bookverse_customer', JSON.stringify(completeUser));
@@ -743,7 +728,70 @@ export class AuthService {
     );
   }
 
-  // Change password method
+  // Force refresh authentication state from storage
+  refreshAuthState(): void {
+    console.log('🔄 Force refreshing auth state...');
+    if (isPlatformBrowser(this.platformId)) {
+      const token = localStorage.getItem('bookverse_token');
+      const customer = localStorage.getItem('bookverse_customer');
+      const admin = localStorage.getItem('bookverse_admin');
+      
+      console.log('🔍 Storage check:', {
+        hasToken: !!token,
+        hasCustomer: !!customer,
+        hasAdmin: !!admin
+      });
+      
+      // Clear current state
+      this.currentCustomer.set(null);
+      this.currentAdmin.set(null);
+      
+      // Restore from storage
+      if (customer) {
+        try {
+          const parsedCustomer = JSON.parse(customer);
+          this.currentCustomer.set(this.transformUserData(parsedCustomer));
+          console.log('✅ Customer state restored');
+        } catch (error) {
+          console.error('❌ Failed to restore customer state:', error);
+          localStorage.removeItem('bookverse_customer');
+        }
+      }
+      
+      if (admin) {
+        try {
+          const parsedAdmin = JSON.parse(admin);
+          this.currentAdmin.set(parsedAdmin);
+          console.log('✅ Admin state restored');
+        } catch (error) {
+          console.error('❌ Failed to restore admin state:', error);
+          localStorage.removeItem('bookverse_admin');
+        }
+      }
+      
+      console.log('🔄 Auth state refresh completed');
+    }
+  }
+  
+  // Emergency method to create a mock token for testing
+  createMockToken(): void {
+    if (isPlatformBrowser(this.platformId) && this.currentCustomer()) {
+      const mockPayload = {
+        sub: this.currentCustomer()?.id,
+        username: this.currentCustomer()?.username,
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours from now
+      };
+      
+      // Create a simple mock JWT (for testing only)
+      const header = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'}));
+      const payload = btoa(JSON.stringify(mockPayload));
+      const mockToken = `${header}.${payload}.mock_signature`;
+      
+      localStorage.setItem('bookverse_token', mockToken);
+      console.log('🔧 Mock token created for testing');
+    }
+  }
+
   changePassword(currentPassword: string, newPassword: string): Observable<any> {
     const currentUser = this.currentCustomer();
     if (!currentUser) {

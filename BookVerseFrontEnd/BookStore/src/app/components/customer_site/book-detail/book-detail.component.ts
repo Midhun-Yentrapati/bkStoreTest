@@ -212,11 +212,12 @@ export class BookDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading book:', error);
         if (error.status === 404) {
-          // Book not found - redirect to home page
           console.log('BookDetailComponent: Book not found (404), redirecting to home');
           this.router.navigate(['/']);
+        } else if (error.status === 403) {
+          console.log('BookDetailComponent: Access forbidden (403), book may require authentication');
+          // Don't redirect for 403, show error message instead
         } else {
-          // Handle other errors - redirect to home page
           console.error('Failed to load book details');
           this.router.navigate(['/']);
         }

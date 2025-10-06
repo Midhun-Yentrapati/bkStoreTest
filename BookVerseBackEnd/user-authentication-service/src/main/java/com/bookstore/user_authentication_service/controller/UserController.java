@@ -19,8 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Tag(name = "User Management", description = "User Profile and Management API")
 @RestController
@@ -70,6 +73,53 @@ public class UserController {
                     .body(Map.of("error", "Failed to retrieve user profile"));
         }
     }
+
+    // --- START: ADDED ENDPOINT ---
+    @Operation(
+            summary = "Get User by ID",
+            description = "Get a user's profile by their ID. Users can only fetch their own profile. Admins can fetch any profile.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - You can only access your own profile"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentUserId = authentication.getName();
+            
+            boolean isAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_SUPER_ADMIN"));
+
+            // Security Check: Allow access if the user is an admin OR if the user is requesting their own profile
+            if (!isAdmin && !currentUserId.equals(userId)) {
+                log.warn("Access denied for user {} trying to access profile of user {}", currentUserId, userId);
+                throw new AccessDeniedException("You are not authorized to access this profile.");
+            }
+
+            log.info("Getting profile for user ID: {}", userId);
+            
+            Optional<UserDTO> userDTO = userService.getUserById(userId);
+            if (userDTO.isPresent()) {
+                return ResponseEntity.ok(userDTO.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User profile not found for ID: " + userId));
+            }
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error getting user profile by ID: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to retrieve user profile"));
+        }
+    }
+    // --- END: ADDED ENDPOINT ---
     
     @Operation(
             summary = "Update User Profile",
@@ -88,7 +138,6 @@ public class UserController {
             String userId = getCurrentUserId();
             log.info("Updating profile for user: {}", userId);
             
-            // Clear sensitive fields that shouldn't be updated via this endpoint
             userDTO.setPassword(null);
             userDTO.setUsername(null);
             userDTO.setEmail(null);
@@ -208,9 +257,6 @@ public class UserController {
         }
     }
     
-
- // In UserController.java
-
     @Operation(
             summary = "Get User Address by ID",
             description = "Get a specific address by its ID for the authenticated user",
@@ -228,7 +274,6 @@ public class UserController {
             String userId = getCurrentUserId();
             log.info("Getting address {} for user: {}", addressId, userId);
 
-            // We'll use the AddressService to handle fetching and ownership validation
             Optional<AddressDTO> addressDTO = addressService.getAddressByIdAndUserId(addressId, userId);
 
             if (addressDTO.isPresent()) {
@@ -336,7 +381,6 @@ public class UserController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         try {
-            // Debug authentication context
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             log.info("[CONTROLLER DEBUG] Authentication: {}", auth);
             log.info("[CONTROLLER DEBUG] Principal: {}", auth != null ? auth.getPrincipal() : "null");
@@ -435,7 +479,7 @@ public class UserController {
     )
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/admin/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+    public ResponseEntity<?> getUserByIdForAdmin(@PathVariable String userId) {
         try {
             log.info("Admin getting user by ID: {}", userId);
             
@@ -558,7 +602,6 @@ public class UserController {
         try {
             log.info("Admin toggling user status for user: {}", userId);
             
-            // Check if user exists first
             Optional<UserDTO> userOpt = userService.getUserById(userId);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -567,7 +610,6 @@ public class UserController {
             
             UserDTO user = userOpt.get();
             
-            // Get current admin's role from SecurityContext
             String currentAdminId = getCurrentUserId();
             Optional<UserDTO> currentAdminOpt = userService.getUserById(currentAdminId);
             
@@ -577,11 +619,6 @@ public class UserController {
             }
             
             UserDTO currentAdmin = currentAdminOpt.get();
-            
-            // Permission logic:
-            // 1. SUPER_ADMIN accounts cannot be disabled by anyone
-            // 2. ADMIN accounts can only be disabled by SUPER_ADMIN
-            // 3. Other roles can be disabled by both SUPER_ADMIN and ADMIN
             
             if (user.getUserRole() == UserRole.SUPER_ADMIN) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -593,7 +630,6 @@ public class UserController {
                         .body(Map.of("error", "Only SUPER_ADMIN can disable ADMIN accounts"));
             }
             
-            // Toggle the account status
             boolean currentlyActive = user.getAccountStatus() == AccountStatus.ACTIVE;
             if (currentlyActive) {
                 userService.deactivateAccount(userId);
@@ -627,14 +663,12 @@ public class UserController {
         try {
             log.info("Admin permanently deleting user: {}", userId);
             
-            // Check if user exists first
             Optional<UserDTO> user = userService.getUserById(userId);
             if (user.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
             }
             
-            // Perform hard delete
             userService.deleteUser(userId);
             
             return ResponseEntity.ok(Map.of(
@@ -659,14 +693,12 @@ public class UserController {
         try {
             log.info("Admin soft deleting user: {}", userId);
             
-            // Check if user exists first
             Optional<UserDTO> user = userService.getUserById(userId);
             if (user.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
             }
             
-            // Perform soft delete
             userService.softDeleteUser(userId);
             
             return ResponseEntity.ok(Map.of(
@@ -813,6 +845,8 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof String) {
             return (String) authentication.getPrincipal();
+        } else if (authentication != null) {
+            return authentication.getName();
         }
         throw new RuntimeException("No authenticated user found");
     }

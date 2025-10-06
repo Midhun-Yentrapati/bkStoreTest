@@ -27,10 +27,12 @@ public class GatewayConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("http://localhost:4200");
-        corsConfig.addAllowedOrigin("http://localhost:3000");
+        corsConfig.addAllowedOriginPattern("http://localhost:*");
+        corsConfig.addAllowedOriginPattern("https://localhost:*");
         corsConfig.addAllowedMethod("*");
-        corsConfig.addAllowedHeader("*");
+        // Explicitly allow the Authorization header
+        corsConfig.addAllowedHeader(HttpHeaders.AUTHORIZATION);
+        corsConfig.addAllowedHeader("*"); // You can keep this for other headers
         corsConfig.setAllowCredentials(true);
         corsConfig.setMaxAge(3600L);
 
@@ -46,18 +48,21 @@ public class GatewayConfig {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
-            
+
             // Handle preflight requests
             if (request.getMethod() == HttpMethod.OPTIONS) {
                 response.setStatusCode(HttpStatus.OK);
-                response.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:4200");
-                response.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                String origin = request.getHeaders().getFirst("Origin");
+                if (origin != null && (origin.startsWith("http://localhost") || origin.startsWith("https://localhost"))) {
+                    response.getHeaders().add("Access-Control-Allow-Origin", origin);
+                }
+                response.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
                 response.getHeaders().add("Access-Control-Allow-Headers", "*");
                 response.getHeaders().add("Access-Control-Allow-Credentials", "true");
                 response.getHeaders().add("Access-Control-Max-Age", "3600");
                 return Mono.empty();
             }
-            
+
             return chain.filter(exchange);
         };
     }

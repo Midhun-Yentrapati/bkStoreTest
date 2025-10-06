@@ -41,7 +41,7 @@ public class CouponController {
         @ApiResponse(responseCode = "400", description = "Invalid coupon data")
     })
     public ResponseEntity<CouponDto> createCoupon(@Valid @RequestBody CouponDto couponDto) {
-        log.info("Creating new coupon with code: {}", couponDto.getCode());
+        log.info("Creating new coupon with code: [REDACTED]");
         
         Coupon coupon = convertToEntity(couponDto);
         Coupon savedCoupon = couponService.createCoupon(coupon);
