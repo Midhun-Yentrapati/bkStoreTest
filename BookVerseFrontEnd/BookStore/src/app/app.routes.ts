@@ -93,7 +93,6 @@ export const routes: Routes = [
       { path: 'coupons', component: CouponManagementComponent },
       { path: 'reviews', component: ManageReviewsComponent },
       { path: 'analytics', component: AnalyticsDashboardComponent },
-      { path: 'jwt-test', loadComponent: () => import('./components/admin_site/jwt-test/jwt-test.component').then(m => m.JwtTestComponent) }
     ]
   },
 

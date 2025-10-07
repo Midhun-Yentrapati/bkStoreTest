@@ -1,64 +1,126 @@
 <div class="container mt-4">
-    <div class="row">
-      <div class="col-12">
-        <h2 class="mb-4">My Orders</h2>
-      </div>
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">My Orders</h2>
     </div>
-  
-    <ng-container *ngIf="orders.length > 0; else noOrders">
-      <div class="list-group">
-        <div class="list-group-item list-group-item-action mb-3 shadow-sm rounded-3" *ngFor="let order of orders">
-          <div class="d-flex w-100 justify-content-between">
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading orders...</span>
+    </div>
+  </div>
+
+  <!-- Orders List -->
+  <ng-container *ngIf="!isLoading && orders.length > 0; else noOrders">
+    <div class="list-group">
+      <div class="list-group-item" 
+           *ngFor="let order of orders" 
+           [ngClass]="'order-status-' + (order.orderStatus || 'pending').toLowerCase()">
+        
+        <!-- Order Header -->
+        <div class="d-flex w-100 justify-content-between align-items-start mb-3">
+          <div>
             <h5 class="mb-1">Order #{{ order.id }}</h5>
             <small class="text-muted">{{ order.orderDate | date:'medium' }}</small>
           </div>
-          <p class="mb-1">Total: <span class="fw-bold text-primary">₹{{ order.totalAmount | number:'1.2-2' }}</span></p>
-          <p class="mb-2">
-            Order Status: 
-                            <span class="badge" [ngClass]="getStatusBadgeClass(order.orderStatus || '')">
-                  {{ getOrderStatusText(order.orderStatus || '') }}
-                </span>
-          </p>
-          <p class="mb-2">
-            Payment Status: 
-            <span class="badge" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus || '')">
+          <div class="text-end">
+            <div class="fw-bold text-primary mb-1">₹{{ order.totalAmount | number:'1.2-2' }}</div>
+            <small class="text-muted">Total Amount</small>
+          </div>
+        </div>
+
+        <!-- Status Row -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Order Status:</strong>
+            <span class="badge ms-2" [ngClass]="getStatusBadgeClass(order.orderStatus || '')">
+              {{ getOrderStatusText(order.orderStatus || '') }}
+            </span>
+          </div>
+          <div class="col-md-6">
+            <strong>Payment Status:</strong>
+            <span class="badge ms-2" [ngClass]="getPaymentStatusBadgeClass(order.paymentStatus || '')">
               {{ getPaymentStatusText(order.paymentStatus || '') }}
             </span>
-          </p>
-          <p class="mb-2">
-            Payment Method: <strong>{{ order.paymentMethod || 'N/A' }}</strong>
-          </p>
-          <p class="mb-2">
-            Delivery Address: 
-            <small class="text-muted">
-              {{ order.shippingAddress?.name || 'N/A' }}, {{ order.shippingAddress?.addressLine1 || 'N/A' }}{{ order.shippingAddress?.addressLine2 ? ', ' + order.shippingAddress?.addressLine2 : '' }}, {{ order.shippingAddress?.city || 'N/A' }}, {{ order.shippingAddress?.state || 'N/A' }} - {{ order.shippingAddress?.pincode || 'N/A' }}
-            </small>
-          </p>
-          <ul class="list-unstyled mb-2 small">
-            <li *ngFor="let item of order.items">
-              {{ item.title }} (x{{ item.quantity }}) - ₹{{ item.price | number:'1.2-2' }} each
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="mb-3">
+          <strong>Payment Method:</strong> 
+          <span class="ms-1">{{ order.paymentMethod || 'Not specified' }}</span>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="mb-3">
+          <strong>Delivery Address:</strong>
+          <div class="address-section" *ngIf="order.shippingAddress; else noAddress">
+            <div class="fw-semibold">{{ order.shippingAddress.name }}</div>
+            <div class="text-muted">
+              {{ order.shippingAddress.addressLine1 }}
+              <span *ngIf="order.shippingAddress.addressLine2">, {{ order.shippingAddress.addressLine2 }}</span>
+            </div>
+            <div class="text-muted">
+              {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} - {{ order.shippingAddress.pincode }}
+            </div>
+            <div *ngIf="order.shippingAddress.phone" class="text-muted">
+              <i class="bi bi-telephone"></i> {{ order.shippingAddress.phone }}
+            </div>
+          </div>
+          <ng-template #noAddress>
+            <div class="text-warning">
+              <i class="bi bi-exclamation-triangle me-1"></i>
+              Address information not available. Please contact support if needed.
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Order Items -->
+        <div class="mb-3" *ngIf="order.items && order.items.length > 0">
+          <strong>Items Ordered:</strong>
+          <ul class="list-unstyled mt-2">
+            <li *ngFor="let item of order.items" class="d-flex justify-content-between">
+              <span>{{ item.title }} (x{{ item.quantity }})</span>
+              <span>₹{{ item.price | number:'1.2-2' }} each</span>
             </li>
           </ul>
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="viewOrderDetails(order.id!)">
-              <i class="bi bi-info-circle me-1"></i> View Details
-            </button>
-            <button class="btn btn-sm btn-outline-danger" (click)="cancelOrder(order.id!)"
-                    [disabled]="!canCancelOrder(order)">
-              <i class="bi bi-x-circle me-1"></i> Cancel Order
-            </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-sm btn-outline-primary" (click)="viewOrderDetails(order.id!)">
+            <i class="bi bi-info-circle me-1"></i> View Details
+          </button>
+          <button class="btn btn-sm btn-outline-success" 
+                  (click)="markPaymentAsPaid(order.id!)"
+                  *ngIf="canMarkAsPaid(order)"
+                  title="Mark payment as completed for Cash on Delivery">
+            <i class="bi bi-check-circle me-1"></i> Mark as Paid
+          </button>
+          <button class="btn btn-sm btn-outline-danger" 
+                  (click)="cancelOrder(order.id!)"
+                  [disabled]="!canCancelOrder(order)">
+            <i class="bi bi-x-circle me-1"></i> Cancel Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- No Orders State -->
+  <ng-template #noOrders>
+    <div *ngIf="!isLoading" class="row">
+      <div class="col-12 text-center">
+        <div class="alert alert-info" role="alert">
+          <i class="bi bi-cart3 me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <h5>No Orders Yet</h5>
+            <p class="mb-0">You haven't placed any orders yet. Start shopping to see your orders here!</p>
           </div>
         </div>
       </div>
-    </ng-container>
-  
-    <ng-template #noOrders>
-      <div class="row">
-        <div class="col-12 text-center">
-          <div class="alert alert-info" role="alert">
-            You haven't placed any orders yet.
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  </div>
+    </div>
+  </ng-template>
+</div>

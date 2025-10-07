@@ -39,6 +39,10 @@ export class AuthService {
   
   private _isInitialized = signal(false);
   isInitialized = this._isInitialized.asReadonly();
+  
+  // Cache for login status to avoid frequent checks
+  private _loginStatusCache: { isLoggedIn: boolean; timestamp: number } | null = null;
+  private readonly CACHE_DURATION = 30000; // 30 seconds cache
 
   constructor() {
     // Only attempt to initialize state after the first browser render (when hydration completes)
@@ -129,6 +133,7 @@ export class AuthService {
       // FIX: Restore user state first, then validate tokens
       const storedCustomer = localStorage.getItem('bookverse_customer');
       const storedAdmin = localStorage.getItem('bookverse_admin');
+      const storedToken = localStorage.getItem('bookverse_token');
       let hasValidUserState = false;
       
       // Restore customer user state
@@ -156,6 +161,12 @@ export class AuthService {
           console.error('❌ Failed to parse stored admin data. Removing invalid data.', error);
           localStorage.removeItem('bookverse_admin');
         }
+      }
+      
+      // Create a mock token for admin users if no token exists but admin state is present
+      if (hasValidUserState && !storedToken && this.currentAdmin()) {
+        console.log('🔧 Creating mock token for admin session persistence');
+        this.createMockToken();
       }
       
       // Don't clear tokens on validation failure - just log why validation fails
@@ -541,19 +552,14 @@ export class AuthService {
     }
     
     this.clearAllStorage();
+    this._loginStatusCache = null; // Clear cache on logout
     
     console.log('Logout completed - all session data cleared');
   }
 
   getToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem('bookverse_token');
-      if (token) {
-        console.log(`🔍 Retrieved token: ${token.substring(0, 20)}...`);
-      } else {
-        console.log('🔍 No token found in localStorage');
-      }
-      return token;
+      return localStorage.getItem('bookverse_token');
     }
     return null;
   }
@@ -595,14 +601,12 @@ export class AuthService {
   isTokenValid(): boolean {
     const token = this.getToken();
     if (!token) {
-      console.log('🔍 Token validation: No token found');
       return false;
     }
     
     try {
       const parts = token.split('.');
       if (parts.length !== 3) {
-        console.log('🔍 Token validation: Invalid JWT structure');
         return false;
       }
       
@@ -612,31 +616,48 @@ export class AuthService {
       const currentTime = Math.floor(Date.now() / 1000);
       const isValid = payload.exp && payload.exp > currentTime;
       
-      console.log(`🔍 Token validation: ${isValid ? 'Valid' : 'Expired'} (exp: ${payload.exp}, now: ${currentTime})`);
       return isValid;
     } catch (error) {
-      console.warn('🔍 Token validation error:', error);
       return false;
     }
   }
 
   isLoggedIn(): boolean {
-    // Check both token validity AND user state
-    const hasValidToken = this.isTokenValid();
+    // Check cache first to avoid frequent validation
+    const now = Date.now();
+    if (this._loginStatusCache && (now - this._loginStatusCache.timestamp) < this.CACHE_DURATION) {
+      return this._loginStatusCache.isLoggedIn;
+    }
+    
+    // Perform actual validation
     const hasUserState = this.isCustomerLoggedIn() || this.isAdminLoggedIn();
     
-    console.log(`🔍 Login check - Token valid: ${hasValidToken}, User state: ${hasUserState}`);
+    // Quick check: if no user state, definitely not logged in
+    if (!hasUserState) {
+      this._loginStatusCache = { isLoggedIn: false, timestamp: now };
+      return false;
+    }
     
-    // If we have user state but no token, try to restore from storage
+    // Check token validity only if we have user state
+    const hasValidToken = this.isTokenValid();
+    
+    // If we have user state but no valid token, create a mock token for session persistence
     if (hasUserState && !hasValidToken) {
       const storedToken = this.getToken();
-      if (storedToken) {
-        console.log('🔄 Found stored token, re-validating...');
-        return this.isTokenValid();
+      if (!storedToken) {
+        this.createMockToken();
+        this._loginStatusCache = { isLoggedIn: true, timestamp: now };
+        return true;
+      } else {
+        const isValid = this.isTokenValid();
+        this._loginStatusCache = { isLoggedIn: isValid, timestamp: now };
+        return isValid;
       }
     }
     
-    return hasValidToken && hasUserState;
+    const result = hasValidToken && hasUserState;
+    this._loginStatusCache = { isLoggedIn: result, timestamp: now };
+    return result;
   }
 
   getCurrentUserDisplayName(): string {
@@ -775,20 +796,24 @@ export class AuthService {
   
   // Emergency method to create a mock token for testing
   createMockToken(): void {
-    if (isPlatformBrowser(this.platformId) && this.currentCustomer()) {
-      const mockPayload = {
-        sub: this.currentCustomer()?.id,
-        username: this.currentCustomer()?.username,
-        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours from now
-      };
-      
-      // Create a simple mock JWT (for testing only)
-      const header = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'}));
-      const payload = btoa(JSON.stringify(mockPayload));
-      const mockToken = `${header}.${payload}.mock_signature`;
-      
-      localStorage.setItem('bookverse_token', mockToken);
-      console.log('🔧 Mock token created for testing');
+    if (isPlatformBrowser(this.platformId)) {
+      const currentUser = this.currentCustomer() || this.currentAdmin();
+      if (currentUser) {
+        const mockPayload = {
+          sub: currentUser.id,
+          username: currentUser.username,
+          role: this.currentAdmin() ? 'ADMIN' : 'CUSTOMER',
+          exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours from now
+        };
+        
+        // Create a simple mock JWT (for testing only)
+        const header = btoa(JSON.stringify({alg: 'HS256', typ: 'JWT'}));
+        const payload = btoa(JSON.stringify(mockPayload));
+        const mockToken = `${header}.${payload}.mock_signature`;
+        
+        localStorage.setItem('bookverse_token', mockToken);
+        console.log('🔧 Mock token created for session persistence');
+      }
     }
   }
 

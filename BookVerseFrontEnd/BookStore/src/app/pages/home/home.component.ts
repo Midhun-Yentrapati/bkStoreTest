@@ -37,7 +37,8 @@ export class HomeComponent {
 
     //displays categories in the category bar
     this.categoryService.getAllCategories().subscribe(data => {
-      this.categories = ['All', ...data.map((cat:CategoryModel) => cat.name)];
+      const activeCategories = data.filter(cat => cat.isActive).slice(0, 9);
+      this.categories = ['All', ...activeCategories.map(cat => cat.name)];
     });
 
     //displays all books

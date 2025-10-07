@@ -88,6 +88,11 @@ export interface Order {
   orderDate?: string; // Alias for createdAt or placedAt
   totalAmount?: number; // Alias for subtotal
   finalAmount?: number; // Alias for grandTotal
+  
+  // Customer information (from backend with details)
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
 }
 
 // OrderDto for creating orders

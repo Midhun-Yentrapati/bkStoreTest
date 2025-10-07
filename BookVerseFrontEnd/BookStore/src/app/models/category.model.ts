@@ -5,6 +5,7 @@ export interface CategoryModel {
     slug?: string;
     isActive?: boolean;
     priority?: number;
+    displayOrder?: number;
     image?: string;
     createdAt?: string;
     updatedAt?: string;

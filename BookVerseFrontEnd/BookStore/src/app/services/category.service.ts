@@ -104,7 +104,7 @@ export class CategoryService {
   }
 
   // Delete category
-  deleteCategory(id: string): Observable<any> {
+  deleteCategory(id: number): Observable<any> {
     return this.http.delete(`${this.categoriesUrl}/${id}`).pipe(
       catchError(this.handleError<any>('deleteCategory'))
     );

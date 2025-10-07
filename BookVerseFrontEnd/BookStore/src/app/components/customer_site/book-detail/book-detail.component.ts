@@ -44,6 +44,7 @@ export class BookDetailComponent implements OnInit {
   loadingReviews = false;
   submittingReview = false;
   reviewSubmissionSuccess = false;
+  private _userLoggedInCache: boolean | null = null;
 
   constructor( 
     private bookService: BookService,
@@ -58,6 +59,8 @@ export class BookDetailComponent implements OnInit {
 
    ngOnInit(): void {
     this.id = String(this.route.snapshot.paramMap.get('id'));
+    // Cache login status once during initialization
+    this._userLoggedInCache = this.authService.isLoggedIn();
     this.loadBookData();
     this.loadReviews();
    }
@@ -268,12 +271,27 @@ export class BookDetailComponent implements OnInit {
     try {
       // Handle different date formats from backend
       let date: Date;
+      
+      if (!dateString) {
+        return 'Not specified';
+      }
+      
       if (Array.isArray(dateString)) {
         // Handle LocalDateTime array format [year, month, day, hour, minute, second]
         const [year, month, day] = dateString as any;
         date = new Date(year, month - 1, day);
-      } else {
+      } else if (typeof dateString === 'string') {
+        // Handle ISO string format
         date = new Date(dateString);
+      } else {
+        // Handle timestamp or other formats
+        date = new Date(dateString);
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date format:', dateString);
+        return 'Date not available';
       }
       
       return date.toLocaleDateString('en-US', { 
@@ -282,7 +300,8 @@ export class BookDetailComponent implements OnInit {
         day: 'numeric' 
       });
     } catch (error) {
-      return dateString.toString();
+      console.error('Error formatting date:', error, 'Original value:', dateString);
+      return 'Date not available';
     }
   }
 
@@ -304,8 +323,13 @@ export class BookDetailComponent implements OnInit {
       }
     });
 
+    // Cache login status to avoid repeated checks
+    if (this._userLoggedInCache === null) {
+      this._userLoggedInCache = this.authService.isLoggedIn();
+    }
+
     // Load user's existing review if logged in (requires auth)
-    if (this.authService.isLoggedIn()) {
+    if (this._userLoggedInCache) {
       this.reviewService.getUserReview(this.id).subscribe({
         next: (review) => {
           this.userReview = review;

@@ -17,11 +17,16 @@ import { catchError, of } from 'rxjs';
 export class CategoryManagementComponent implements OnInit {
   categories: CategoryModel[] = [];
   newCategoryName: string = '';
+  categoryDescription: string = '';
+  categoryImage: string = '';
+  displayOrder: number = 0;
+  isActive: boolean = true;
   categoryInputError: boolean = false;
 
   isLoading: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  editingCategory: CategoryModel | null = null;
 
   constructor(private categoryService: CategoryService, private router: Router) { }
 
@@ -88,21 +93,39 @@ export class CategoryManagementComponent implements OnInit {
     this.errorMessage = null;
     this.successMessage = null;
 
-    // For now, we'll just add it to the local array since CategoryService doesn't support creating new categories
-    // In a real application, you would need to implement category creation in the service
-    const newId = this._generateNextCategoryId();
-
     const categoryPayload: CategoryModel = {
-      id: newId,
-      name: this.newCategoryName.trim()
+      id: 0, // Backend will assign ID
+      name: this.newCategoryName.trim(),
+      slug: this.generateSlug(this.newCategoryName.trim()),
+      description: this.categoryDescription.trim() || undefined,
+      image: this.categoryImage.trim() || undefined,
+      displayOrder: this.displayOrder || this.categories.length + 1,
+      isActive: this.isActive
     };
 
-    // Add to local array for now
-    this.categories.push(categoryPayload);
-    this.newCategoryName = '';
-    this.successMessage = 'Category added successfully! (Note: This is local only - implement backend creation)';
-    this.isLoading = false;
-    this.clearMessagesAfterDelay();
+    this.categoryService.createCategory(categoryPayload).subscribe({
+      next: (newCategory) => {
+        this.categories.push(newCategory);
+        this.resetForm();
+        this.successMessage = 'Category added successfully!';
+        this.isLoading = false;
+        this.clearMessagesAfterDelay();
+      },
+      error: (error) => {
+        console.error('Error creating category:', error);
+        this.errorMessage = 'Failed to create category. Please try again.';
+        this.isLoading = false;
+        this.clearMessagesAfterDelay(3000, true);
+      }
+    });
+  }
+
+  private generateSlug(name: string): string {
+    return name.toLowerCase()
+      .replace(/[^a-z0-9 -]/g, '') // Remove invalid chars
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/-+/g, '-') // Replace multiple - with single -
+      .replace(/^-+|-+$/g, ''); // Trim - from start and end
   }
 
   onDelete(id: number): void { 
@@ -111,12 +134,20 @@ export class CategoryManagementComponent implements OnInit {
       this.errorMessage = null;
       this.successMessage = null;
 
-      // For now, we'll just remove it from the local array since CategoryService doesn't support deleting categories
-      // In a real application, you would need to implement category deletion in the service
-      this.categories = this.categories.filter(c => c.id !== id);
-      this.successMessage = 'Category deleted successfully! (Note: This is local only - implement backend deletion)';
-      this.isLoading = false;
-      this.clearMessagesAfterDelay();
+      this.categoryService.deleteCategory(id).subscribe({
+        next: () => {
+          this.categories = this.categories.filter(c => c.id !== id);
+          this.successMessage = 'Category deleted successfully!';
+          this.isLoading = false;
+          this.clearMessagesAfterDelay();
+        },
+        error: (error) => {
+          console.error('Error deleting category:', error);
+          this.errorMessage = 'Failed to delete category. Please try again.';
+          this.isLoading = false;
+          this.clearMessagesAfterDelay(3000, true);
+        }
+      });
     }
   }
 
@@ -129,6 +160,45 @@ export class CategoryManagementComponent implements OnInit {
       }
       this.isLoading = false;
     }, delay);
+  }
+
+  onEdit(category: CategoryModel): void {
+    this.editingCategory = category;
+    this.newCategoryName = category.name;
+    this.categoryDescription = category.description || '';
+    this.categoryImage = category.image || '';
+    this.displayOrder = category.displayOrder || 0;
+    this.isActive = category.isActive !== false;
+  }
+
+  onToggleStatus(category: CategoryModel): void {
+    const updatedCategory = { ...category, isActive: !category.isActive };
+    
+    this.categoryService.updateCategory(category.id, updatedCategory).subscribe({
+      next: (updated) => {
+        const index = this.categories.findIndex(c => c.id === category.id);
+        if (index !== -1) {
+          this.categories[index] = updated;
+        }
+        this.successMessage = `Category ${updated.isActive ? 'activated' : 'deactivated'} successfully!`;
+        this.clearMessagesAfterDelay();
+      },
+      error: (error) => {
+        console.error('Error updating category status:', error);
+        this.errorMessage = 'Failed to update category status. Please try again.';
+        this.clearMessagesAfterDelay(3000, true);
+      }
+    });
+  }
+
+  resetForm(): void {
+    this.newCategoryName = '';
+    this.categoryDescription = '';
+    this.categoryImage = '';
+    this.displayOrder = 0;
+    this.isActive = true;
+    this.editingCategory = null;
+    this.categoryInputError = false;
   }
 
   goBack(): void {

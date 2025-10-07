@@ -31,17 +31,15 @@ export class OrderService {
       return throwError(() => new Error('User not logged in'));
     }
 
-    // Use backend endpoint: /api/orders?userId={userId} or /api/orders for admin
+    // Use backend endpoint with details: /api/orders/with-details
     const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    const url = isAdmin ? this.apiUrl : `${this.apiUrl}?userId=${currentUser.id}`;
+    const url = isAdmin ? `${this.apiUrl}/with-details` : `${this.apiUrl}/with-details?userId=${currentUser.id}`;
     
-    console.log('Fetching orders from URL:', url);
+    console.log('Fetching orders with details from URL:', url);
     
     return this.http.get<any>(url).pipe(
       map(response => {
         console.log('Raw orders response received:', response);
-        console.log('Response type:', typeof response);
-        console.log('Is array:', Array.isArray(response));
         
         // Handle different response formats
         let orders: Order[];
@@ -56,27 +54,51 @@ export class OrderService {
           orders = [];
         }
         
-        console.log('Processed orders:', orders.length);
-        return orders;
-      }),
-      catchError(error => {
-        console.error('Orders API error details:', {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          message: error.message,
-          error: error.error
+        // Process orders to ensure proper field mapping
+        const processedOrders = orders.map(order => {
+          const processedOrder: Order = {
+            ...order,
+            orderDate: order.orderDate || order.createdAt || order.placedAt,
+            totalAmount: order.totalAmount || order.subtotal || order.grandTotal,
+            items: order.items || order.orderItems || [],
+            orderStatus: order.orderStatus || 'Pending',
+            paymentStatus: order.paymentStatus || 'Pending'
+          };
+          
+          return processedOrder;
         });
         
-        // If it's a 200 response but treated as error, it might be a parsing issue
-        if (error.status === 200) {
-          console.log('Status 200 but treated as error - likely parsing issue');
-          console.log('Error response body:', error.error);
-          // Try to return empty array for 200 errors
-          return of([]);
-        }
-        
-        return throwError(() => error);
+        console.log('Processed orders:', processedOrders.length);
+        return processedOrders;
+      }),
+      catchError(() => {
+        // Fallback to basic orders endpoint
+        console.log('Falling back to basic orders endpoint');
+        const fallbackUrl = isAdmin ? this.apiUrl : `${this.apiUrl}?userId=${currentUser.id}`;
+        return this.http.get<any>(fallbackUrl).pipe(
+          map(response => {
+            let orders = Array.isArray(response) ? response : [];
+            return orders.map(order => ({
+              ...order,
+              orderDate: order.orderDate || order.createdAt || order.placedAt,
+              totalAmount: order.totalAmount || order.subtotal || order.grandTotal,
+              items: order.items || order.orderItems || [],
+              orderStatus: order.orderStatus || 'Pending',
+              paymentStatus: order.paymentStatus || 'Pending',
+              shippingAddress: order.shippingAddress || {
+                name: 'Address not available',
+                phone: '',
+                addressLine1: 'Please contact support for address details',
+                city: '',
+                state: '',
+                pincode: '',
+                country: 'India',
+                addressType: 'HOME' as const
+              }
+            }));
+          }),
+          catchError(() => of([]))
+        );
       })
     );
   }
@@ -303,7 +325,7 @@ export class OrderService {
     );
   }
 
-  updatePaymentStatus(orderId: string, paymentStatus: Order['paymentStatus'], paymentDetails?: PaymentDetails): Observable<Order> {
+  updatePaymentStatusAdmin(orderId: string, paymentStatus: Order['paymentStatus'], paymentDetails?: PaymentDetails): Observable<Order> {
     // Use backend endpoint: PUT /api/orders/{orderId}/payment-status?status={status}
     return this.http.put<Order>(`${this.apiUrl}/${orderId}/payment-status`, null, {
       params: { status: paymentStatus! }
@@ -373,12 +395,26 @@ export class OrderService {
     return 'BV' + Math.random().toString(36).substr(2, 9).toUpperCase();
   }
 
-  // Method for admins to get all orders
+  // Method for admins to get all orders with customer details
   getAllOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl).pipe(
+    return this.http.get<Order[]>(`${this.apiUrl}/admin/with-customer-details`).pipe(
+      catchError(() => {
+        // Fallback to basic endpoint
+        return this.http.get<Order[]>(this.apiUrl).pipe(
+          catchError(() => of([]))
+        );
+      })
+    );
+  }
+
+  // Update payment status (for customers)
+  updatePaymentStatus(orderId: string, paymentStatus: 'Paid'): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/${orderId}/payment-status`, null, {
+      params: { status: paymentStatus }
+    }).pipe(
       catchError(error => {
-        console.error('Error fetching all orders:', error);
-        return of([]);
+        console.error('Error updating payment status:', error);
+        throw error;
       })
     );
   }

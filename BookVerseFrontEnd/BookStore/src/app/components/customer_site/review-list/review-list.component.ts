@@ -24,12 +24,41 @@ export class ReviewListComponent {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    try {
+      // Handle different date formats from backend
+      let date: Date;
+      
+      if (!dateString) {
+        return 'Date not available';
+      }
+      
+      // Handle LocalDateTime array format [year, month, day, hour, minute, second]
+      if (Array.isArray(dateString)) {
+        const [year, month, day] = dateString as any;
+        date = new Date(year, month - 1, day);
+      } else if (typeof dateString === 'string') {
+        // Handle ISO string format
+        date = new Date(dateString);
+      } else {
+        // Handle timestamp or other formats
+        date = new Date(dateString);
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date format:', dateString);
+        return 'Invalid date';
+      }
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error, 'Original value:', dateString);
+      return 'Date unavailable';
+    }
   }
 
   getInitials(name: string): string {

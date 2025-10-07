@@ -4,7 +4,25 @@
   border-radius: 16px;
   box-shadow: 0 4px 25px var(--shadow-color);
   padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-/* For your HTML, you will need to add this class to the main div */
-/* <div class="d-flex flex-wrap ... category-nav-container"> */
+.category-nav-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.category-nav-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-nav-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.category-nav-container button {
+  flex-shrink: 0;
+}

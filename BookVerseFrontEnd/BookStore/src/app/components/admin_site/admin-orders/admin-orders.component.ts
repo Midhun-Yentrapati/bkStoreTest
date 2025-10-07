@@ -56,18 +56,24 @@ export class AdminOrdersComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    // Use getAllOrders for admin to see all orders
+    // Use getAllOrders for admin to see all orders with customer details
     this.orderService.getAllOrders().subscribe({
       next: (orders) => {
-        // Convert to OrderWithDetails and fetch additional data
+        console.log('Raw admin orders received:', orders);
+        
+        // Convert to OrderWithDetails and ensure customer data is available
         this.orders = orders.map(order => ({
           ...order,
           items: order.orderItems || order.items || [],
-          orderItems: order.orderItems || order.items || []
+          orderItems: order.orderItems || order.items || [],
+          // Ensure customer data is available
+          customerName: (order as any).customerName || 'Customer Name Not Available',
+          customerEmail: (order as any).customerEmail || 'Email Not Available',
+          customerPhone: (order as any).customerPhone || order.shippingAddress?.phone || 'Phone Not Available'
         }));
         
         this.isLoading = false;
-        console.log('Orders loaded:', this.orders);
+        console.log('Processed admin orders:', this.orders);
       },
       error: (error) => {
         console.error('Error loading orders:', error);

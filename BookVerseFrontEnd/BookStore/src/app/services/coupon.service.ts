@@ -18,7 +18,8 @@ export class CouponService {
   ) {}
 
   getAllCoupons(): Observable<Coupon[]> {
-    return this.http.get<Coupon[]>(this.apiUrl).pipe(
+    return this.http.get<Coupon[]>(`${this.apiUrl}/active`).pipe(
+      map(coupons => coupons.map(coupon => this.transformCoupon(coupon))),
       catchError(error => {
         console.error('Error fetching coupons:', error);
         return of([]);
@@ -28,6 +29,7 @@ export class CouponService {
 
   getActiveCoupons(): Observable<Coupon[]> {
     return this.http.get<Coupon[]>(`${this.apiUrl}/active`).pipe(
+      map(coupons => coupons.map(coupon => this.transformCoupon(coupon))),
       catchError(error => {
         console.error('Error fetching active coupons:', error);
         return of([]);
@@ -37,6 +39,7 @@ export class CouponService {
 
   getCouponById(couponId: string): Observable<Coupon | null> {
     return this.http.get<Coupon>(`${this.apiUrl}/${couponId}`).pipe(
+      map(coupon => this.transformCoupon(coupon)),
       catchError(error => {
         console.error('Error fetching coupon:', error);
         return of(null);
@@ -45,12 +48,17 @@ export class CouponService {
   }
 
   validateCoupon(couponCode: string, orderAmount: number): Observable<CouponValidationResponse> {
-    return this.http.post<CouponValidationResponse>(`${this.apiUrl}/validate`, null, {
+    return this.http.post<any>(`${this.apiUrl}/validate`, null, {
       params: {
         code: couponCode,
         orderAmount: orderAmount.toString()
       }
     }).pipe(
+      map(response => ({
+        valid: response.valid || false,
+        discountAmount: response.discount || 0,
+        message: response.valid ? 'Coupon is valid' : 'Invalid coupon'
+      })),
       catchError(error => {
         console.error('Error validating coupon:', error);
         return of({
@@ -67,13 +75,18 @@ export class CouponService {
       return throwError(() => new Error('User must be logged in to apply coupon'));
     }
 
-    return this.http.post<CouponValidationResponse>(`${this.apiUrl}/apply`, null, {
+    return this.http.post<any>(`${this.apiUrl}/validate`, null, {
       params: {
         code: couponCode,
-        userId: currentUser.id,
-        orderAmount: orderAmount.toString()
+        orderAmount: orderAmount.toString(),
+        userId: currentUser.id
       }
     }).pipe(
+      map(response => ({
+        valid: response.valid || false,
+        discountAmount: response.discount || 0,
+        message: response.valid ? 'Coupon applied successfully' : 'Failed to apply coupon'
+      })),
       catchError(error => {
         console.error('Error applying coupon:', error);
         return of({
@@ -85,18 +98,16 @@ export class CouponService {
   }
 
   createCoupon(couponDto: CouponDto): Observable<Coupon> {
-    const currentUser = this.authService.getCurrentCustomer();
+    const currentUser = this.authService.getCurrentCustomer() || this.authService.getCurrentAdmin();
     if (!currentUser) {
       return throwError(() => new Error('User must be logged in to create coupon'));
     }
 
-    // Only admin users can create coupons
-    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    if (!isAdmin) {
-      return throwError(() => new Error('Only admin users can create coupons'));
-    }
+    // Transform frontend DTO to backend format
+    const backendCoupon = this.transformToBackend(couponDto);
 
-    return this.http.post<Coupon>(this.apiUrl, couponDto).pipe(
+    return this.http.post<Coupon>(this.apiUrl, backendCoupon).pipe(
+      map(coupon => this.transformCoupon(coupon)),
       catchError(error => {
         console.error('Error creating coupon:', error);
         throw error;
@@ -105,18 +116,16 @@ export class CouponService {
   }
 
   updateCoupon(couponId: string, couponDto: CouponDto): Observable<Coupon> {
-    const currentUser = this.authService.getCurrentCustomer();
+    const currentUser = this.authService.getCurrentCustomer() || this.authService.getCurrentAdmin();
     if (!currentUser) {
       return throwError(() => new Error('User must be logged in to update coupon'));
     }
 
-    // Only admin users can update coupons
-    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    if (!isAdmin) {
-      return throwError(() => new Error('Only admin users can update coupons'));
-    }
+    // Transform frontend DTO to backend format
+    const backendCoupon = this.transformToBackend(couponDto);
 
-    return this.http.put<Coupon>(`${this.apiUrl}/${couponId}`, couponDto).pipe(
+    return this.http.put<Coupon>(`${this.apiUrl}/${couponId}`, backendCoupon).pipe(
+      map(coupon => this.transformCoupon(coupon)),
       catchError(error => {
         console.error('Error updating coupon:', error);
         throw error;
@@ -125,15 +134,9 @@ export class CouponService {
   }
 
   deleteCoupon(couponId: string): Observable<void> {
-    const currentUser = this.authService.getCurrentCustomer();
+    const currentUser = this.authService.getCurrentCustomer() || this.authService.getCurrentAdmin();
     if (!currentUser) {
       return throwError(() => new Error('User must be logged in to delete coupon'));
-    }
-
-    // Only admin users can delete coupons
-    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    if (!isAdmin) {
-      return throwError(() => new Error('Only admin users can delete coupons'));
     }
 
     return this.http.delete<void>(`${this.apiUrl}/${couponId}`).pipe(
@@ -143,4 +146,47 @@ export class CouponService {
       })
     );
   }
+
+  private transformCoupon(backendCoupon: any): Coupon {
+    return {
+      id: backendCoupon.id,
+      code: backendCoupon.code,
+      title: backendCoupon.title,
+      description: backendCoupon.description,
+      discountType: backendCoupon.discountType === 'PERCENTAGE' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
+      discountValue: backendCoupon.discountValue,
+      minimumOrderAmount: backendCoupon.minOrderAmount,
+      maximumDiscountAmount: backendCoupon.maxDiscountAmount,
+      validFrom: backendCoupon.validFrom,
+      validUntil: backendCoupon.validUntil,
+      usageLimit: backendCoupon.usageLimit,
+      usedCount: backendCoupon.usageCount || 0,
+      isActive: backendCoupon.isActive,
+      createdAt: backendCoupon.createdAt,
+      updatedAt: backendCoupon.updatedAt,
+      // Aliases for template compatibility
+      minOrderAmount: backendCoupon.minOrderAmount,
+      maxDiscountAmount: backendCoupon.maxDiscountAmount,
+      usageCount: backendCoupon.usageCount || 0
+    };
+  }
+
+  private transformToBackend(frontendDto: CouponDto): any {
+    return {
+      code: frontendDto.code,
+      title: frontendDto.title,
+      description: frontendDto.description,
+      discountType: frontendDto.discountType,
+      discountValue: frontendDto.discountValue,
+      minOrderAmount: frontendDto.minimumOrderAmount,
+      maxDiscountAmount: frontendDto.maximumDiscountAmount,
+      validFrom: frontendDto.validFrom,
+      validUntil: frontendDto.validUntil,
+      usageLimit: frontendDto.usageLimit,
+      userLimit: 1, // Default user limit
+      scope: 'ALL', // Default scope
+      isActive: frontendDto.isActive
+    };
+  }
 }
+
