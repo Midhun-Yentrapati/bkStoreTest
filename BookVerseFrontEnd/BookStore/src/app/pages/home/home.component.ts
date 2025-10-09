@@ -19,6 +19,7 @@ export class HomeComponent {
 
   books: BookModel[] = [];
   filtreredBooks: BookModel[] = [];
+  limitedBooks: BookModel[] = [];
 
   newlyLaunchedBooks: BookWithSales[] = [];
   bestSellers: BookWithSales[] = [];
@@ -45,6 +46,7 @@ export class HomeComponent {
     this.bookService.getAllBooks().subscribe(books => {
       this.books = books;
       this.filtreredBooks = books;
+      this.updateLimitedBooks();
     });
   }
 
@@ -61,11 +63,12 @@ export class HomeComponent {
         });
       });
     }
+    this.updateLimitedBooks();
   }
 
-  getLimitedBooks(): BookModel[] {
+  updateLimitedBooks(): void {
     const booksToShow = this.filtreredBooks.length > 0 ? this.filtreredBooks : this.books;
-    return booksToShow.slice(0, 20); // Limit to 20 books (5 rows × 4 books)
+    this.limitedBooks = booksToShow.slice(0, 20);
   }
   
 }

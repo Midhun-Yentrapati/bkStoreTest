@@ -49,11 +49,9 @@ export class BookService {
   // Create new book
   createBook(book: Omit<BookModel, 'id'>): Observable<BookModel> {
     const backendBook = this.mapFrontendBookToBackend(book);
-    console.log('Creating book with data:', backendBook);
     return this.http.post<any>(this.booksUrl, backendBook).pipe(
       map(createdBook => this.mapBackendBookToFrontend(createdBook)),
       catchError(error => {
-        console.error('Book creation failed:', error);
         throw error;
       })
     );
@@ -61,15 +59,11 @@ export class BookService {
 
   // Create new book with relations (categories and images)
   createBookWithRelations(bookData: any): Observable<BookModel> {
-    console.log('Creating book with relations:', bookData);
     return this.http.post<any>(this.booksUrl, bookData).pipe(
       map(createdBook => {
-        console.log('Book created successfully:', createdBook);
         return this.mapBackendBookToFrontend(createdBook);
       }),
       catchError(error => {
-        console.error('Book creation with relations failed:', error);
-        console.error('Error details:', error.error);
         throw error;
       })
     );
@@ -80,44 +74,11 @@ export class BookService {
     const stringId = this.toStringId(id);
     const backendBook = this.mapFrontendBookToBackend(book);
     
-    // Log basic request info
-    console.log('Updating book:', stringId);
-    
     return this.http.put<any>(`${this.booksUrl}/${stringId}`, backendBook).pipe(
       map(updatedBook => {
-        // 🔍 DEBUG: Log raw backend response
-        console.group('📥 BOOK SERVICE: Backend Response Received');
-        console.log('✅ HTTP Status: SUCCESS');
-        console.log('📦 Raw Backend Response:', updatedBook);
-        console.log('🔄 Response Type:', typeof updatedBook);
-        console.log('📊 Response Keys:', Object.keys(updatedBook || {}));
-        console.log('⏰ Response Time:', new Date().toISOString());
-        console.groupEnd();
-        
-        const mappedBook = this.mapBackendBookToFrontend(updatedBook);
-        
-        // DEBUG: Log mapped frontend response
-        console.group('🔄 BOOK SERVICE: Response Mapping Complete');
-        console.log('📤 Mapped Frontend Response:', mappedBook);
-        console.log('🔄 Mapping Function: mapBackendBookToFrontend');
-        console.log('✅ Service Response Ready for Component');
-        console.groupEnd();
-        
-        return mappedBook;
+        return this.mapBackendBookToFrontend(updatedBook);
       }),
       catchError(error => {
-        // DEBUG: Log service-level errors
-        console.group('❌ BOOK SERVICE: Request Failed');
-        console.error('HTTP Status: ERROR');
-        console.error('🚨 Service Error:', error);
-        console.error('📄 Error Message:', error.message);
-        console.error('🔢 HTTP Status Code:', error.status);
-        console.error('📊 Error Body:', error.error);
-        console.error('🌐 Failed URL:', error.url);
-        console.error('⏰ Error Time:', new Date().toISOString());
-        console.groupEnd();
-        
-        // Re-throw the error to ensure it reaches the component
         throw error;
       })
     );
@@ -128,53 +89,11 @@ export class BookService {
     const stringId = this.toStringId(id);
     const backendUpdates = this.mapFrontendBookToBackend(bookUpdates);
     
-    // DEBUG: Log service-level request details
-    console.group('🔧 BOOK SERVICE: patchBook() Method Called');
-    console.log('📍 Service Method: patchBook');
-    console.log('🆔 Book ID (original):', id);
-    console.log('🆔 Book ID (string):', stringId);
-    console.log('📤 Frontend Book Data:', bookUpdates);
-    console.log('🔄 Mapped Backend Data:', backendUpdates);
-    console.log('🌐 Request URL:', `${this.booksUrl}/${stringId}`);
-    console.log('📡 HTTP Method: PATCH');
-    console.log('⏰ Request Time:', new Date().toISOString());
-    console.groupEnd();
-    
     return this.http.patch<any>(`${this.booksUrl}/${stringId}`, backendUpdates).pipe(
       map(updatedBook => {
-        // 🔍 DEBUG: Log raw backend response
-        console.group('📥 BOOK SERVICE: Backend Response Received');
-        console.log('✅ HTTP Status: SUCCESS');
-        console.log('📦 Raw Backend Response:', updatedBook);
-        console.log('🔄 Response Type:', typeof updatedBook);
-        console.log('📊 Response Keys:', Object.keys(updatedBook || {}));
-        console.log('⏰ Response Time:', new Date().toISOString());
-        console.groupEnd();
-        
-        const mappedBook = this.mapBackendBookToFrontend(updatedBook);
-        
-        // DEBUG: Log mapped frontend response
-        console.group('🔄 BOOK SERVICE: Response Mapping Complete');
-        console.log('📤 Mapped Frontend Response:', mappedBook);
-        console.log('🔄 Mapping Function: mapBackendBookToFrontend');
-        console.log('✅ Service Response Ready for Component');
-        console.groupEnd();
-        
-        return mappedBook;
+        return this.mapBackendBookToFrontend(updatedBook);
       }),
       catchError(error => {
-        // DEBUG: Log service-level errors
-        console.group('❌ BOOK SERVICE: Request Failed');
-        console.error('HTTP Status: ERROR');
-        console.error('🚨 Service Error:', error);
-        console.error('📄 Error Message:', error.message);
-        console.error('🔢 HTTP Status Code:', error.status);
-        console.error('📊 Error Body:', error.error);
-        console.error('🌐 Failed URL:', error.url);
-        console.error('⏰ Error Time:', new Date().toISOString());
-        console.groupEnd();
-        
-        // Re-throw the error to ensure it reaches the component
         throw error;
       })
     );
@@ -539,10 +458,6 @@ export class BookService {
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(`${operation} failed:`, error);
-      console.error('Error status:', error.status);
-      console.error('Error message:', error.message);
-      console.error('Error body:', error.error);
       throw error; // Re-throw to allow component to handle
     };
   }
@@ -675,21 +590,12 @@ export class BookService {
   // Update book categories separately
   updateBookCategories(id: string | number, categoryIds: number[]): Observable<BookModel> {
     const stringId = this.toStringId(id);
-    console.group('🏷️ BOOK SERVICE: updateBookCategories() Method Called');
-    console.log('📍 Service Method: updateBookCategories');
-    console.log('🆔 Book ID:', stringId);
-    console.log('🏷️ Category IDs:', categoryIds);
-    console.log('🌐 Request URL:', `${this.booksUrl}/${stringId}/categories`);
-    console.log('📡 HTTP Method: PUT');
-    console.groupEnd();
     
     return this.http.put<any>(`${this.booksUrl}/${stringId}/categories`, categoryIds).pipe(
       map(updatedBook => {
-        console.log('✅ Categories updated successfully:', updatedBook);
         return this.mapBackendBookToFrontend(updatedBook);
       }),
       catchError(error => {
-        console.error('❌ Failed to update categories:', error);
         throw error;
       })
     );
@@ -705,21 +611,11 @@ export class BookService {
       displayOrder: index
     }));
     
-    console.group('🖼️ BOOK SERVICE: updateBookImages() Method Called');
-    console.log('📍 Service Method: updateBookImages');
-    console.log('🆔 Book ID:', stringId);
-    console.log('🖼️ Images:', backendImages);
-    console.log('🌐 Request URL:', `${this.booksUrl}/${stringId}/images`);
-    console.log('📡 HTTP Method: PUT');
-    console.groupEnd();
-    
     return this.http.put<any>(`${this.booksUrl}/${stringId}/images`, backendImages).pipe(
       map(updatedBook => {
-        console.log('✅ Images updated successfully:', updatedBook);
         return this.mapBackendBookToFrontend(updatedBook);
       }),
       catchError(error => {
-        console.error('❌ Failed to update images:', error);
         throw error;
       })
     );

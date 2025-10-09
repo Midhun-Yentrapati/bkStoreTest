@@ -357,20 +357,31 @@
 }
 
 .book-card.big {
-  max-width: 260px;
-  width: 260px;
+  max-width: 220px;
+  width: 220px;
+  min-width: 220px;
+  flex-shrink: 0;
 }
 
 .book-card.big .card-body {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .book-card.big .card-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
+  -webkit-line-clamp: 2;
+}
+
+.book-card.big .card-author {
+  -webkit-line-clamp: 1;
 }
 
 .book-card.big .card-price {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
+}
+
+.book-card.big .card-actions {
+  padding: 0.75rem;
 }
 
 /* Responsive Design */

@@ -88,16 +88,12 @@
           this.authService.register(userData).subscribe({
             next: (user) => {
               this.successMessage = `Welcome to BookVerse, ${user.fullName}! Registration successful.`;
-              setTimeout(() => {
-                this.router.navigate(['/']);
-              }, 2000);
+              this.isSubmitting = false;
+              this.router.navigate(['/']);
             },
             error: (err) => {
               this.errorMessage = err.message || 'Registration failed. Please try again.';
               this.isSubmitting = false;
-            },
-            complete: () => {
-              // Keep isSubmitting true to prevent multiple submissions during redirect
             }
           });
         } else {

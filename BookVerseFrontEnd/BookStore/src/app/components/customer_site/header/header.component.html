@@ -39,16 +39,15 @@
       <!-- Wishlist -->
       <button (click)="goToWishlist()" class="action-btn icon-btn cart-wishlist-btn" aria-label="Wishlist">
         <span class="material-icons">favorite_border</span>
-        <span class="badge badge-count" *ngIf="(wishlistItemCount$ | async) as count; else: noBadge">{{ count > 99 ? '99+' : count }}</span>
+        <span class="badge badge-count" *ngIf="wishlistItemCount() > 0">{{ wishlistItemCount() > 99 ? '99+' : wishlistItemCount() }}</span>
       </button>
       
       <!-- Shopping Cart -->
       <button (click)="goToCart()" class="action-btn icon-btn cart-wishlist-btn" aria-label="Cart">
         <span class="material-icons">shopping_cart</span>
-        <span class="badge badge-count" *ngIf="(cartItemCount$ | async) as count; else: noBadge">{{ count > 99 ? '99+' : count }}</span>
+        <span class="badge badge-count" *ngIf="cartItemCount() > 0">{{ cartItemCount() > 99 ? '99+' : cartItemCount() }}</span>
       </button>
 
-      <ng-template #noBadge></ng-template>
       
       <!-- Settings Dropdown -->
       <div class="user-menu-container">

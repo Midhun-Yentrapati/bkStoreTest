@@ -44,9 +44,9 @@
 .horizontal-scroll-container {
   display: flex;
   overflow-x: auto;
-  gap: 1.5rem;
-  padding: 0.5rem;
-  margin: 0 -0.5rem;
+  gap: 1rem;
+  padding: 0.25rem;
+  margin: 0 -0.25rem;
 
   /* Hides the scrollbar for a cleaner look */
   -ms-overflow-style: none;

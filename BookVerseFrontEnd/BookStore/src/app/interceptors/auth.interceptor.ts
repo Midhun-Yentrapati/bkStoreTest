@@ -13,10 +13,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   let token: string | null = null;
   if (isPlatformBrowser(platformId)) {
     token = localStorage.getItem('bookverse_token');
-    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? 'present' : 'null');
     if (!token) {
       token = authService.getToken();
-      console.log('[AUTH INTERCEPTOR] Token from service:', token ? 'present' : 'null');
     }
   } else {
     token = authService.getToken();
@@ -27,7 +25,6 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   
   // Skip authentication for public endpoints
   if (isPublicEndpoint(req.url)) {
-    console.log('[AUTH INTERCEPTOR] Skipping auth for public endpoint:', req.url);
     return next(req);
   }
 
@@ -36,40 +33,27 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     const refreshToken = localStorage.getItem('bookverse_refresh_token');
     if (refreshToken) {
       // Attempt token refresh (implement refresh logic here if needed)
-      console.log('[AUTH INTERCEPTOR] No access token, but refresh token exists');
     }
   }
   
   // Add token to request if available
   if (token) {
-    console.log('[AUTH INTERCEPTOR] Request URL:', req.url);
-    console.log('[AUTH INTERCEPTOR] Token exists: true. Adding Bearer token to request');
-    
     const authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });
-    
-    console.log('[AUTH INTERCEPTOR] Authorization header added');
     
     return next(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         // Only clear tokens for authentication endpoints, not authorization failures
         if (error.status === 401 && req.url.includes('/api/auth/')) {
-          console.warn('Authentication failed - clearing tokens');
           if (isPlatformBrowser(platformId)) {
             localStorage.removeItem('bookverse_token');
             localStorage.removeItem('bookverse_refresh_token');
           }
-        } else if (error.status === 401) {
-          console.warn('Authorization failed for:', req.url, '- keeping tokens');
         }
         return throwError(() => error);
       })
     );
-  } else {
-    // This runs during SSR or if no token exists
-    console.log('[AUTH INTERCEPTOR] Request URL:', req.url);
-    console.log(`[AUTH INTERCEPTOR] Platform is browser: ${isPlatformBrowser(platformId)}, Token exists: ${!!token}`);
   }
 
   // If running on server or no token is found in browser, proceed with original request (unauthenticated)
@@ -79,9 +63,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 // FIX: Helper functions now require and use platformId
 function getTokenFromStorage(platformId: Object): string | null {
   if (isPlatformBrowser(platformId)) {
-    const token = localStorage.getItem('bookverse_token');
-    console.log('[AUTH INTERCEPTOR] Token from localStorage:', token ? 'present' : 'null');
-    return token;
+    return localStorage.getItem('bookverse_token');
   }
   return null;
 }

@@ -1,12 +1,12 @@
 import { Component, computed, effect, inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common'; // Use CommonModule for NgIf
-import { FormsModule } from '@angular/forms'; // For [(ngModel)]
-import { Router, RouterLink, RouterLinkActive } from '@angular/router'; // For navigation and routerLink directive
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 
-import { AuthService } from '../../../services/auth.service'; // Import AuthService
-import { CartService } from '../../../services/cart.service'; // Import CartService
-import { WishlistService } from '../../../services/wishlist.service'; // Import WishlistService
-import { Observable } from 'rxjs';
+import { AuthService } from '../../../services/auth.service';
+import { CartService } from '../../../services/cart.service';
+import { WishlistService } from '../../../services/wishlist.service';
 
 @Component({
   selector: 'app-header',
@@ -35,30 +35,24 @@ export class HeaderComponent {
   isLoggedIn = computed(() => this.authService.isCustomerLoggedIn());
   currentUser = computed(() => this.authService.getCurrentCustomer());
 
-  // Cart and wishlist item counts
-  cartItemCount$: Observable<number>;
-  wishlistItemCount$: Observable<number>;
+  // Cart and wishlist item counts as signals
+  cartItemCount = computed(() => 0);
+  wishlistItemCount = computed(() => 0);
 
   // Inject Router, AuthService, CartService, and WishlistService
   constructor(
     private router: Router,
-
     private authService: AuthService,
     private cartService: CartService,
     private wishlistService: WishlistService
   ) {
-    // Initialize cart and wishlist count observables
-    this.cartItemCount$ = this.cartService.getCartItemCount();
-    this.wishlistItemCount$ = this.wishlistService.getWishlistCount();
-    // Fixed: Add platform check to prevent SSR hydration logging issue
+    // Initialize signals after services are injected
+    this.cartItemCount = toSignal(this.cartService.getCartItemCount(), { initialValue: 0 });
+    this.wishlistItemCount = toSignal(this.wishlistService.getWishlistCount(), { initialValue: 0 });
     effect(() => {
       if (isPlatformBrowser(this.platformId)) {
         const user = this.currentUser();
-        if (user) {
-          console.log('User logged in:', user.fullName);
-        } else {
-          console.log('User logged out');
-        }
+        // User state changed
       }
     });
   }
@@ -71,69 +65,33 @@ export class HeaderComponent {
   // Toggle settings dropdown
   toggleSettingsDropdown(): void {
     this.showSettingsDropdown = !this.showSettingsDropdown;
-    console.log('🔄 Dropdown toggled:', this.showSettingsDropdown);
   }
 
   // Close settings dropdown
   closeDropdown(): void {
     if (this.showSettingsDropdown) {
       this.showSettingsDropdown = false;
-      console.log('❌ Dropdown closed');
     }
   }
 
   // New simplified event handlers for dropdown buttons
   handleProfileClick(): void {
-    console.log('🎯 Profile clicked from dropdown');
     this.closeDropdown();
-    
-    // Use setTimeout to ensure dropdown closes before navigation
-    setTimeout(() => {
-      this.router.navigate(['/profile']).then(success => {
-        if (success) {
-          console.log('✅ Profile navigation successful');
-        } else {
-          console.error('❌ Profile navigation failed');
-        }
-      }).catch(error => {
-        console.error('❌ Profile navigation error:', error);
-      });
-    }, 100);
+    this.router.navigate(['/profile']);
   }
 
   handleSettingsClick(): void {
-    console.log('🎯 Settings clicked from dropdown');
     this.closeDropdown();
-    
-    // Use setTimeout to ensure dropdown closes before navigation
-    setTimeout(() => {
-      this.router.navigate(['/settings']).then(success => {
-        if (success) {
-          console.log('✅ Settings navigation successful');
-        } else {
-          console.error('❌ Settings navigation failed');
-        }
-      }).catch(error => {
-        console.error('❌ Settings navigation error:', error);
-      });
-    }, 100);
+    this.router.navigate(['/settings']);
   }
 
   handleLogoutClick(): void {
-    console.log('🎯 Logout clicked from dropdown');
     this.closeDropdown();
-    
-    // Use setTimeout to ensure dropdown closes before logout
-    setTimeout(() => {
-      try {
-        this.authService.logout(); // This already navigates to '/' in AuthService
-        console.log('✅ Logout successful - user redirected to home');
-      } catch (error) {
-        console.error('❌ Logout error:', error);
-        // Fallback navigation if logout fails
-        this.router.navigate(['/']);
-      }
-    }, 100);
+    try {
+      this.authService.logout();
+    } catch (error) {
+      this.router.navigate(['/']);
+    }
   }
 
   // Legacy methods for backward compatibility (keep for now)
@@ -163,35 +121,30 @@ export class HeaderComponent {
   }
 
   onLogin(): void {
-    console.log('Login clicked');
     this.router.navigate(['/login']);
     this.isMenuOpen = false;
     this.closeSettingsDropdown();
   }
 
   onSignup(): void {
-    console.log('Signup clicked');
     this.router.navigate(['/register']); // Fixed: navigate to /register instead of /signup
     this.isMenuOpen = false;
     this.closeSettingsDropdown();
   }
 
   goToWishlist(): void {
-    console.log('Wishlist clicked');
     this.router.navigate(['/wishlist']);
     this.isMenuOpen = false;
     this.closeSettingsDropdown();
   }
 
   goToCart(): void {
-    console.log('Cart clicked');
     this.router.navigate(['/cart']);
     this.isMenuOpen = false;
     this.closeSettingsDropdown();
   }
 
   goToOrders(): void {
-    console.log('Orders clicked');
     this.router.navigate(['/orders']);
     this.isMenuOpen = false;
     this.closeSettingsDropdown();
@@ -214,7 +167,6 @@ export class HeaderComponent {
 
   // Test dropdown button functionality
   testDropdownButton(): void {
-    console.log('🧪 Test button clicked - Dropdown is working!');
-    console.log('🔍 Check browser developer tools (F12) for navigation logs when clicking other buttons');
+    // Test button functionality
   }
 }
