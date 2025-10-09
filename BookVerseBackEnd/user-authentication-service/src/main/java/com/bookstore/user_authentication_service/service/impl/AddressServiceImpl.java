@@ -43,6 +43,15 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<AddressDTO> findAddressById(String addressId) {
+        if (addressId == null || addressId.trim().isEmpty()) {
+            return Optional.empty();
+        }
+        return addressRepository.findById(addressId).map(this::mapEntityToDto);
+    }
+
+    @Override
     public AddressDTO createAddress(String userId, AddressDTO addressDTO) {
         log.info("Creating address for user: {}", userId);
         

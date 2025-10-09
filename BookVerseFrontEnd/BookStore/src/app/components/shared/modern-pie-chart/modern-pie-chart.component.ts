@@ -50,20 +50,22 @@ interface ChartData {
           </circle>
           
           <!-- Center text -->
-          <text 
-            [attr.x]="center" 
-            [attr.y]="center - 10" 
-            text-anchor="middle" 
-            class="center-title">
-            {{ centerTitle }}
-          </text>
-          <text 
-            [attr.x]="center" 
-            [attr.y]="center + 10" 
-            text-anchor="middle" 
-            class="center-value">
-            {{ totalValue }}
-          </text>
+          <g *ngIf="showCenterText">
+            <text 
+              [attr.x]="center" 
+              [attr.y]="center - 10" 
+              text-anchor="middle" 
+              class="center-title">
+              {{ centerTitle }}
+            </text>
+            <text 
+              [attr.x]="center" 
+              [attr.y]="center + 10" 
+              text-anchor="middle" 
+              class="center-value">
+              {{ totalValue }}
+            </text>
+          </g>
         </svg>
         
         <!-- Hover Tooltip -->
@@ -241,6 +243,7 @@ export class ModernPieChartComponent implements OnChanges {
   @Input() showLegend: boolean = false;
   @Input() centerTitle: string = 'Total';
   @Input() centerColor: string = '#ffffff';
+  @Input() showCenterText: boolean = true;
   @Input() colors: string[] = [
     '#ff8a80',  // Light coral
     '#b39ddb',  // Light purple  

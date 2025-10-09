@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { AnalyticsService, AnalyticsDashboard, TopSellingBook } from '../../../services/analytics.service';
 import { AdminDashboardCardsComponent } from '../admin-dashboard-cards/admin-dashboard-cards.component';
 import { YearlySalesChartComponent } from '../yearly-sales-chart/yearly-sales-chart.component';
+import { OrderService } from '../../../services/order.service';
+import { Order } from '../../../models/order.model';
 import { forkJoin } from 'rxjs';
 
 // Interface for the card data (used for UI display)
@@ -44,7 +46,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     { title: 'Avg Order Value', value: 0, description: 'Average value of an order', isCurrency: true, iconClass: 'fas fa-dollar-sign', colorClass: 'bg-red-100 text-red-800' },
   ];
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(private analyticsService: AnalyticsService, private orderService: OrderService) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -61,8 +63,7 @@ export class AnalyticsDashboardComponent implements OnInit {
 
   /**
    * Fetches data for the dashboard from multiple backend endpoints concurrently.
-   * - Core stats via /api/analytics/dashboard
-   * - Top/Least books via /api/books/highly-sold & /api/books/least-sold
+   * Uses the same correct logic as yearly-sales-chart component for total revenue calculation.
    */
   loadDashboardData(): void {
     this.isLoading = true;
@@ -70,10 +71,10 @@ export class AnalyticsDashboardComponent implements OnInit {
 
     // Use forkJoin to manage multiple API calls efficiently and concurrently
     forkJoin({
+      // Fetch all orders to calculate correct totals (same as yearly-sales-chart)
+      orders: this.orderService.getOrders(),
       // Fetches basic stats from Admin/Analytics Service
       dashboardStats: this.analyticsService.getDashboardStats(),
-      // Fetches sales trends from Admin/Analytics Service
-      salesTrends: this.analyticsService.getSalesTrendsData(),
       // Fetches Top Selling Books from Admin/Analytics Service
       topBooks: this.analyticsService.getTopSellingBooksData(),
       // Fetches Least Selling Books from Admin/Analytics Service
@@ -82,13 +83,22 @@ export class AnalyticsDashboardComponent implements OnInit {
       next: (results) => {
         console.log('Dashboard data loaded:', results);
         
-        // Map dashboard stats
-        const stats = results.dashboardStats;
+        // Calculate correct totals from orders (same logic as yearly-sales-chart)
+        const orders = results.orders || [];
+        const correctTotalRevenue = this.calculateTotalRevenueFromOrders(orders);
+        const totalOrders = orders.length;
+        const totalItemsSold = this.calculateTotalItemsSold(orders);
+        const averageOrderValue = totalOrders > 0 ? (correctTotalRevenue / totalOrders) : 0;
+        
+        console.log('Calculated correct total revenue:', correctTotalRevenue);
+        console.log('Total orders:', totalOrders);
+        
+        // Use calculated values instead of potentially incorrect backend stats
         this.dashboardData = {
-          totalRevenue: stats.totalRevenue || 0,
-          totalOrders: stats.totalOrders || 0,
-          totalItemsSold: stats.pendingOrders + stats.deliveredOrders || 0,
-          averageOrderValue: stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders) : 0,
+          totalRevenue: correctTotalRevenue,
+          totalOrders: totalOrders,
+          totalItemsSold: totalItemsSold,
+          averageOrderValue: averageOrderValue,
           topSellingItems: results.topBooks || [],
           leastSellingItems: results.leastBooks || []
         };
@@ -177,5 +187,31 @@ export class AnalyticsDashboardComponent implements OnInit {
         break;
     }
     return date.toISOString().split('T')[0];
+  }
+
+  /**
+   * Calculate total revenue from all orders (same logic as yearly-sales-chart)
+   */
+  private calculateTotalRevenueFromOrders(orders: Order[]): number {
+    return orders.reduce((total, order) => {
+      const orderAmount = order.finalAmount || order.totalAmount || 0;
+      return total + orderAmount;
+    }, 0);
+  }
+
+  /**
+   * Calculate total items sold from all orders
+   */
+  private calculateTotalItemsSold(orders: Order[]): number {
+    return orders.reduce((total, order) => {
+      // Sum up quantities from order items if available
+      if (order.orderItems && Array.isArray(order.orderItems)) {
+        return total + order.orderItems.reduce((itemTotal, item) => {
+          return itemTotal + (item.quantity || 0);
+        }, 0);
+      }
+      // Fallback: assume 1 item per order if orderItems not available
+      return total + 1;
+    }, 0);
   }
 }

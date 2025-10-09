@@ -33,6 +33,14 @@ export class AddressService {
   }
 
   /**
+   * Get a specific address by ID for admin users
+   * Uses the admin endpoint that can access any user's address
+   */
+  getAddressByIdForAdmin(id: string): Observable<Address> {
+    return this.http.get<Address>(`${this.apiBaseUrl}/addresses/${id}`);
+  }
+
+  /**
    * Add a new address
    */
   addAddress(address: Omit<Address, 'id'>): Observable<Address> {

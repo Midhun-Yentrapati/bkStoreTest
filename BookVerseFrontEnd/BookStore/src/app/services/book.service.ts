@@ -96,7 +96,7 @@ export class BookService {
         
         const mappedBook = this.mapBackendBookToFrontend(updatedBook);
         
-        // 🔍 DEBUG: Log mapped frontend response
+        // DEBUG: Log mapped frontend response
         console.group('🔄 BOOK SERVICE: Response Mapping Complete');
         console.log('📤 Mapped Frontend Response:', mappedBook);
         console.log('🔄 Mapping Function: mapBackendBookToFrontend');
@@ -106,9 +106,9 @@ export class BookService {
         return mappedBook;
       }),
       catchError(error => {
-        // 🔍 DEBUG: Log service-level errors
+        // DEBUG: Log service-level errors
         console.group('❌ BOOK SERVICE: Request Failed');
-        console.error('💥 HTTP Status: ERROR');
+        console.error('HTTP Status: ERROR');
         console.error('🚨 Service Error:', error);
         console.error('📄 Error Message:', error.message);
         console.error('🔢 HTTP Status Code:', error.status);
@@ -128,7 +128,7 @@ export class BookService {
     const stringId = this.toStringId(id);
     const backendUpdates = this.mapFrontendBookToBackend(bookUpdates);
     
-    // 🔍 DEBUG: Log service-level request details
+    // DEBUG: Log service-level request details
     console.group('🔧 BOOK SERVICE: patchBook() Method Called');
     console.log('📍 Service Method: patchBook');
     console.log('🆔 Book ID (original):', id);
@@ -153,7 +153,7 @@ export class BookService {
         
         const mappedBook = this.mapBackendBookToFrontend(updatedBook);
         
-        // 🔍 DEBUG: Log mapped frontend response
+        // DEBUG: Log mapped frontend response
         console.group('🔄 BOOK SERVICE: Response Mapping Complete');
         console.log('📤 Mapped Frontend Response:', mappedBook);
         console.log('🔄 Mapping Function: mapBackendBookToFrontend');
@@ -163,9 +163,9 @@ export class BookService {
         return mappedBook;
       }),
       catchError(error => {
-        // 🔍 DEBUG: Log service-level errors
+        // DEBUG: Log service-level errors
         console.group('❌ BOOK SERVICE: Request Failed');
-        console.error('💥 HTTP Status: ERROR');
+        console.error('HTTP Status: ERROR');
         console.error('🚨 Service Error:', error);
         console.error('📄 Error Message:', error.message);
         console.error('🔢 HTTP Status Code:', error.status);
@@ -424,16 +424,23 @@ export class BookService {
     );
   }
 
-  // Get least sold books (for admin dashboard)
+  // Get least sold books (for admin dashboard) - excluding books with 0 sales
   getLeastSoldBooks(limit: number = 10): Observable<BookWithSales[]> {
     return this.http.get<any[]>(`${this.booksUrl}/least-sold?limit=${limit}`).pipe(
-      map(books => books.map(book => {
-        const mappedBook = this.mapBackendBookToFrontend(book);
-        return {
-          ...mappedBook,
-          no_of_books_sold: book.noOfBooksSold || 0
-        } as BookWithSales;
-      })),
+      map(books => {
+        // Filter out books with 0 sales and map the data
+        const booksWithSales = books
+          .map(book => {
+            const mappedBook = this.mapBackendBookToFrontend(book);
+            return {
+              ...mappedBook,
+              no_of_books_sold: book.noOfBooksSold || 0
+            } as BookWithSales;
+          })
+          .filter(book => book.no_of_books_sold > 0); // Only include books with sales > 0
+        
+        return booksWithSales;
+      }),
       catchError(this.handleError<BookWithSales[]>('getLeastSoldBooks', []))
     );
   }

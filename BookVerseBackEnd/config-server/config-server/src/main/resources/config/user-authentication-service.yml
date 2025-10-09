@@ -14,7 +14,7 @@ spring:
     # MySQL Configuration for production
     url: jdbc:mysql://localhost:3306/bookstore_auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: Midhun@64
+    password: root123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

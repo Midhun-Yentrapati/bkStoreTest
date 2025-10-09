@@ -27,15 +27,18 @@ export class OrderService {
 
   getOrders(): Observable<Order[]> {
     const currentUser = this.authService.getCurrentCustomer();
-    if (!currentUser) {
+    const currentAdmin = this.authService.getCurrentAdmin();
+    
+    if (!currentUser && !currentAdmin) {
       return throwError(() => new Error('User not logged in'));
     }
 
-    // Use backend endpoint with details: /api/orders/with-details
-    const isAdmin = currentUser.username && currentUser.username.toLowerCase().includes('admin');
-    const url = isAdmin ? `${this.apiUrl}/with-details` : `${this.apiUrl}/with-details?userId=${currentUser.id}`;
+    // Use basic endpoints that actually exist
+    const isAdmin = currentAdmin || (currentUser?.username && currentUser.username.toLowerCase().includes('admin'));
+    const url = isAdmin ? this.apiUrl : `${this.apiUrl}?userId=${currentUser!.id}`;
     
-    console.log('Fetching orders with details from URL:', url);
+    console.log('Fetching orders from URL:', url);
+    console.log('Authentication status:', { hasCustomer: !!currentUser, hasAdmin: !!currentAdmin, isAdmin });
     
     return this.http.get<any>(url).pipe(
       map(response => {
@@ -71,34 +74,9 @@ export class OrderService {
         console.log('Processed orders:', processedOrders.length);
         return processedOrders;
       }),
-      catchError(() => {
-        // Fallback to basic orders endpoint
-        console.log('Falling back to basic orders endpoint');
-        const fallbackUrl = isAdmin ? this.apiUrl : `${this.apiUrl}?userId=${currentUser.id}`;
-        return this.http.get<any>(fallbackUrl).pipe(
-          map(response => {
-            let orders = Array.isArray(response) ? response : [];
-            return orders.map(order => ({
-              ...order,
-              orderDate: order.orderDate || order.createdAt || order.placedAt,
-              totalAmount: order.totalAmount || order.subtotal || order.grandTotal,
-              items: order.items || order.orderItems || [],
-              orderStatus: order.orderStatus || 'Pending',
-              paymentStatus: order.paymentStatus || 'Pending',
-              shippingAddress: order.shippingAddress || {
-                name: 'Address not available',
-                phone: '',
-                addressLine1: 'Please contact support for address details',
-                city: '',
-                state: '',
-                pincode: '',
-                country: 'India',
-                addressType: 'HOME' as const
-              }
-            }));
-          }),
-          catchError(() => of([]))
-        );
+      catchError(error => {
+        console.error('Error fetching orders:', error);
+        return of([]);
       })
     );
   }
@@ -397,10 +375,74 @@ export class OrderService {
 
   // Method for admins to get all orders with customer details
   getAllOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/admin/with-customer-details`).pipe(
-      catchError(() => {
+    // Try the admin endpoint with customer details first
+    return this.http.get<any>(`${this.apiUrl}/admin/with-customer-details`).pipe(
+      map(response => {
+        console.log('Admin orders with customer details response:', response);
+        
+        // Handle different response formats
+        let orders: Order[];
+        if (Array.isArray(response)) {
+          orders = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          orders = response.data;
+        } else if (response && response.orders && Array.isArray(response.orders)) {
+          orders = response.orders;
+        } else {
+          console.warn('Unexpected response format for admin orders');
+          orders = [];
+        }
+        
+        // Process orders to ensure proper field mapping and customer details
+        return orders.map(order => ({
+          ...order,
+          orderDate: order.orderDate || order.createdAt || order.placedAt,
+          totalAmount: order.totalAmount || order.subtotal || order.grandTotal,
+          items: order.items || order.orderItems || [],
+          orderStatus: order.orderStatus || 'Pending',
+          paymentStatus: order.paymentStatus || 'Pending',
+          // Ensure customer details are available
+          customerName: order.customerName || order.shippingAddress?.name || 'Customer Name Not Available',
+          customerEmail: order.customerEmail || 'Email Not Available',
+          customerPhone: order.customerPhone || order.shippingAddress?.phone || 'Phone Not Available',
+          // Ensure shipping address is properly structured
+          shippingAddress: order.shippingAddress || {
+            name: order.customerName || 'Name Not Available',
+            phone: order.customerPhone || 'Phone Not Available',
+            addressLine1: 'Address details not available',
+            city: 'City Not Available',
+            state: 'State Not Available',
+            pincode: 'PIN Not Available',
+            country: 'India',
+            addressType: 'HOME' as const
+          }
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching admin orders with customer details:', error);
         // Fallback to basic endpoint
         return this.http.get<Order[]>(this.apiUrl).pipe(
+          map(orders => orders.map(order => ({
+            ...order,
+            orderDate: order.orderDate || order.createdAt || order.placedAt,
+            totalAmount: order.totalAmount || order.subtotal || order.grandTotal,
+            items: order.items || order.orderItems || [],
+            orderStatus: order.orderStatus || 'Pending',
+            paymentStatus: order.paymentStatus || 'Pending',
+            customerName: 'Customer Details Not Available',
+            customerEmail: 'Email Not Available',
+            customerPhone: 'Phone Not Available',
+            shippingAddress: {
+              name: 'Address Not Available',
+              phone: '',
+              addressLine1: 'Please contact support for address details',
+              city: '',
+              state: '',
+              pincode: '',
+              country: 'India',
+              addressType: 'HOME' as const
+            }
+          }))),
           catchError(() => of([]))
         );
       })

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Address } from '../models/address.model';
 
 export interface AdminUser {
   id: string;
@@ -76,6 +77,14 @@ export class AdminService {
   getCustomerById(id: string): Observable<CustomerUser> {
     return this.http.get<CustomerUser>(`${this.apiUrl}/customers/${id}`).pipe(
       catchError(this.handleError<CustomerUser>('getCustomerById'))
+    );
+  }
+
+  // Address Management (Admin)
+  getAddressById(id: string): Observable<Address> {
+    // This endpoint is for admins to fetch any address by ID
+    return this.http.get<Address>(`http://localhost:8090/api/users/admin/addresses/${id}`).pipe(
+      catchError(this.handleError<Address>('getAddressById'))
     );
   }
 

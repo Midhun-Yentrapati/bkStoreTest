@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookModel, BookUtils, CustomerRating } from '../../../models/book.model';
 import { BookService } from '../../../services/book.service';
@@ -8,7 +8,7 @@ import { NotificationService } from '../../../services/notification.service';
 import { ReviewService } from '../../../services/review.service';
 import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ReviewListComponent } from '../review-list/review-list.component';
 import { ReviewFormComponent } from '../review-form/review-form.component';
 import { StarRatingComponent } from '../star-rating/star-rating.component';
@@ -21,7 +21,7 @@ import { HorizontalBookSectionComponent } from '../horizontal-book-section/horiz
   templateUrl: './book-detail.component.html',
   styleUrl: './book-detail.component.css'
 })
-export class BookDetailComponent implements OnInit {
+export class BookDetailComponent implements OnInit, OnDestroy {
 
   id!: string;
   book!: BookModel;
@@ -45,6 +45,7 @@ export class BookDetailComponent implements OnInit {
   submittingReview = false;
   reviewSubmissionSuccess = false;
   private _userLoggedInCache: boolean | null = null;
+  private routeSubscription: Subscription | null = null;
 
   constructor( 
     private bookService: BookService,
@@ -58,11 +59,34 @@ export class BookDetailComponent implements OnInit {
    ) { }
 
    ngOnInit(): void {
-    this.id = String(this.route.snapshot.paramMap.get('id'));
     // Cache login status once during initialization
     this._userLoggedInCache = this.authService.isLoggedIn();
-    this.loadBookData();
-    this.loadReviews();
+    
+    // Subscribe to route parameter changes to handle navigation between books
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const newId = String(params.get('id'));
+      if (newId && newId !== this.id) {
+        this.id = newId;
+        this.loadBookData();
+        this.loadReviews();
+        // Reset image selection when book changes
+        this.selectedImageIndex = 0;
+        // Scroll to top when navigating to a new book
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (newId && !this.id) {
+        // Initial load case
+        this.id = newId;
+        this.loadBookData();
+        this.loadReviews();
+      }
+    });
+   }
+
+   ngOnDestroy(): void {
+    // Clean up subscription to prevent memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
    }
 
    // Image gallery methods
@@ -181,18 +205,7 @@ export class BookDetailComponent implements OnInit {
     });
      }
 
-  navigateToBook(bookId: string | number): void {
-    const stringId = bookId.toString();
-    // Update the URL without refreshing the page
-    this.router.navigate(['/book', stringId], { replaceUrl: true });
-    
-    // Update the current book ID and reload all data
-    this.id = stringId;
-    this.loadBookData();
-    
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+
   
   private loadBookData(): void {
     console.log('Loading book data for ID:', this.id);
@@ -205,8 +218,6 @@ export class BookDetailComponent implements OnInit {
           this.book = book;
           this.isInWishlist$ = this.wishlistService.isInWishlist(this.book.id);
           this.loadSimilarBooks();
-          // Reset image selection when book changes
-          this.selectedImageIndex = 0;
         } else {
           console.error('Book not found');
           this.router.navigate(['/']);

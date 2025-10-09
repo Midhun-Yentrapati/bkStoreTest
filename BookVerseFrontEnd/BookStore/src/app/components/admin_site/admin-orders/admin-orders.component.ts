@@ -2,12 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderService } from '../../../services/order.service';
+
+import { AdminService } from '../../../services/admin.service';
+import { AddressService } from '../../../services/address.service';
 import { Order, OrderWithDetails } from '../../../models/order.model';
 import { UserModel } from '../../../models/user.model';
 import { BookModel } from '../../../models/book.model';
 import { AuthService } from '../../../services/auth.service';
 import { BookService } from '../../../services/book.service';
 import { FormsModule } from '@angular/forms';
+import { Address } from '../../../models/address.model';
+import { forkJoin, of, firstValueFrom } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-orders',
@@ -44,6 +50,9 @@ export class AdminOrdersComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    
+    private adminService: AdminService,
+    private addressService: AddressService,
     private authService: AuthService,
     private bookService: BookService
   ) {}
@@ -56,24 +65,11 @@ export class AdminOrdersComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    // Use getAllOrders for admin to see all orders with customer details
-    this.orderService.getAllOrders().subscribe({
+    // Use getOrders method which handles admin vs customer logic internally
+    this.orderService.getOrders().subscribe({
       next: (orders) => {
         console.log('Raw admin orders received:', orders);
-        
-        // Convert to OrderWithDetails and ensure customer data is available
-        this.orders = orders.map(order => ({
-          ...order,
-          items: order.orderItems || order.items || [],
-          orderItems: order.orderItems || order.items || [],
-          // Ensure customer data is available
-          customerName: (order as any).customerName || 'Customer Name Not Available',
-          customerEmail: (order as any).customerEmail || 'Email Not Available',
-          customerPhone: (order as any).customerPhone || order.shippingAddress?.phone || 'Phone Not Available'
-        }));
-        
-        this.isLoading = false;
-        console.log('Processed admin orders:', this.orders);
+        this.processOrdersWithAddressesAndCustomers(orders);
       },
       error: (error) => {
         console.error('Error loading orders:', error);
@@ -81,6 +77,176 @@ export class AdminOrdersComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  private processOrdersWithAddressesAndCustomers(orders: Order[]): void {
+    if (orders.length === 0) {
+      this.orders = [];
+      this.isLoading = false;
+      return;
+    }
+
+    console.log(`Processing ${orders.length} admin orders with address and customer fetching...`);
+    console.log('Raw orders received:', orders);
+
+    // Create requests to fetch addresses and customer details for each order
+    const enrichmentRequests = orders.map((order, index) => {
+      console.log(`Processing order ${index + 1}/${orders.length}: ${order.id}`);
+      console.log(`Order details:`, {
+        id: order.id,
+        userId: order.userId,
+        shippingAddressId: order.shippingAddressId,
+        billingAddressId: order.billingAddressId,
+        hasShippingAddress: !!order.shippingAddress,
+        customerName: (order as any).customerName,
+        customerEmail: (order as any).customerEmail,
+        customerPhone: (order as any).customerPhone
+      });
+      
+      const shouldFetchAddress = order.shippingAddressId && !order.shippingAddress;
+      const shouldFetchCustomer = order.userId && !(order as any).customerName;
+      
+      console.log(`Fetch decisions for order ${order.id}:`, {
+        shouldFetchAddress,
+        shouldFetchCustomer,
+        reason: {
+          address: shouldFetchAddress ? `Has shippingAddressId: ${order.shippingAddressId}` : 'Already has address or no ID',
+          customer: shouldFetchCustomer ? `Has userId: ${order.userId}` : 'Already has customer data or no user ID'
+        }
+      });
+      
+      const addressRequest = shouldFetchAddress
+        ? (async () => {
+            try {
+              console.log(`Fetching address for order ${order.id}: ${order.shippingAddressId}`);
+              // CORRECT: This calls the admin-specific endpoint
+              const address = await firstValueFrom(this.addressService.getAddressByIdForAdmin(order.shippingAddressId!));
+              console.log(`Successfully fetched address for order ${order.id}:`, address);
+              return address;
+            } catch (error: any) {
+              console.error(`Error fetching address ${order.shippingAddressId} for order ${order.id}:`, error);
+              console.error('Address API Error Details:', {
+                status: error.status,
+                statusText: error.statusText,
+                url: error.url,
+                message: error.message
+              });
+              return this.getDefaultAddress();
+            }
+          })()
+        : (() => {
+            console.log(`Order ${order.id} already has address or no address ID`);
+            return Promise.resolve(order.shippingAddress || this.getDefaultAddress());
+          })();
+
+      const customerRequest = shouldFetchCustomer
+        ? (async () => {
+            try {
+              console.log(`Fetching customer details for order ${order.id}: ${order.userId}`);
+              const customer = await firstValueFrom(this.adminService.getCustomerById(order.userId));
+              console.log(`Successfully fetched customer for order ${order.id}:`, customer);
+              return customer;
+            } catch (error: any) {
+              console.error(`Error fetching customer ${order.userId} for order ${order.id}:`, error);
+              console.error('Customer API Error Details:', {
+                status: error.status,
+                statusText: error.statusText,
+                url: error.url,
+                message: error.message
+              });
+              return {
+                id: order.userId,
+                fullName: 'Customer Name Not Available',
+                email: 'Email Not Available',
+                phoneNumber: 'Phone Not Available'
+              };
+            }
+          })()
+        : (() => {
+            console.log(`Order ${order.id} already has customer details or no user ID`);
+            return Promise.resolve({
+              id: order.userId,
+              fullName: (order as any).customerName || 'Customer Name Not Available',
+              email: (order as any).customerEmail || 'Email Not Available',
+              phoneNumber: (order as any).customerPhone || 'Phone Not Available'
+            });
+          })();
+
+      // Combine address and customer requests using Promise.all
+      return Promise.all([addressRequest, customerRequest]).then(([address, customer]) => ({
+        address,
+        customer,
+        order
+      }));
+    });
+
+    // Execute all enrichment requests using Promise.all
+    Promise.all(enrichmentRequests)
+      .then((results) => {
+        console.log(`Successfully processed ${results.length} orders with enriched data`);
+        console.log('Enrichment results:', results);
+        
+        this.orders = results.map(({ order, address, customer }) => {
+          const enrichedOrder = {
+            ...order,
+            items: order.orderItems || order.items || [],
+            orderItems: order.orderItems || order.items || [],
+            shippingAddress: address,
+            customerName: customer.fullName,
+            customerEmail: customer.email,
+            customerPhone: customer.phoneNumber || address?.phone || 'Phone Not Available',
+            // Ensure proper date and amount fields
+            orderDate: order.orderDate || order.createdAt || order.placedAt,
+            totalAmount: order.finalAmount || order.grandTotal || order.subtotal
+          } as OrderWithDetails;
+          
+          console.log(`Enriched order ${order.id}:`, {
+            customerName: enrichedOrder.customerName,
+            customerEmail: enrichedOrder.customerEmail,
+            customerPhone: enrichedOrder.customerPhone,
+            hasAddress: !!enrichedOrder.shippingAddress,
+            addressLine1: enrichedOrder.shippingAddress?.addressLine1
+          });
+          
+          return enrichedOrder;
+        });
+
+        this.isLoading = false;
+        console.log('Admin orders processed successfully with addresses and customer details:', this.orders.length);
+      })
+      .catch((error) => {
+        console.error('Error processing orders with addresses and customers:', error);
+        // Fallback: use orders without proper enrichment
+        this.orders = orders.map(order => ({
+          ...order,
+          items: order.orderItems || order.items || [],
+          orderItems: order.orderItems || order.items || [],
+          shippingAddress: order.shippingAddress || this.getDefaultAddress(),
+          customerName: (order as any).customerName || 'Customer Name Not Available',
+          customerEmail: (order as any).customerEmail || 'Email Not Available',
+          customerPhone: (order as any).customerPhone || order.shippingAddress?.phone || 'Phone Not Available',
+          orderDate: order.orderDate || order.createdAt || order.placedAt,
+          totalAmount: order.finalAmount || order.grandTotal || order.subtotal
+        } as OrderWithDetails));
+        this.isLoading = false;
+        console.warn('Fallback: Using orders without complete enrichment due to errors');
+      });
+  }
+
+  private getDefaultAddress(): Address {
+    return {
+      name: 'Address not available',
+      phone: '',
+      addressLine1: 'Please contact support for address details',
+      addressLine2: '',
+      city: '',
+      state: '',
+      pincode: '',
+      country: 'India',
+      addressType: 'HOME' as const,
+      isDefault: false,
+      isActive: true
+    };
   }
 
   getFilteredOrders(): OrderWithDetails[] {

@@ -302,7 +302,7 @@ public class UserServiceImpl implements UserService {
         log.info("Activating account for user: {}", userId);
         
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         user.setAccountStatus(AccountStatus.ACTIVE);
         user.setUpdatedAt(LocalDateTime.now());
@@ -315,7 +315,7 @@ public class UserServiceImpl implements UserService {
         log.info("Deactivating account for user: {}", userId);
         
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         user.setAccountStatus(AccountStatus.INACTIVE);
         user.setUpdatedAt(LocalDateTime.now());
@@ -334,7 +334,7 @@ public class UserServiceImpl implements UserService {
         
         // Find the user
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         // Verify current password
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
@@ -419,7 +419,7 @@ public class UserServiceImpl implements UserService {
         
         Address address = addressRepository.findById(addressId)
                 .filter(addr -> addr.getUser().getId().equals(userId))
-                .orElseThrow(() -> AddressNotFoundException.addressNotFoundForUser(addressId, userId));
+                .orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
         
         // Update fields
         if (addressDTO.getName() != null) address.setName(addressDTO.getName());
@@ -455,7 +455,7 @@ public class UserServiceImpl implements UserService {
         
         Address address = addressRepository.findById(addressId)
                 .filter(addr -> addr.getUser().getId().equals(userId))
-                .orElseThrow(() -> AddressNotFoundException.addressNotFoundForUser(addressId, userId));
+                .orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
         
         addressRepository.delete(address);
     }
@@ -463,18 +463,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public AddressDTO setDefaultAddress(String userId, String addressId) {
         log.info("Setting default address {} for user: {}", addressId, userId);
-        
+
+        // 1. Validate that the user exists
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+
+        // 2. Find the address and ensure it belongs to the user
         Address address = addressRepository.findById(addressId)
                 .filter(addr -> addr.getUser().getId().equals(userId))
-                .orElseThrow(() -> AddressNotFoundException.addressNotFoundForUser(addressId, userId));
-        
-        // Unset all other default addresses for this user
+                .orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId + " for user " + userId));
+
+        // 3. Unset all other default addresses for this user
         addressRepository.unsetAllDefaultAddressesForUser(userId);
-        
-        // Set this address as default
+
+        // 4. Set this address as the new default
         address.setIsDefault(true);
         Address savedAddress = addressRepository.save(address);
-        
+
         return convertToAddressDTO(savedAddress);
     }
     

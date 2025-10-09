@@ -10,7 +10,7 @@ spring:
     url: jdbc:mysql://localhost:3306/cart_order_management?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: Midhun@64
+    password: root123
     platform: mysql
   jpa:
     hibernate:

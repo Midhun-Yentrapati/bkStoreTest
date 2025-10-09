@@ -1,10 +1,15 @@
 package com.bookstore2.Bookstore2.Controller;
 
+import com.bookstore2.Bookstore2.Models.DailySalesSummary;
+import com.bookstore2.Bookstore2.Service.AnalyticsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -12,6 +17,9 @@ import java.util.*;
 @RequestMapping("/api/analytics")
 public class AnalyticsController {
 
+    @Autowired
+    private AnalyticsService analyticsService;
+    
     private final RestTemplate restTemplate = new RestTemplate();
     private final String ORDER_SERVICE_URL = "http://localhost:8090/api/orders";
     private final String BOOK_SERVICE_URL = "http://localhost:8090/api/books";
@@ -211,6 +219,153 @@ public class AnalyticsController {
         } catch (Exception e) {
             System.out.println("Error fetching least selling books: " + e.getMessage());
             return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+
+    // Daily Sales Summary Management Methods
+    
+    @PostMapping("/daily-sales-summary")
+    public ResponseEntity<DailySalesSummary> processDailySalesSummary(@RequestBody DailySalesSummary dailySalesSummary) {
+        try {
+            DailySalesSummary savedSummary = analyticsService.saveOrUpdateDailySalesSummary(dailySalesSummary);
+            return ResponseEntity.ok(savedSummary);
+        } catch (Exception e) {
+            System.out.println("Error processing daily sales summary: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/daily-sales-summaries/recent")
+    public ResponseEntity<List<DailySalesSummary>> getRecentDailySalesSummaries() {
+        try {
+            List<DailySalesSummary> summaries = analyticsService.getRecentDailySalesSummaries();
+            return ResponseEntity.ok(summaries);
+        } catch (Exception e) {
+            System.out.println("Error fetching recent daily sales summaries: " + e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+    
+    @GetMapping("/daily-sales-summary/{date}")
+    public ResponseEntity<DailySalesSummary> getDailySalesSummaryByDate(@PathVariable LocalDate date) {
+        try {
+            DailySalesSummary summary = analyticsService.getDailySalesSummaryByDate(date);
+            if (summary != null) {
+                return ResponseEntity.ok(summary);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching daily sales summary by date: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/daily-sales-summaries")
+    public ResponseEntity<List<DailySalesSummary>> getDailySalesSummariesByDateRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            List<DailySalesSummary> summaries = analyticsService.getDailySalesSummariesByDateRange(startDate, endDate);
+            return ResponseEntity.ok(summaries);
+        } catch (Exception e) {
+            System.out.println("Error fetching daily sales summaries by date range: " + e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+    
+    // Analytics Calculation Methods
+    
+    @GetMapping("/total-revenue")
+    public ResponseEntity<BigDecimal> getTotalRevenueInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            BigDecimal totalRevenue = analyticsService.calculateTotalRevenueInRange(startDate, endDate);
+            return ResponseEntity.ok(totalRevenue);
+        } catch (Exception e) {
+            System.out.println("Error calculating total revenue: " + e.getMessage());
+            return ResponseEntity.ok(BigDecimal.ZERO);
+        }
+    }
+    
+    @GetMapping("/total-orders")
+    public ResponseEntity<Integer> getTotalOrdersInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            Integer totalOrders = analyticsService.calculateTotalOrdersInRange(startDate, endDate);
+            return ResponseEntity.ok(totalOrders);
+        } catch (Exception e) {
+            System.out.println("Error calculating total orders: " + e.getMessage());
+            return ResponseEntity.ok(0);
+        }
+    }
+    
+    @GetMapping("/total-items-sold")
+    public ResponseEntity<Integer> getTotalItemsSoldInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            Integer totalItems = analyticsService.calculateTotalItemsSoldInRange(startDate, endDate);
+            return ResponseEntity.ok(totalItems);
+        } catch (Exception e) {
+            System.out.println("Error calculating total items sold: " + e.getMessage());
+            return ResponseEntity.ok(0);
+        }
+    }
+    
+    @GetMapping("/average-order-value")
+    public ResponseEntity<BigDecimal> getAverageOrderValueInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            BigDecimal avgOrderValue = analyticsService.calculateAverageOrderValueInRange(startDate, endDate);
+            return ResponseEntity.ok(avgOrderValue);
+        } catch (Exception e) {
+            System.out.println("Error calculating average order value: " + e.getMessage());
+            return ResponseEntity.ok(BigDecimal.ZERO);
+        }
+    }
+    
+    @GetMapping("/top-selling-items")
+    public ResponseEntity<List<Object[]>> getTopSellingItemsInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            List<Object[]> topItems = analyticsService.getTopSellingItemsInRange(startDate, endDate);
+            return ResponseEntity.ok(topItems);
+        } catch (Exception e) {
+            System.out.println("Error fetching top selling items: " + e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+    
+    @GetMapping("/least-selling-items")
+    public ResponseEntity<List<Object[]>> getLeastSellingItemsInRange(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            List<Object[]> leastItems = analyticsService.getLeastSellingItemsInRange(startDate, endDate);
+            return ResponseEntity.ok(leastItems);
+        } catch (Exception e) {
+            System.out.println("Error fetching least selling items: " + e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+    
+    @GetMapping("/analytics-dashboard")
+    public ResponseEntity<Map<String, Object>> getAnalyticsDashboard(
+            @RequestParam LocalDate startDate, 
+            @RequestParam LocalDate endDate) {
+        try {
+            Map<String, Object> dashboard = analyticsService.getAnalyticsDashboard(startDate, endDate);
+            return ResponseEntity.ok(dashboard);
+        } catch (Exception e) {
+            System.out.println("Error fetching analytics dashboard: " + e.getMessage());
+            Map<String, Object> errorDashboard = new HashMap<>();
+            errorDashboard.put("error", "Failed to fetch analytics data");
+            return ResponseEntity.ok(errorDashboard);
         }
     }
 }

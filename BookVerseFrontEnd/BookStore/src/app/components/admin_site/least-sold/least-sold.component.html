@@ -9,12 +9,13 @@
     <app-modern-pie-chart 
       [data]="chartData"
       [size]="260"
-      centerTitle="Books"
+      [showCenterText]="false"
       [colors]="['#ffab91', '#f48fb1', '#ce93d8', '#b39ddb', '#9fa8da', '#90caf9']">
     </app-modern-pie-chart>
   </div>
   <div *ngIf="!isLoading && !errorMessage && !hasChartData" class="no-data-message">
-    <p>No least sold books data available to display.</p>
-    <p>Please check your JSON server data for 'books' and 'books_by_category' and ensure it has sales data.</p>
+    <p>No least sold books with sales data available to display.</p>
+    <p>This chart shows books with the lowest sales (excluding books with 0 sales).</p>
+    <p>Please ensure your data contains books with sales greater than 0.</p>
   </div>
 </div>

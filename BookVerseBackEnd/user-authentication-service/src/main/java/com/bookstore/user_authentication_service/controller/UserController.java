@@ -1,5 +1,4 @@
 package com.bookstore.user_authentication_service.controller;
-
 import com.bookstore.user_authentication_service.dto.*;
 import com.bookstore.user_authentication_service.entity.*;
 import com.bookstore.user_authentication_service.service.AddressService;
@@ -25,10 +24,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -279,39 +278,65 @@ public class UserController {
             if (addressDTO.isPresent()) {
                 return ResponseEntity.ok(addressDTO.get());
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                     .body(Map.of("error", "Address not found or not owned by user"));
+                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("Error getting address by ID: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Map.of("error", "Failed to retrieve address"));
+            log.error("Error getting address by ID: {}", addressId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred."));
         }
     }
-    
+
+    /**
+     * [ADMIN] Get any address by its ID.
+     *
+     * @param addressId The ID of the address to retrieve.
+     * @return The address DTO if found.
+     */
+    @GetMapping("/admin/addresses/{addressId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "[ADMIN] Get any address by ID", description = "Allows an admin to retrieve any address by its unique ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Address retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - User is not an admin"),
+            @ApiResponse(responseCode = "404", description = "Address not found")
+    })
+    public ResponseEntity<?> getAnyAddressById(@PathVariable String addressId) {
+        log.info("Admin request to get address by ID: {}", addressId);
+        Optional<AddressDTO> addressDTO = addressService.findAddressById(addressId);
+        if (addressDTO.isPresent()) {
+            return ResponseEntity.ok(addressDTO.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @Operation(
             summary = "Set Default Address",
-            description = "Set an address as default for the authenticated user",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @PutMapping("/addresses/{addressId}/default")
-    public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
-        try {
-            String userId = getCurrentUserId();
-            log.info("Setting default address {} for user: {}", addressId, userId);
-            
-            AddressDTO defaultAddress = userService.setDefaultAddress(userId, addressId);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Default address set successfully",
-                    "address", defaultAddress
-            ));
-        } catch (Exception e) {
-            log.error("Error setting default address: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        security = @SecurityRequirement(name = "bearerAuth")
+)
+@PutMapping("/addresses/{addressId}/default")
+public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
+    try {
+        String userId = getCurrentUserId();
+        log.info("Setting default address {} for user: {}", addressId, userId);
+        
+        AddressDTO defaultAddress = userService.setDefaultAddress(userId, addressId);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Default address set successfully",
+                "address", defaultAddress
+        ));
+    } catch (IllegalArgumentException | NoSuchElementException e) {
+        log.error("Error setting default address: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+        log.error("An unexpected error occurred while setting default address: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "An unexpected error occurred."));
     }
+}
     
     @Operation(
             summary = "Get Default Address",

@@ -171,7 +171,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
   }
 
   private handleUpdateSuccess(response: any, customMessage?: string): void {
-    console.group('🎉 UPDATE SUCCESS HANDLER');
+    console.group('UPDATE SUCCESS HANDLER');
     console.log('✅ Final Update Status: SUCCESS');
     console.log('📦 Final Response:', response);
     console.log('💬 Custom Message:', customMessage);
@@ -281,7 +281,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
       salesCategory: this.selectedSalesCategory
     };
 
-    // 🔍 DEBUG: Log the data being sent to backend
+    // DEBUG: Log the data being sent to backend
     console.group('📤 FRONTEND → BACKEND: Book Update Request');
     console.log('🎯 Book ID:', updatedBook.id);
     console.log('📝 Original Book Data:', this.editableBook);
@@ -349,9 +349,9 @@ export class EditPageComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          // 🔍 DEBUG: Log error details
+          // DEBUG: Log error details
           console.group('❌ BACKEND → FRONTEND: Book Update Error');
-          console.error('💥 Update Status: FAILED');
+          console.error('Update Status: FAILED');
           console.error('🚨 Error Object:', error);
           console.error('📄 Error Message:', error.message);
           console.error('🔢 Error Status:', error.status);

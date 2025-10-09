@@ -19,6 +19,8 @@ public interface AddressService {
     void deleteAddress(String userId, String addressId);
     
     Optional<AddressDTO> getAddressByIdAndUserId(String addressId, String userId);
+
+    Optional<AddressDTO> findAddressById(String addressId);
     
     // Default Address Management
     AddressDTO setDefaultAddress(String userId, String addressId);

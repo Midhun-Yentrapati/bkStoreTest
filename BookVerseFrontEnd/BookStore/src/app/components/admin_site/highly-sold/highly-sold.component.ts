@@ -5,6 +5,7 @@ import { BookService } from '../../../services/book.service';
 import { BookWithSales } from '../../../models/book.model';
 import { Router } from '@angular/router';
 import { ModernPieChartComponent } from '../../shared/modern-pie-chart/modern-pie-chart.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-highly-sold',
@@ -25,7 +26,7 @@ export class HighlySoldComponent implements OnInit, OnDestroy {
   hasChartData: boolean = false;
   chartData: { label: string; value: number }[] = [];
 
-  constructor(private bookService: BookService, private router: Router) {
+  constructor(private bookService: BookService, private router: Router, private http: HttpClient) {
     // Chart.js components are manually registered in yearly-sales-chart component
     // No need to re-register here since we're using ModernPieChartComponent
   }
@@ -41,7 +42,7 @@ export class HighlySoldComponent implements OnInit, OnDestroy {
 
     // Use analytics service for top selling books
     import('../../../services/analytics.service').then(({ AnalyticsService }) => {
-      const analyticsService = new AnalyticsService(this.bookService['http']);
+      const analyticsService = new AnalyticsService(this.http);
       this.salesSubscription = analyticsService.getTopSellingBooksData().subscribe({
         next: (books: any[]) => {
           this.isLoading = false;
