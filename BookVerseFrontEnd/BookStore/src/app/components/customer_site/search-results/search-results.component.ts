@@ -81,6 +81,8 @@ export class SearchResultsComponent implements OnInit {
         this.searchResults = response.results;
         this.totalResults = response.total;
 
+
+
         // Fetch similar books only if there are primary results
         if (this.searchResults.length > 0) {
           this.fetchSimilarBooks(this.searchResults[0].id.toString());

@@ -23,7 +23,12 @@ export class BookService {
   // returns all books - getAllBooks
   getAllBooks(): Observable<BookModel[]> {
     return this.http.get<BookModel[]>(this.booksUrl).pipe(
-      map(books => books.map(book => this.mapBackendBookToFrontend(book))),
+      map(books => {
+        return books.map(book => {
+          const mappedBook = this.mapBackendBookToFrontend(book);
+          return mappedBook;
+        });
+      }),
       catchError(this.handleError<BookModel[]>('getAllBooks', []))
     );
   }
@@ -189,42 +194,42 @@ export class BookService {
   }
 
   searchBooks(query: string, filters?: any): Observable<{ results: BookModel[], total: number }> {
-    if (!query || query.trim() === '') {
+    let params = new HttpParams();
+
+    if (query && query.trim() !== '') {
+      params = params.set('query', query);
+    }
+
+    if (filters && filters.categories && filters.categories.length > 0) {
+      // The backend expects a list of strings, so we pass it directly
+      filters.categories.forEach((category: string) => {
+        params = params.append('categories', category);
+      });
+    }
+
+    // If no query and no categories, we can call getAllBooks or return empty based on desired behavior
+    if (!params.has('query') && !params.has('categories')) {
       return this.getAllBooks().pipe(
         map(books => ({ results: books, total: books.length }))
       );
     }
-    
-    return this.http.get<any[]>(`${this.booksUrl}/search?query=${encodeURIComponent(query)}`).pipe(
+
+    return this.http.get<any[]>(`${this.booksUrl}/search`, { params }).pipe(
       map(books => {
         const mappedBooks = books.map(book => this.mapBackendBookToFrontend(book));
-        let filteredBooks = mappedBooks;
         
-        // Apply additional frontend filters if provided
-        if (filters) {
-          // Apply category filter
-          if (filters.categories && filters.categories.length > 0) {
-            filteredBooks = filteredBooks.filter(book =>
-              book.categories?.some(bookCategory => 
-                filters.categories.some((filterCategory: string) => 
-                  bookCategory.name?.toLowerCase() === filterCategory.toLowerCase()
-                )
-              )
-            );
-          }
-          
-          // Apply price filter
-          if (filters.maxPrice && filters.maxPrice > 0) {
-            const maxPrice = Number(filters.maxPrice);
-            if (!isNaN(maxPrice)) {
-              filteredBooks = filteredBooks.filter(book => book.price <= maxPrice);
-            }
+        // Price filtering can still be done on the frontend if not supported by backend
+        let filteredBooks = mappedBooks;
+        if (filters && filters.maxPrice && filters.maxPrice > 0) {
+          const maxPrice = Number(filters.maxPrice);
+          if (!isNaN(maxPrice)) {
+            filteredBooks = filteredBooks.filter(book => book.price <= maxPrice);
           }
         }
-        
+
         return {
           results: filteredBooks,
-          total: filteredBooks.length
+          total: filteredBooks.length // Note: This total is after frontend filtering
         };
       }),
       catchError(this.handleError<{ results: BookModel[], total: number }>('searchBooks', { results: [], total: 0 }))
@@ -367,13 +372,15 @@ export class BookService {
   // Updated methods for the three sections on home page
   getNewlyLaunchedBooks(): Observable<BookWithSales[]> {
     return this.http.get<any[]>(`${this.booksUrl}/sales-category/NEWLY_LAUNCHED`).pipe(
-      map(books => books.map(book => {
-        const mappedBook = this.mapBackendBookToFrontend(book);
-        return {
-          ...mappedBook,
-          no_of_books_sold: book.noOfBooksSold || 0
-        } as BookWithSales;
-      })),
+      map(books => {
+        return books.map(book => {
+          const mappedBook = this.mapBackendBookToFrontend(book);
+          return {
+            ...mappedBook,
+            no_of_books_sold: book.noOfBooksSold || 0
+          } as BookWithSales;
+        });
+      }),
       catchError(this.handleError<BookWithSales[]>('getNewlyLaunchedBooks', []))
     );
   }
@@ -474,7 +481,9 @@ export class BookService {
 
   // Map backend BookWithRelations to frontend BookModel
   private mapBackendBookToFrontend(backendBook: any): BookModel {
-    return {
+    const mappedImageUrls = backendBook.images?.map((img: any) => img.imageUrl) || [];
+
+    const mappedBook = {
       id: backendBook.id,
       isbn: backendBook.isbn,
       title: backendBook.title,
@@ -507,9 +516,11 @@ export class BookService {
       // Legacy properties for backward compatibility
       stock_display: backendBook.stockDisplay,
       stock_actual: backendBook.stockActual,
-      image_urls: backendBook.images?.map((img: any) => img.imageUrl) || [],
+      image_urls: mappedImageUrls,
       customerRatings: [] // Will be handled by review service
     };
+
+    return mappedBook;
   }
 
   // Format date for backend (convert array format to ISO string)

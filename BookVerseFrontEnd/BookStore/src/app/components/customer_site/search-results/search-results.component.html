@@ -16,7 +16,18 @@
     <div class="results-column">
       <!-- Loading State -->
       <div *ngIf="isLoading" class="loading-indicator">
-        <p>Loading results...</p>
+        <div class="modern-spinner">
+          <div class="spinner-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="loading-text">
+          <h5>Searching for books...</h5>
+          <p>Please wait while we find the best matches</p>
+        </div>
       </div>
 
       <!-- Content when not loading -->

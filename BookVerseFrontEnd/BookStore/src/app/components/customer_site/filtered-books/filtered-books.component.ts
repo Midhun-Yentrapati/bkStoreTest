@@ -74,8 +74,8 @@ export class FilteredBooksComponent implements OnInit {
         // Apply category filter locally if specified
         if (this.currentFilterCategory) {
           this.filteredBooks = this.books.filter(book => 
-            book.categories.some(cat => 
-              cat.toLowerCase().includes(this.currentFilterCategory!.toLowerCase())
+            book.categories && book.categories.some(cat => 
+              cat.name.toLowerCase().includes(this.currentFilterCategory!.toLowerCase())
             )
           );
         } else {
@@ -323,7 +323,7 @@ export class FilteredBooksComponent implements OnInit {
 
   // TrackBy function for better performance
   trackByBookId(index: number, book: BookModel): string {
-    return book.id;
+    return String(book.id);
   }
   
   // Get category badge classes using the CategoryColorService
@@ -334,5 +334,10 @@ export class FilteredBooksComponent implements OnInit {
   // Utility method to get FormControl
   getSearchControl(): FormControl {
     return this.searchForm.get('query') as FormControl;
+  }
+
+  // Helper method to convert book ID to string
+  getBookIdAsString(book: BookModel): string {
+    return typeof book.id === 'number' ? book.id.toString() : book.id;
   }
 }

@@ -381,10 +381,18 @@
 <ng-template #loading>
   <div class="loading-container">
     <div class="loading-content">
-      <div class="spinner" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <div class="modern-spinner">
+        <div class="spinner-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
-      <h5>Loading book details...</h5>
+      <div class="loading-text">
+        <h5>Loading book details...</h5>
+        <p>Please wait while we fetch the information</p>
+      </div>
     </div>
   </div>
 </ng-template>

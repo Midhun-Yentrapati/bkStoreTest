@@ -115,9 +115,10 @@ public class BookController {
                 schema = @Schema(implementation = Books.class)))
     })
     @GetMapping("/search")
-    public List<Books> searchBooks(
-            @Parameter(description = "Search query for book title or author") @RequestParam String query) {
-        return bookService.searchBooks(query);
+    public List<BookWithRelations> searchBooks(
+            @Parameter(description = "Search query for book title or author") @RequestParam(required = false) String query,
+            @Parameter(description = "List of category names to filter by") @RequestParam(required = false) List<String> categories) {
+        return bookService.searchBooks(query, categories);
     }
 
     // Returns similar books to a book based on it's categories

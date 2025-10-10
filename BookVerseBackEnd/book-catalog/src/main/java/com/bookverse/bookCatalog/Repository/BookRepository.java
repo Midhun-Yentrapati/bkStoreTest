@@ -48,6 +48,18 @@ public interface BookRepository extends JpaRepository<Books, Long>, JpaSpecifica
            "WHERE b.salesCategory = :salesCategory AND b.isActive = true")
     List<Books> findBySalesCategoryWithRelations(@Param("salesCategory") Books.SalesCategory salesCategory);
 
+    @Query("SELECT DISTINCT b FROM Books b " +
+           "LEFT JOIN FETCH b.bookCategories bc " +
+           "LEFT JOIN FETCH bc.category c " +
+           "LEFT JOIN FETCH b.bookImages " +
+           "WHERE b.isActive = true AND " +
+           "(:query IS NULL OR :query = '' OR (LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', :query, '%')))) AND " +
+           "(:categories IS NULL OR c.name IN :categories)")
+    List<Books> searchBooks(@Param("query") String query, @Param("categories") List<String> categories);
+
+    @Query("SELECT b FROM Books b WHERE b.isActive = true")
+    List<Books> findAllActiveBooks();
+
     // Admin methods - finds all books (including inactive ones)
     @Query("SELECT DISTINCT b FROM Books b " +
            "LEFT JOIN FETCH b.bookCategories bc " +

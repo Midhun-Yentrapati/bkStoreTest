@@ -54,12 +54,10 @@ export class BookCardComponent implements OnInit {
     this.addingToCart = true;
     this.cartService.addToCart(this.book).subscribe({
       next: (cartItem) => {
-        console.log(`Added ${this.book.title} to cart`);
         this.notificationService.cartSuccess(this.book.title);
         this.addingToCart = false;
       },
       error: (error) => {
-        console.error('Error adding to cart:', error);
         this.notificationService.cartError(this.book.title, error.message);
         this.addingToCart = false;
       }
@@ -92,14 +90,12 @@ export class BookCardComponent implements OnInit {
   private addToWishlist(): void {
     this.wishlistService.addToWishlist(this.book).subscribe({
       next: (wishlistItem) => {
-        console.log(`Added ${this.book.title} to wishlist`);
         this.notificationService.wishlistSuccess(this.book.title);
         this.addingToWishlist = false;
         // Update wishlist status
         this.isInWishlist$ = this.wishlistService.isInWishlist(this.book.id);
       },
       error: (error) => {
-        console.error('Error adding to wishlist:', error);
         this.notificationService.wishlistError(this.book.title, error.message);
         this.addingToWishlist = false;
       }
@@ -113,25 +109,22 @@ export class BookCardComponent implements OnInit {
         if (wishlistItem) {
           this.wishlistService.removeFromWishlist(wishlistItem.id).subscribe({
             next: () => {
-              console.log(`Removed ${this.book.title} from wishlist`);
               this.notificationService.success('Removed from Wishlist', `"${this.book.title}" has been removed from your wishlist.`);
               this.addingToWishlist = false;
               // Update wishlist status
               this.isInWishlist$ = this.wishlistService.isInWishlist(this.book.id);
             },
             error: (error) => {
-              console.error('Error removing from wishlist:', error);
               this.notificationService.error('Wishlist Error', 'Failed to remove from wishlist. Please try again.');
               this.addingToWishlist = false;
             }
           });
         } else {
-          console.error('Wishlist item not found');
           this.addingToWishlist = false;
         }
       },
       error: (error) => {
-        console.error('Error getting wishlist item:', error);
+        this.notificationService.error('Wishlist Error', 'Failed to get wishlist item. Please try again.');
         this.addingToWishlist = false;
       }
     });
@@ -143,7 +136,19 @@ export class BookCardComponent implements OnInit {
   }
 
   getFirstImageUrl(): string {
-    return this.book.image_urls?.[0] || this.book.images?.[0]?.imageUrl || 'https://placehold.co/150x200?text=No+Image';
+    // Prioritize modern `images` array over legacy `image_urls`
+    if (this.book.images && this.book.images.length > 0) {
+      const primaryImage = this.book.images.find(img => img.isPrimary);
+      return primaryImage ? primaryImage.imageUrl : this.book.images[0].imageUrl;
+    }
+    
+    // Fallback to legacy `image_urls`
+    if (this.book.image_urls && this.book.image_urls.length > 0) {
+      return this.book.image_urls[0];
+    }
+    
+    // Return a placeholder if no image is available
+    return 'https://placehold.co/150x200?text=No+Image';
   }
 
   getCategoryNames(): string[] {

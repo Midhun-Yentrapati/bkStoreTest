@@ -352,8 +352,20 @@ public class BookService {
     }
 
     // Searches for books by title, author, or description.
-    public List<Books> searchBooks(String query) {
-        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query, query);
+    public List<BookWithRelations> searchBooks(String query, List<String> categories) {
+        List<Books> books;
+        if ((query == null || query.trim().isEmpty()) && (categories == null || categories.isEmpty())) {
+            // If no search criteria, return all active books with relations
+            books = bookRepository.findAllWithCategories();
+        } else {
+            // Perform search and fetch entities
+            books = bookRepository.searchBooks(query, categories);
+        }
+        
+        // Convert entities to DTOs to ensure all relations are loaded and sent
+        return books.stream()
+                .map(this::convertToBookWithRelations)
+                .collect(Collectors.toList());
     }
     
     // Finds books that share at least one category with a given book.
