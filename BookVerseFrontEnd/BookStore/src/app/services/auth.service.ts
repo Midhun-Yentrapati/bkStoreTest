@@ -735,19 +735,66 @@ export class AuthService {
     );
   }
 
-  forgotPassword(email: string): Observable<boolean> {
+  forgotPassword(email: string): Observable<any> {
+    const forgotPasswordData = { email: email };
     
-    return this.http.get<UserModel[]>(this.usersUrl).pipe(
-      map(users => {
-        const user = users.find(u => u.email === email);
-        if (user) {
-          return true;
-        } else {
-          return true;
-        }
+    return this.http.post<any>(`${this.authUrl}/forgot-password`, forgotPasswordData).pipe(
+      tap(response => {
+        console.log('Forgot password response:', response);
       }),
       catchError(err => {
-        return throwError(() => new Error('Unable to process password reset request'));
+        let errorMessage = 'Unable to process password reset request';
+        
+        if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+  
+  resetPassword(email: string, newPassword: string): Observable<any> {
+    const resetPasswordData = {
+      email: email,
+      newPassword: newPassword
+    };
+    
+    return this.http.post<any>(`${this.authUrl}/reset-password`, resetPasswordData).pipe(
+      tap(response => {
+        console.log('Reset password response:', response);
+      }),
+      catchError(err => {
+        let errorMessage = 'Password reset failed';
+        
+        if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+  
+  validateResetToken(token: string): Observable<any> {
+    return this.http.get<any>(`${this.authUrl}/validate-reset-token/${token}`).pipe(
+      tap(response => {
+        console.log('Validate reset token response:', response);
+      }),
+      catchError(err => {
+        let errorMessage = 'Token validation failed';
+        
+        if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        return throwError(() => new Error(errorMessage));
       })
     );
   }

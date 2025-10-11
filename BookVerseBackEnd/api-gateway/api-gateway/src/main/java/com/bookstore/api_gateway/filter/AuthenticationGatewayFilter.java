@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 
-// @Component - Disabled for now to focus on CORS issues
+@Component
 public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationGatewayFilter.class);
@@ -27,6 +27,9 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
         // Authentication endpoints
         "/api/auth/login",
         "/api/auth/register",
+        "/api/auth/forgot-password",
+        "/api/auth/reset-password",
+        "/api/auth/validate-reset-token",
         "/api/test",
         
         // Public book browsing

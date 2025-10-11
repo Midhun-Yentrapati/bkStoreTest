@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Tag(name = "Authentication", description = "Authentication and User Management API")
 @RestController
@@ -436,6 +439,112 @@ public class AuthController {
     }
     
     @Operation(
+            summary = "Initiate Password Reset",
+            description = "Send password reset email to user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Password reset email sent successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Email not found"
+            )
+    })
+    @PostMapping("/forgot-password") // POST /api/auth/forgot-password - Initiate password reset
+    public ResponseEntity<Map<String, Object>> forgotPassword(
+            @RequestBody ForgotPasswordRequest request) {
+        
+        log.info("Password reset requested for email: {}", request.getEmail());
+        
+        try {
+            authenticationService.initiatePasswordReset(request.getEmail());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "If the email exists in our system, you will receive password reset instructions.");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error during password reset request: {}", e.getMessage());
+            
+            // Always return success to prevent email enumeration
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "If the email exists in our system, you will receive password reset instructions.");
+            
+            return ResponseEntity.ok(response);
+        }
+    }
+    
+    @Operation(
+            summary = "Reset Password",
+            description = "Reset password using reset token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Password reset successful"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or expired reset token"
+            )
+    })
+    @PostMapping("/reset-password") // POST /api/auth/reset-password - Reset password with email
+    public ResponseEntity<Map<String, Object>> resetPassword(
+            @RequestBody ResetPasswordRequest request) {
+        
+        log.info("Password reset attempt for email: {}", request.getEmail());
+        
+        try {
+            authenticationService.resetPasswordWithEmail(request.getEmail(), request.getNewPassword());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Password has been reset successfully. You can now login with your new password.");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error during password reset: {}", e.getMessage());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    
+    @Operation(
+            summary = "Validate Reset Token",
+            description = "Validate if password reset token is valid"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Token validation result"
+            )
+    })
+    @GetMapping("/validate-reset-token/{token}") // GET /api/auth/validate-reset-token/{token} - Validate reset token
+    public ResponseEntity<Map<String, Object>> validateResetToken(
+            @PathVariable String token) {
+        
+        log.info("Validating password reset token");
+        
+        boolean isValid = authenticationService.validatePasswordResetToken(token);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("valid", isValid);
+        response.put("message", isValid ? "Token is valid" : "Token is invalid or expired");
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @Operation(
             summary = "Debug authentication",
             description = "Get current authentication context for debugging (Admin only)"
     )
@@ -480,6 +589,23 @@ public class AuthController {
     @lombok.AllArgsConstructor
     public static class RefreshTokenRequest {
         private String refreshToken;
+    }
+    
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class ForgotPasswordRequest {
+        private String email;
+    }
+    
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class ResetPasswordRequest {
+        private String email;
+        private String newPassword;
     }
     
     @lombok.Data

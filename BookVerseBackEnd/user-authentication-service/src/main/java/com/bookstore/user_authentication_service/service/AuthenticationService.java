@@ -58,4 +58,6 @@ public interface AuthenticationService {
     // Availability Validation
     void validateUsernameAvailability(String username);
     void validateEmailAvailability(String email);
+
+    void resetPasswordWithEmail(String email, String newPassword);
 }

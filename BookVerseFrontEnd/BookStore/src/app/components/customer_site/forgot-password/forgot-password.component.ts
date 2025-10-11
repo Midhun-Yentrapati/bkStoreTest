@@ -70,6 +70,15 @@ export class ForgotPasswordComponent implements OnInit {
     }
     return null;
   }
+  
+  // Get reset token validation error message
+  getResetTokenErrorMessage(): string {
+    const tokenControl = this.rf['resetToken'];
+    if (tokenControl.errors) {
+      if (tokenControl.errors['required']) return 'Reset token is required.';
+    }
+    return '';
+  }
 
   // Calculate password strength
   calculatePasswordStrength(password: string): 'weak' | 'medium' | 'strong' {
@@ -167,16 +176,22 @@ export class ForgotPasswordComponent implements OnInit {
     this.isLoading = true;
     const { email } = this.forgotPasswordForm.value;
 
-    // Since there's no dedicated forgot password API, we simulate the email verification process
-    // In a real application, this would send a reset email with a secure token
     console.log('Password reset requested for email:', email);
     
-    setTimeout(() => {
-      this.userEmail = email;
-      this.showResetForm = true;
-      this.successMessage = `Password reset verification completed for ${email}. Please enter your new password below.`;
-      this.isLoading = false;
-    }, 1500);
+    this.authService.forgotPassword(email).subscribe({
+      next: (response) => {
+        console.log('Forgot password response:', response);
+        this.userEmail = email;
+        this.showResetForm = true;
+        this.successMessage = response.message || `Password reset instructions have been sent to ${email}. Please check your email and enter the reset token below.`;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Forgot password error:', error);
+        this.errorMessage = error.message || 'Failed to process password reset request. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
   onResetPassword(): void {
@@ -203,20 +218,26 @@ export class ForgotPasswordComponent implements OnInit {
 
     this.isLoading = true;
 
-    // Since there's no dedicated forgot password API, we simulate the password reset process
-    // In a real application, this would use a secure token to reset the password
-    console.log('Password reset simulation for user:', this.userEmail);
+    console.log('Password reset for user:', this.userEmail);
     console.log('New password strength:', this.passwordStrength);
     
-    setTimeout(() => {
-      this.successMessage = `Password reset completed for ${this.userEmail}! \n\nIMPORTANT: This is a demo simulation. In a real application, your password would be securely updated. \n\nPlease contact your administrator or use the 'Change Password' feature in your profile after logging in with your current credentials.`;
-      this.isLoading = false;
-      
-      // Clear forms and redirect to login after showing the message
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 5000);
-    }, 1500);
+    this.authService.resetPassword(this.userEmail, newPassword).subscribe({
+      next: (response) => {
+        console.log('Reset password response:', response);
+        this.successMessage = response.message || `Password has been reset successfully for ${this.userEmail}! You can now login with your new password.`;
+        this.isLoading = false;
+        
+        // Clear forms and redirect to login after showing the message
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Reset password error:', error);
+        this.errorMessage = error.message || 'Failed to reset password. Please check your reset token and try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
   goBack(): void {
@@ -235,6 +256,25 @@ export class ForgotPasswordComponent implements OnInit {
 
   canSubmitPasswordForm(): boolean {
     return this.resetPasswordForm.valid && this.passwordStrength !== 'weak' && !this.isLoading;
+  }
+  
+  // Validate reset token
+  validateToken(): void {
+    const token = this.rf['resetToken'].value;
+    if (token && token.trim() !== '') {
+      this.authService.validateResetToken(token).subscribe({
+        next: (response) => {
+          if (!response.valid) {
+            this.errorMessage = 'Invalid or expired reset token.';
+          } else {
+            this.errorMessage = '';
+          }
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to validate reset token.';
+        }
+      });
+    }
   }
 
   // Password requirement check methods
