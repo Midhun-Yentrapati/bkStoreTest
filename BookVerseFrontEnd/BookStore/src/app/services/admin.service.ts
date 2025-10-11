@@ -1,31 +1,61 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Address } from '../models/address.model';
 
-export interface AdminUser {
+export interface User {
+  // Core user fields (always present)
   id: string;
   username: string;
   email: string;
   fullName: string;
-  role: string;
-  department: string;
-  isActive: boolean;
+  userRole: string; // CUSTOMER, ADMIN, SUPER_ADMIN, etc.
+  userType: string; // CUSTOMER, ADMIN
+  accountStatus: string; // ACTIVE, INACTIVE, LOCKED, etc.
   createdAt: string;
+  updatedAt?: string;
+  
+  // Optional personal fields
+  mobileNumber?: string;
+  dateOfBirth?: string;
+  bio?: string;
+  profilePictureUrl?: string;
+  
+  // Admin-specific fields (null for customers)
+  employeeId?: string;
+  department?: string;
+  managerId?: string;
+  hireDate?: string;
+  salary?: number;
+  
+  // Account security fields
+  isEmailVerified?: boolean;
+  isMobileVerified?: boolean;
+  isTwoFactorEnabled?: boolean;
+  failedLoginAttempts?: number;
+  accountLockedUntil?: string;
   lastLoginAt?: string;
+  lastLoginIp?: string;
+  passwordChangedAt?: string;
+  deletedAt?: string;
+  
+  // Computed/UI fields
+  isActive?: boolean; // Computed from accountStatus
 }
 
-export interface CustomerUser {
-  id: string;
-  username: string;
-  email: string;
-  fullName: string;
-  phoneNumber?: string;
-  address?: string;
-  isActive: boolean;
-  createdAt: string;
-  lastLoginAt?: string;
+// Keep legacy interfaces for backward compatibility but extend from User
+export interface AdminUser extends User {
+  // Legacy compatibility - these should map to User fields
+  role?: string; // Maps to userRole
+  isAccountActive?: boolean; // Maps to computed isActive
+}
+
+export interface CustomerUser extends User {
+  // Legacy compatibility
+  phoneNumber?: string; // Maps to mobileNumber
+  address?: string; // Additional field if needed
+  isAccountActive?: boolean; // Maps to computed isActive
 }
 
 @Injectable({
@@ -38,7 +68,21 @@ export class AdminService {
 
   // Admin User Management
   getAllAdmins(): Observable<AdminUser[]> {
-    return this.http.get<AdminUser[]>(`${this.apiUrl}/admins`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/admins`).pipe(
+      map((response: any) => {
+        console.log('Raw admin response:', response);
+        // Handle both array and paginated response formats
+        if (Array.isArray(response)) {
+          return response;
+        } else if (response && Array.isArray(response.content)) {
+          return response.content;
+        } else if (response && Array.isArray(response.data)) {
+          return response.data;
+        } else {
+          console.warn('Unexpected admin response structure:', response);
+          return [];
+        }
+      }),
       catchError(this.handleError<AdminUser[]>('getAllAdmins', []))
     );
   }
@@ -69,7 +113,21 @@ export class AdminService {
 
   // Customer User Management
   getAllCustomers(): Observable<CustomerUser[]> {
-    return this.http.get<CustomerUser[]>(`${this.apiUrl}/customers`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/customers`).pipe(
+      map((response: any) => {
+        console.log('Raw customer response:', response);
+        // Handle both array and paginated response formats
+        if (Array.isArray(response)) {
+          return response;
+        } else if (response && Array.isArray(response.content)) {
+          return response.content;
+        } else if (response && Array.isArray(response.data)) {
+          return response.data;
+        } else {
+          console.warn('Unexpected customer response structure:', response);
+          return [];
+        }
+      }),
       catchError(this.handleError<CustomerUser[]>('getAllCustomers', []))
     );
   }
@@ -110,6 +168,44 @@ export class AdminService {
   getUserStatistics(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/statistics`).pipe(
       catchError(this.handleError<any>('getUserStatistics', {}))
+    );
+  }
+
+  // Combined User Management Methods
+  /**
+   * Get all users (both admin and customer) - replaces direct HTTP call to /users/admin/all
+   */
+  getAllUsers(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/all`).pipe(
+      catchError(this.handleError<any>('getAllUsers', { adminUsers: [], customerUsers: [] }))
+    );
+  }
+
+  /**
+   * Delete any user (admin or customer) by ID - replaces direct HTTP DELETE /users/{id}
+   */
+  deleteUser(userId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`).pipe(
+      catchError(this.handleError<any>('deleteUser'))
+    );
+  }
+
+  /**
+   * Update user status (activate/deactivate) - uses correct backend endpoints /activate and /deactivate
+   */
+  updateUserStatus(userId: string, isActive: boolean): Observable<any> {
+    const endpoint = isActive ? 'activate' : 'deactivate';
+    return this.http.put(`${this.apiUrl}/${userId}/${endpoint}`, {}).pipe(
+      catchError(this.handleError<any>('updateUserStatus'))
+    );
+  }
+
+  /**
+   * Reset user password - replaces direct HTTP POST /users/{id}/reset-password
+   */
+  resetUserPassword(userId: string): Observable<any> {
+    return this.http.post(`http://localhost:8090/api/users/${userId}/reset-password`, {}).pipe(
+      catchError(this.handleError<any>('resetUserPassword'))
     );
   }
 

@@ -45,18 +45,29 @@ export class AuthService {
   private readonly CACHE_DURATION = 30000; // 30 seconds cache
 
   constructor() {
-    // Only attempt to initialize state after the first browser render (when hydration completes)
-    afterNextRender(() => {
-      setTimeout(() => this.initializeAuthState(), 0);
-    });
-    
-    // Fallback for non-SSR environments with delay to ensure DOM is ready
-    if (isPlatformBrowser(this.platformId) && !this._isInitialized()) {
-      setTimeout(() => {
-        if (!this._isInitialized()) {
-          this.initializeAuthState();
-        }
-      }, 100);
+    // Initialize auth state with proper timing and fallback
+    if (isPlatformBrowser(this.platformId)) {
+      // For browser environment, use afterNextRender if available, otherwise fallback
+      try {
+        afterNextRender(() => {
+          if (!this._isInitialized()) {
+
+            this.initializeAuthState();
+          }
+        });
+      } catch (error) {
+        // Fallback if afterNextRender is not available
+
+        setTimeout(() => {
+          if (!this._isInitialized()) {
+            this.initializeAuthState();
+          }
+        }, 100);
+      }
+    } else {
+      // For server-side rendering, mark as initialized but don't restore state
+
+      this._isInitialized.set(true);
     }
   }
   
@@ -121,78 +132,89 @@ export class AuthService {
 
   private initializeAuthState() {
     if (!this._isInitialized()) {
-      console.log('🚀 Initializing auth state...');
+
       
       // ENSURE: Only proceed if in browser environment
       if (!isPlatformBrowser(this.platformId)) {
-        console.log('⚠️ Not in browser environment, skipping auth initialization');
+
         this._isInitialized.set(true);
         return;
       }
       
-      // FIX: Restore user state first, then validate tokens
-      const storedCustomer = localStorage.getItem('bookverse_customer');
-      const storedAdmin = localStorage.getItem('bookverse_admin');
-      const storedToken = localStorage.getItem('bookverse_token');
-      let hasValidUserState = false;
-      
-      // Restore customer user state
-      if (storedCustomer) {
-        try {
-          const rawCustomer = JSON.parse(storedCustomer);
-          const customer = this.transformUserData(rawCustomer);
-          this.currentCustomer.set(customer);
-          hasValidUserState = true;
-          console.log('🔄 Customer auth state restored from localStorage:', customer.username);
-        } catch (error) {
-          console.error('❌ Failed to parse stored customer data. Removing invalid data.', error);
-          localStorage.removeItem('bookverse_customer');
+      try {
+        // FIX: Restore user state first, then validate tokens
+        const storedCustomer = localStorage.getItem('bookverse_customer');
+        const storedAdmin = localStorage.getItem('bookverse_admin');
+        const storedToken = localStorage.getItem('bookverse_token');
+        let hasValidUserState = false;
+        console.log('Checking stored auth data:', {
+          hasCustomer: !!storedCustomer,
+          hasAdmin: !!storedAdmin,
+          hasToken: !!storedToken
+        });
+        
+        // Restore customer user state
+        if (storedCustomer) {
+          try {
+            const rawCustomer = JSON.parse(storedCustomer);
+            const customer = this.transformUserData(rawCustomer);
+            this.currentCustomer.set(customer);
+            hasValidUserState = true;
+            console.log('🔄 Customer auth state restored from localStorage:', customer.username);
+          } catch (error) {
+            console.error('❌ Failed to parse stored customer data. Removing invalid data.', error);
+            localStorage.removeItem('bookverse_customer');
+          }
         }
-      }
-      
-      // Restore admin user state
-      if (storedAdmin) {
-        try {
-          const admin = JSON.parse(storedAdmin);
-          this.currentAdmin.set(admin);
-          hasValidUserState = true;
-          console.log('🔄 Admin auth state restored from localStorage:', admin.username);
-        } catch (error) {
-          console.error('❌ Failed to parse stored admin data. Removing invalid data.', error);
-          localStorage.removeItem('bookverse_admin');
+        
+        // Restore admin user state
+        if (storedAdmin) {
+          try {
+            const admin = JSON.parse(storedAdmin);
+            this.currentAdmin.set(admin);
+            hasValidUserState = true;
+            console.log('🔄 Admin auth state restored from localStorage:', admin.username);
+          } catch (error) {
+            console.error('❌ Failed to parse stored admin data. Removing invalid data.', error);
+            localStorage.removeItem('bookverse_admin');
+          }
         }
-      }
-      
-      // Create a mock token for admin users if no token exists but admin state is present
-      if (hasValidUserState && !storedToken && this.currentAdmin()) {
-        console.log('🔧 Creating mock token for admin session persistence');
-        this.createMockToken();
-      }
-      
-      // Don't clear tokens on validation failure - just log why validation fails
-      if (hasValidUserState) {
-        console.log('✅ User state restored successfully.');
-        const currentToken = this.getToken();
-        if (!currentToken) {
-          console.warn('⚠️ User state exists but no token found. Checking if token was cleared.');
-          // Check if token exists in raw localStorage
-          const rawToken = isPlatformBrowser(this.platformId) ? localStorage.getItem('bookverse_token') : null;
-          console.log(`Raw token in localStorage: ${rawToken ? 'EXISTS' : 'MISSING'}`);
+        
+        // If we have valid user state, ensure we have a token for API requests
+        if (hasValidUserState) {
+          if (!storedToken) {
+            console.log('User state exists but no token found. Creating mock token for session persistence.');
+            this.createMockToken();
+          } else {
+            // Validate existing token
+            const isTokenValid = this.isTokenValid();
+
+            
+            if (!isTokenValid) {
+              console.log('Token invalid, creating new mock token for session persistence.');
+              this.createMockToken();
+            }
+          }
+          
+
         } else {
-          console.log(`🔍 Token found: ${currentToken.substring(0, 20)}...`);
-          const isValid = this.isTokenValid();
-          console.log(`🔍 Token validation result: ${isValid}`);
+
         }
+        
+      } catch (error) {
+        console.error('Error during auth state initialization:', error);
+        // Clear potentially corrupted data
+        this.clearAllStorage();
       }
       
       this._isInitialized.set(true);
-      console.log('✅ Auth state initialization completed');
+
       
       // Log final state for debugging
       const finalToken = this.getToken();
       const finalCustomer = this.currentCustomer();
       const finalAdmin = this.currentAdmin();
-      console.log('📊 Final auth state:', {
+      console.log('Final auth state:', {
         hasToken: !!finalToken,
         hasCustomer: !!finalCustomer,
         hasAdmin: !!finalAdmin,
@@ -235,19 +257,19 @@ export class AuthService {
           const token = response.token || response.accessToken;
           if (token && isPlatformBrowser(this.platformId)) {
             localStorage.setItem('bookverse_token', token);
-            console.log('✅ Access token stored:', token.substring(0, 20) + '...');
+            console.log('Access token stored:', token.substring(0, 20) + '...');
             
             const refreshToken = response.refreshToken || response.refresh_token;
             if (refreshToken) {
               localStorage.setItem('bookverse_refresh_token', refreshToken);
-              console.log('✅ Refresh token stored');
+              console.log('Refresh token stored');
             }
             
             // Verify token was stored correctly
             const verifyToken = localStorage.getItem('bookverse_token');
-            console.log('🔍 Token verification after storage:', verifyToken ? 'SUCCESS' : 'FAILED');
+            console.log('Token verification after storage:', verifyToken ? 'SUCCESS' : 'FAILED');
           } else if (!token) {
-            console.warn('⚠️ No token found in response, but login was successful');
+            console.log('No token found in response, but login was successful');
             console.log('Response structure:', Object.keys(response));
           }
           
@@ -574,27 +596,26 @@ export class AuthService {
   setTokens(accessToken: string, refreshToken?: string): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('bookverse_token', accessToken);
-      console.log('✅ Token manually set:', accessToken.substring(0, 20) + '...');
+      console.log('Token manually set:', accessToken.substring(0, 20) + '...');
       if (refreshToken) {
         localStorage.setItem('bookverse_refresh_token', refreshToken);
-        console.log('✅ Refresh token manually set');
       }
       
       // Verify storage
       const verifyToken = localStorage.getItem('bookverse_token');
-      console.log('🔍 Token verification after manual set:', verifyToken ? 'SUCCESS' : 'FAILED');
+      console.log('Token verification after manual set:', verifyToken ? 'SUCCESS' : 'FAILED');
     }
   }
 
   clearTokens(): void {
     if (isPlatformBrowser(this.platformId)) {
-      console.log('🗑️ Clearing tokens from localStorage');
+      console.log('Clearing tokens from localStorage');
       localStorage.removeItem('bookverse_token');
       localStorage.removeItem('bookverse_refresh_token');
       
       // Verify clearing
       const verifyToken = localStorage.getItem('bookverse_token');
-      console.log('🔍 Token verification after clearing:', verifyToken ? 'STILL EXISTS' : 'CLEARED');
+      console.log('Token verification after clearing:', verifyToken ? 'STILL EXISTS' : 'CLEARED');
     }
   }
 
@@ -772,7 +793,7 @@ export class AuthService {
         try {
           const parsedCustomer = JSON.parse(customer);
           this.currentCustomer.set(this.transformUserData(parsedCustomer));
-          console.log('✅ Customer state restored');
+          console.log('Customer state restored');
         } catch (error) {
           console.error('❌ Failed to restore customer state:', error);
           localStorage.removeItem('bookverse_customer');

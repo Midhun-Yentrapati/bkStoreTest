@@ -172,7 +172,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
 
   private handleUpdateSuccess(response: any, customMessage?: string): void {
     console.group('UPDATE SUCCESS HANDLER');
-    console.log('✅ Final Update Status: SUCCESS');
+    console.log('Final Update Status: SUCCESS');
     console.log('📦 Final Response:', response);
     console.log('💬 Custom Message:', customMessage);
     console.groupEnd();
@@ -283,10 +283,10 @@ export class EditPageComponent implements OnInit, OnDestroy {
 
     // DEBUG: Log the data being sent to backend
     console.group('📤 FRONTEND → BACKEND: Book Update Request');
-    console.log('🎯 Book ID:', updatedBook.id);
+    console.log('Book ID:', updatedBook.id);
     console.log('📝 Original Book Data:', this.editableBook);
     console.log('📋 Form Values:', formValue);
-    console.log('🏷️ Selected Categories:', this.selectedCategories);
+    console.log('Selected Categories:', this.selectedCategories);
     console.log('🏪 Sales Category:', this.selectedSalesCategory);
     console.log('📦 Final Update Payload:', updatedBook);
     console.log('🔧 Using PUT method (backend doesn\'t support PATCH)');
@@ -297,7 +297,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
       this.bookService.updateBook(updatedBook.id, updatedBook).subscribe({
         next: (basicUpdateResponse) => {
           console.group('📥 BACKEND → FRONTEND: Basic Book Update Response');
-          console.log('✅ Basic Update Status: SUCCESS');
+          console.log('Basic Update Status: SUCCESS');
           console.log('📦 Backend Response:', basicUpdateResponse);
           console.groupEnd();
           
@@ -306,13 +306,13 @@ export class EditPageComponent implements OnInit, OnDestroy {
             const categoryIds = this.selectedCategories.map(cat => cat.id);
             this.bookService.updateBookCategories(updatedBook.id, categoryIds).subscribe({
               next: (categoryResponse) => {
-                console.log('✅ Categories updated successfully:', categoryResponse);
+                console.log('Categories updated successfully:', categoryResponse);
                 
                 // Update images separately if they exist
                 if (updatedBook.images && updatedBook.images.length > 0) {
                   this.bookService.updateBookImages(updatedBook.id, updatedBook.images).subscribe({
                     next: (imageResponse) => {
-                      console.log('✅ Images updated successfully:', imageResponse);
+                      console.log('Images updated successfully:', imageResponse);
                       this.handleUpdateSuccess(imageResponse);
                     },
                     error: (imageError) => {

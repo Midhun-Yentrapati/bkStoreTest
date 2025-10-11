@@ -85,10 +85,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private populateForm() {
     const user = this.currentUser();
-    console.log('🔍 Profile Component - Current user data:', user);
+    console.log('Profile Component - Current user data:', user);
     
     if (user) {
-      console.log('🔍 Profile Component - DOB and Bio values:', {
+      console.log('Profile Component - DOB and Bio values:', {
         dateOfBirth: user.dateOfBirth,
         bio: user.bio
       });
@@ -103,11 +103,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         bio: user.bio || ''
       };
       
-      console.log('🔍 Profile Component - Form values being set:', formValues);
+      console.log('Profile Component - Form values being set:', formValues);
       
       this.profileForm.patchValue(formValues);
       
-      console.log('🔍 Profile Component - Form values after patch:', this.profileForm.value);
+      console.log('Profile Component - Form values after patch:', this.profileForm.value);
     }
   }
 
@@ -135,7 +135,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private fetchCompleteUserProfile() {
     this.authService.fetchCompleteUserProfile().subscribe({
       next: (completeUser) => {
-        console.log('✅ Profile component loaded with complete user data:', completeUser);
+        console.log('Profile component loaded with complete user data:', completeUser);
         // Form will be populated automatically due to signal reactivity
         setTimeout(() => {
           this.populateForm();

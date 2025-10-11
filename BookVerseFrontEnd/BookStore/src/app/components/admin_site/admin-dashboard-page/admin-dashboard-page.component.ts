@@ -12,6 +12,7 @@ import { AuthService } from '../../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { CategoryService } from '../../../services/category.service';
+import { AdminService } from '../../../services/admin.service';
 
 import { forkJoin, of, Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -83,7 +84,8 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     private authService: AuthService,
     private http: HttpClient,
     private analyticsService: AnalyticsService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private adminService: AdminService
   ) {
     // Register Chart.js components for sales trends chart
     Chart.register(
@@ -317,29 +319,24 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
       return of(0);
     }
 
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
-
-    // Fetch both admin and customer users simultaneously
+    // Use AdminService instead of direct HTTP calls
     return forkJoin({
-      adminUsers: this.http.get<any>(`${this.apiBaseUrl}/users/admin/admins`, { headers }).pipe(
+      adminUsers: this.adminService.getAllAdmins().pipe(
         catchError(error => {
           console.error('Error fetching admin users:', error);
-          return of({ content: [] }); // Return empty array on error
+          return of([]); // Return empty array on error
         })
       ),
-      customerUsers: this.http.get<any>(`${this.apiBaseUrl}/users/admin/customers`, { headers }).pipe(
+      customerUsers: this.adminService.getAllCustomers().pipe(
         catchError(error => {
           console.error('Error fetching customer users:', error);
-          return of({ content: [] }); // Return empty array on error
+          return of([]); // Return empty array on error
         })
       )
     }).pipe(
       map(data => {
-        const adminCount = data.adminUsers.content ? data.adminUsers.content.length : 0;
-        const customerCount = data.customerUsers.content ? data.customerUsers.content.length : 0;
+        const adminCount = data.adminUsers.length;
+        const customerCount = data.customerUsers.length;
         const totalCount = adminCount + customerCount;
         
         console.log('📊 User count breakdown:', {
@@ -387,12 +384,12 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     
     this.bookService.getAllBooks().subscribe({
       next: (books) => {
-        console.log('✅ Book catalog loaded successfully:', books.length, 'books');
+        console.log('Book catalog loaded successfully:', books.length, 'books');
         
         // Test book details fetch
         if (books.length > 0) {
           this.bookService.getBookById(books[0].id).subscribe({
-            next: (book) => console.log('✅ Book details fetch successful:', book.title),
+            next: (book) => console.log('Book details fetch successful:', book.title),
             error: (error) => console.error('❌ Book details fetch failed:', error)
           });
         }
@@ -408,7 +405,7 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     
     this.orderService.getAllOrders().subscribe({
       next: (orders) => {
-        console.log('✅ Orders loaded successfully:', orders.length, 'orders');
+        console.log('Orders loaded successfully:', orders.length, 'orders');
         
         // Test order status update if orders exist
         if (orders.length > 0) {
@@ -427,7 +424,7 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     
     this.http.get(`${this.apiBaseUrl}/users/admin/all`).subscribe({
       next: (users: any) => {
-        console.log('✅ User management loaded successfully:', Array.isArray(users) ? users.length : 0, 'users');
+        console.log('User management loaded successfully:', Array.isArray(users) ? users.length : 0, 'users');
       },
       error: (error) => {
         console.error('❌ User management loading failed:', error);
@@ -443,7 +440,7 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     
     this.analyticsService.getAnalyticsDashboard(startDate, endDate).subscribe({
       next: (dashboard) => {
-        console.log('✅ Analytics dashboard loaded successfully:', dashboard);
+        console.log('Analytics dashboard loaded successfully:', dashboard);
       },
       error: (error) => {
         console.error('❌ Analytics dashboard loading failed:', error);
@@ -452,11 +449,11 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
   }
 
   private testCategoryManagementFunctionality(): void {
-    console.log('🏷️ Testing Category Management Functionality...');
+    console.log('Testing Category Management Functionality...');
     
     this.categoryService.getAllCategories().subscribe({
       next: (categories) => {
-        console.log('✅ Category management loaded successfully:', categories.length, 'categories');
+        console.log('Category management loaded successfully:', categories.length, 'categories');
       },
       error: (error) => {
         console.error('❌ Category management loading failed:', error);
@@ -469,7 +466,7 @@ export class AdminDashboardPageComponent implements OnInit, OnChanges, AfterView
     
     this.http.get(`${this.apiBaseUrl}/coupons`).subscribe({
       next: (coupons: any) => {
-        console.log('✅ Coupon management loaded successfully:', Array.isArray(coupons) ? coupons.length : 0, 'coupons');
+        console.log('Coupon management loaded successfully:', Array.isArray(coupons) ? coupons.length : 0, 'coupons');
       },
       error: (error) => {
         console.error('❌ Coupon management loading failed:', error);

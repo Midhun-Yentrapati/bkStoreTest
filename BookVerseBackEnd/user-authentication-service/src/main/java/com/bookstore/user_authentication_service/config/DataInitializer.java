@@ -82,7 +82,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 userRepository.save(superAdmin);
                 
-                log.info("✅ Super admin user created successfully!");
+                log.info("Super admin user created successfully!");
                 log.info("   Username: {}", adminUsername);
                 log.info("   Email: {}", adminEmail);
                 log.info("   Role: SUPER_ADMIN");
@@ -94,7 +94,7 @@ public class DataInitializer implements CommandLineRunner {
             }
             
         } catch (Exception e) {
-            log.error("❌ Failed to create super admin user: {}", e.getMessage(), e);
+            log.error("Failed to create super admin user: {}", e.getMessage(), e);
         }
     }
 }

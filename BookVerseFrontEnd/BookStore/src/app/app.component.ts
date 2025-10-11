@@ -35,43 +35,74 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     // Use effect to monitor auth initialization for better SSR compatibility
     effect(() => {
+      // Always hide login prompt on admin routes, regardless of auth state
+      if (this.isAdminRoute) {
+        this.showLoginPrompt = false;
+        return;
+      }
+      
       // Only show login prompt if:
       // 1. Auth service is initialized
       // 2. No user is logged in (neither customer nor admin)
       // 3. User hasn't interacted yet
-      // 4. Not on admin route
-      if (this.authService.isInitialized() && 
+      // 4. Not on admin route (already checked above)
+      // 5. We're in browser environment
+      if (isPlatformBrowser(this.platformId) &&
+          this.authService.isInitialized() && 
           !this.authService.isLoggedIn() && 
-          !this.hasUserInteracted &&
-          !this.isAdminRoute) {
-        this.showLoginPrompt = true;
+          !this.hasUserInteracted) {
+        // Add a small delay to avoid race conditions during initialization
+        setTimeout(() => {
+          // Double-check conditions after delay
+          if (!this.isAdminRoute && 
+              !this.authService.isLoggedIn() && 
+              !this.hasUserInteracted) {
+            this.showLoginPrompt = true;
+          }
+        }, 100);
       } else {
-        // Hide login prompt if user is logged in or on admin route
+        // Hide login prompt if user is logged in
         this.showLoginPrompt = false;
       }
     });
   }
 
   ngOnInit(){
-
+      // Check initial route immediately
+      this.checkAndSetAdminRoute();
       
       // Subscribe to router events to detect admin routes
       this.routerSubscription = this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: NavigationEnd) => {
-        this.isAdminRoute = event.urlAfterRedirects.startsWith('/admin');
-        // Hide login prompt when navigating to admin routes
+        const newUrl = event.urlAfterRedirects;
+        this.isAdminRoute = this.isAdminUrl(newUrl);
+        
+
+        
+        // Always hide login prompt when navigating to admin routes
         if (this.isAdminRoute) {
           this.showLoginPrompt = false;
+          this.hasUserInteracted = true; // Prevent showing later
         }
       });
+    }
+    
+    private checkAndSetAdminRoute(): void {
+      const currentUrl = this.router.url;
+      this.isAdminRoute = this.isAdminUrl(currentUrl);
       
-      // Check initial route
-      this.isAdminRoute = this.router.url.startsWith('/admin');
+
+      
       // Hide login prompt if starting on admin route
       if (this.isAdminRoute) {
         this.showLoginPrompt = false;
+        this.hasUserInteracted = true; // Prevent showing later
       }
+    }
+    
+    private isAdminUrl(url: string): boolean {
+      return url.startsWith('/admin') || url.includes('/admin/');
     }
 
     ngOnDestroy(): void {
@@ -98,8 +129,14 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     closeLoginPrompt(){
+
       this.showLoginPrompt = false;
       this.hasUserInteracted = true; // Mark as interacted to prevent showing again
+      
+      // Double-check that we're not on admin route
+      if (this.isAdminRoute) {
+
+      }
     }
   
 

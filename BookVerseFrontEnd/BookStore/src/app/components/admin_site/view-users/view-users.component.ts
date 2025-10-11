@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
-import { AdminUser } from '../../../models/book';
-import { UserModel } from '../../../models/user.model';
+import { AdminService, User } from '../../../services/admin.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-view-users',
@@ -15,27 +14,28 @@ import { UserModel } from '../../../models/user.model';
   styleUrls: ['./view-users.component.css']
 })
 export class ViewUsersComponent implements OnInit {
-  adminUsers: AdminUser[] = [];
-  normalUsers: UserModel[] = [];
-  filteredAdminUsers: AdminUser[] = [];
-  filteredNormalUsers: UserModel[] = [];
+  adminUsers: User[] = []; // All admin users from unified table
+  normalUsers: User[] = []; // All customer users from unified table
+  filteredAdminUsers: User[] = [];
+  filteredNormalUsers: User[] = [];
   searchForm!: FormGroup;
   isLoading: boolean = false;
   errorMessage: string = '';
-
-  private apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
-  private usersUrl = `${this.apiBaseUrl}/users/admin/all`; // Correct backend endpoint
-  private customersUrl = `${this.apiBaseUrl}/users/admin/customers`; // Customer users endpoint
-  private adminUsersUrl = `${this.apiBaseUrl}/users/admin/admins`; // Admin users endpoint
+  currentUser: User | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private adminService: AdminService
+  ) {
+    effect(() => {
+      this.currentUser = this.authService.currentAdmin() as User | null;
+    });
+  }
 
   ngOnInit(): void {
+
     this.searchForm = this.fb.group({
       query: ['']
     });
@@ -48,110 +48,59 @@ export class ViewUsersComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Load both customer and admin users from backend
-    Promise.all([
-      this.loadCustomerUsers(),
-      this.loadAdminUsers()
-    ]).then(() => {
-      this.isLoading = false;
-      this.applyFilters();
-    }).catch(error => {
-      console.error('Error loading users:', error);
-      this.errorMessage = 'Failed to load users. Please try again.';
-      this.isLoading = false;
-    });
-  }
+    forkJoin({
+      adminUsers: this.adminService.getAllAdmins(),
+      customerUsers: this.adminService.getAllCustomers()
+    }).subscribe({
+      next: (result) => {
+        console.log('Raw result from AdminService:', result);
+        
+        const adminUsersData = Array.isArray(result.adminUsers) ? result.adminUsers : [];
+        const customerUsersData = Array.isArray(result.customerUsers) ? result.customerUsers : [];
+        
+        console.log('Admin users data:', adminUsersData);
+        console.log('Customer users data:', customerUsersData);
+        
+        // Process admin users - they come as unified User objects
+        this.adminUsers = adminUsersData.map((user: any) => ({
+          ...user,
+          // Ensure isActive is computed from accountStatus
+          isActive: user.isActive !== undefined ? user.isActive : 
+                   (user.accountStatus === 'ACTIVE' || user.isAccountActive === true),
+          // Ensure userRole is available (fallback to role if needed)
+          userRole: user.userRole || user.role || 'ADMIN',
+          // Ensure userType is set
+          userType: user.userType || 'ADMIN'
+        }));
 
-  private async loadCustomerUsers(): Promise<void> {
-    return this.http.get<any>(this.customersUrl).toPromise().then(data => {
-      // Handle paginated response
-      if (data.content && Array.isArray(data.content)) {
-        this.normalUsers = data.content.map((user: any) => {
-          const mappedUser = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            fullName: user.fullName || user.full_name,
-            userType: user.userType || user.user_type,
-            mobileNumber: user.mobileNumber || user.mobile_number,
-            dateOfBirth: user.dateOfBirth || user.date_of_birth,
-            bio: user.bio,
-            isActive: user.isActive !== undefined ? user.isActive : true,
-            createdAt: user.createdAt || user.created_at,
-            lastUpdated: user.lastUpdated || user.last_updated,
-            userRole: user.userRole || user.user_role
-          };
-          return mappedUser;
-        });
-      } else if (Array.isArray(data)) {
-        // Handle direct array response
-        this.normalUsers = data.map((user: any) => ({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName || user.full_name,
-          userType: user.userType || user.user_type,
-          mobileNumber: user.mobileNumber || user.mobile_number,
-          dateOfBirth: user.dateOfBirth || user.date_of_birth,
-          bio: user.bio,
-          isActive: user.isActive !== undefined ? user.isActive : true,
-          createdAt: user.createdAt || user.created_at,
-          lastUpdated: user.lastUpdated || user.last_updated,
-          userRole: user.userRole || user.user_role
+        // Process customer users - they come as unified User objects  
+        this.normalUsers = customerUsersData.map((user: any) => ({
+          ...user,
+          // Ensure isActive is computed from accountStatus
+          isActive: user.isActive !== undefined ? user.isActive : 
+                   (user.accountStatus === 'ACTIVE' || user.isAccountActive === true),
+          // Ensure userRole is available
+          userRole: user.userRole || 'CUSTOMER',
+          // Ensure userType is set
+          userType: user.userType || 'CUSTOMER',
+          // Map phoneNumber to mobileNumber if needed
+          mobileNumber: user.mobileNumber || user.phoneNumber || ''
         }));
-      } else {
-        this.normalUsers = [];
-      }
-      
-      console.log('Loaded customer users:', this.normalUsers.length);
-    }).catch(error => {
-      console.error('Error loading customer users:', error);
-      this.normalUsers = [];
-      throw error;
-    });
-  }
 
-  private async loadAdminUsers(): Promise<void> {
-    return this.http.get<any>(this.adminUsersUrl).toPromise().then(data => {
-      // Handle paginated response
-      if (data.content && Array.isArray(data.content)) {
-        this.adminUsers = data.content.map((user: any) => ({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName || user.full_name,
-          userType: user.userType || user.user_type,
-          userRole: user.userRole || user.user_role,
-          employeeId: user.employeeId || user.employee_id,
-          department: user.department,
-          isActive: user.isActive !== undefined ? user.isActive : true,
-          createdAt: user.createdAt || user.created_at,
-          lastUpdated: user.lastUpdated || user.last_updated
-        }));
-      } else if (Array.isArray(data)) {
-        // Handle direct array response
-        this.adminUsers = data.map((user: any) => ({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName || user.full_name,
-          userType: user.userType || user.user_type,
-          userRole: user.userRole || user.user_role,
-          employeeId: user.employeeId || user.employee_id,
-          department: user.department,
-          isActive: user.isActive !== undefined ? user.isActive : true,
-          createdAt: user.createdAt || user.created_at,
-          lastUpdated: user.lastUpdated || user.last_updated
-        }));
-      } else {
+        this.applyFilters();
+        
+        console.log(`Loaded ${this.adminUsers.length} admin users and ${this.normalUsers.length} customer users`);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.errorMessage = 'Failed to load users. Please try again.';
+        this.isLoading = false;
+        
         this.adminUsers = [];
+        this.normalUsers = [];
+        this.applyFilters();
       }
-      
-      console.log('Loaded admin users:', this.adminUsers.length);
-    }).catch(error => {
-      console.error('Error loading admin users:', error);
-      this.adminUsers = [];
-      throw error;
     });
   }
 
@@ -164,20 +113,20 @@ export class ViewUsersComponent implements OnInit {
   private applyFilters(): void {
     const query = this.searchForm.get('query')?.value?.toLowerCase() || '';
 
-    // Filter admin users
+    // Filter admin users - handle null values gracefully
     this.filteredAdminUsers = this.adminUsers.filter(user =>
-      user.username.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      user.fullName.toLowerCase().includes(query) ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.fullName?.toLowerCase().includes(query) ||
       (user.employeeId && user.employeeId.toLowerCase().includes(query)) ||
       (user.department && user.department.toLowerCase().includes(query))
     );
 
-    // Filter normal users
+    // Filter customer users - handle null values gracefully
     this.filteredNormalUsers = this.normalUsers.filter(user =>
-      user.username.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      user.fullName.toLowerCase().includes(query) ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.fullName?.toLowerCase().includes(query) ||
       (user.mobileNumber && user.mobileNumber.includes(query))
     );
   }
@@ -190,16 +139,13 @@ export class ViewUsersComponent implements OnInit {
     this.searchForm.get('query')?.setValue('');
   }
 
-  editUser(user: UserModel | AdminUser): void {
-    // Navigate to user edit page
+  editUser(user: User): void {
     this.router.navigate(['/admin/edit-user', user.id]);
   }
 
-  deleteUser(user: UserModel | AdminUser): void {
+  deleteUser(user: User): void {
     if (confirm(`Are you sure you want to delete user "${user.username}"?`)) {
-      const deleteUrl = `${this.apiBaseUrl}/users/${user.id}`;
-      
-      this.http.delete(deleteUrl).subscribe({
+      this.adminService.deleteUser(user.id).subscribe({
         next: () => {
           console.log('User deleted successfully');
           this.loadUsers(); // Reload the users list
@@ -212,27 +158,9 @@ export class ViewUsersComponent implements OnInit {
     }
   }
 
-  toggleUserStatus(user: UserModel | AdminUser): void {
-    const newStatus = !user.isActive;
-    const updateUrl = `${this.apiBaseUrl}/users/${user.id}/status`;
-    
-    this.http.put(updateUrl, { isActive: newStatus }).subscribe({
-      next: () => {
-        user.isActive = newStatus;
-        console.log(`User ${user.username} status updated to ${newStatus ? 'active' : 'inactive'}`);
-      },
-      error: (error) => {
-        console.error('Error updating user status:', error);
-        this.errorMessage = 'Failed to update user status. Please try again.';
-      }
-    });
-  }
-
-  resetPassword(user: UserModel | AdminUser): void {
+  resetPassword(user: User): void {
     if (confirm(`Are you sure you want to reset password for "${user.username}"?`)) {
-      const resetUrl = `${this.apiBaseUrl}/users/${user.id}/reset-password`;
-      
-      this.http.post(resetUrl, {}).subscribe({
+      this.adminService.resetUserPassword(user.id).subscribe({
         next: () => {
           console.log('Password reset successfully');
           alert('Password reset email has been sent to the user.');
@@ -245,13 +173,11 @@ export class ViewUsersComponent implements OnInit {
     }
   }
 
-  viewUserDetails(user: UserModel | AdminUser): void {
-    // Navigate to user details page
+  viewUserDetails(user: User): void {
     this.router.navigate(['/admin/user-details', user.id]);
   }
 
   exportUsers(): void {
-    // Export users data
     const allUsers = [...this.normalUsers, ...this.adminUsers];
     const csvData = this.convertToCSV(allUsers);
     this.downloadCSV(csvData, 'users_export.csv');
@@ -287,9 +213,84 @@ export class ViewUsersComponent implements OnInit {
     this.loadUsers();
   }
 
-  // Methods needed by the template that were removed
+  canDisableUser(user: User): boolean {
+    if (!this.currentUser) {
+      return false;
+    }
+
+    // Use userRole property directly
+    const currentUserRole = this.currentUser.userRole;
+    const targetUserRole = user.userRole;
+
+    // Super admin can never be disabled
+    if (targetUserRole === 'SUPER_ADMIN') {
+      return false;
+    }
+
+    // A user cannot disable themselves
+    if (user.id === this.currentUser.id) {
+      return false;
+    }
+
+    // SUPER_ADMIN can disable anyone except other SUPER_ADMINs
+    if (currentUserRole === 'SUPER_ADMIN') {
+      return targetUserRole !== 'SUPER_ADMIN';
+    }
+
+    // ADMIN can disable customers but not other admins or super admins
+    if (currentUserRole === 'ADMIN') {
+      return targetUserRole !== 'SUPER_ADMIN' && targetUserRole !== 'ADMIN';
+    }
+
+    // Other roles cannot disable users
+    return false;
+  }
+
+  getProtectionReason(userRole?: string): string {
+    if (userRole === 'SUPER_ADMIN') {
+      return 'Super admins are protected and cannot be disabled.';
+    }
+    if (userRole === 'ADMIN') {
+      return 'Admins can only be managed by super admins.';
+    }
+    return 'This user has a protected role.';
+  }
+
+  getProtectionText(userRole?: string): string {
+    if (userRole === 'SUPER_ADMIN' || userRole === 'ADMIN') {
+      return 'Protected';
+    }
+    return 'Protected Role';
+  }
+
+  toggleUserStatus(user: User): void {
+    const newStatus = !user.isActive;
+    const action = newStatus ? 'activate' : 'deactivate';
+    const confirmation = window.confirm(`Are you sure you want to ${action} the user "${user.username}"?\n\nClick 'OK' to continue or 'Cancel' to abort.`);
+
+    if (confirmation) {
+      this.adminService.updateUserStatus(user.id, newStatus).subscribe({
+        next: () => {
+          // Update the user in both arrays
+          const adminUser = this.adminUsers.find(u => u.id === user.id);
+          if (adminUser) adminUser.isActive = newStatus;
+
+          const normalUser = this.normalUsers.find(u => u.id === user.id);
+          if (normalUser) normalUser.isActive = newStatus;
+
+          this.applyFilters();
+          console.log(`User ${user.username} has been successfully ${action}d.`);
+        },
+        error: (error) => {
+          console.error(`Error trying to ${action} user:`, error);
+          this.errorMessage = `Failed to ${action} user. Please try again.`;
+        }
+      });
+    }
+  }
+
   goBack(): void {
-    this.router.navigate(['/admin-main']);
+    this.router.navigate(['/admin/dashboard']);
   }
 
   getSearchControl(): FormControl {
@@ -301,11 +302,7 @@ export class ViewUsersComponent implements OnInit {
     this.router.navigate(['/admin/add-user']);
   }
 
-  trackByAdminUserId(index: number, user: AdminUser): string {
-    return user.id;
-  }
-
-  trackByNormalUserId(index: number, user: UserModel): string {
+  trackByUserId(index: number, user: User): any {
     return user.id;
   }
 
@@ -317,162 +314,12 @@ export class ViewUsersComponent implements OnInit {
       case 'ADMIN': return 'Admin';
       case 'MANAGER': return 'Manager';
       case 'MODERATOR': return 'Moderator';
-      case 'SUPPORT': return 'Support';
       case 'CUSTOMER': return 'Customer';
       default: return userRole;
     }
   }
 
-  deleteAdminUser(adminUserId: string): void {
-    this.deleteUser({ id: adminUserId } as AdminUser);
-  }
-
-  deleteNormalUser(userId: string): void {
-    this.deleteUser({ id: userId } as UserModel);
-  }
-
-  canToggleUserStatus(userRole?: string): boolean {
-    // If userRole is undefined, treat as regular user (can be toggled)
-    if (!userRole) return true;
-    
-    // Get current admin's role
-    const currentAdmin = this.authService.getCurrentAdmin();
-    const currentAdminRole = currentAdmin?.userRole;
-    
-    // Permission logic:
-    // 1. SUPER_ADMIN accounts cannot be disabled by anyone
-    // 2. ADMIN accounts can only be disabled by SUPER_ADMIN
-    // 3. Other roles can be disabled by both SUPER_ADMIN and ADMIN
-    
-    if (userRole === 'SUPER_ADMIN') {
-      return false; // SUPER_ADMIN accounts are always protected
-    }
-    
-    if (userRole === 'ADMIN') {
-      return currentAdminRole === 'SUPER_ADMIN'; // Only SUPER_ADMIN can disable ADMIN accounts
-    }
-    
-    // All other roles (MANAGER, MODERATOR, SUPPORT, CUSTOMER) can be toggled
-    return true;
-  }
-
-  activateUser(userId: string, userRole?: string): void {
-    this.updateUserStatus(userId, true, userRole);
-  }
-
-  deactivateUser(userId: string, userRole?: string): void {
-    // Prevent disabling ADMIN and SUPER_ADMIN accounts
-    if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') {
-      alert('Cannot disable ADMIN or SUPER_ADMIN accounts for security reasons.');
-      return;
-    }
-    this.updateUserStatus(userId, false, userRole);
-  }
-
-  private updateUserStatus(userId: string, isActive: boolean, userRole?: string): void {
-    const action = isActive ? 'activate' : 'deactivate';
-    const confirmMessage = `Are you sure you want to ${action} this user account?`;
-    
-    if (confirm(confirmMessage)) {
-      console.log(`Attempting to ${action} user with ID: ${userId}`);
-      
-      const updateUrl = `${this.apiBaseUrl}/users/${userId}/status`;
-      
-      this.http.put(updateUrl, { isActive }).subscribe({
-        next: (data: any) => {
-          console.log(`User status updated successfully:`, data);
-          
-          // Update the user status in local arrays
-          this.updateUserStatusInArrays(userId, data.isActive);
-          
-          const statusText = data.isActive ? 'activated' : 'deactivated';
-          alert(`User account ${statusText} successfully!`);
-        },
-        error: (error) => {
-          console.error('Error updating user status:', error);
-          alert('Failed to update user status. Please try again.');
-        }
-      });
-    }
-  }
-
-  // Helper method to update user status in local arrays
-  private updateUserStatusInArrays(userId: string, isActive: boolean): void {
-    // Update admin users
-    const adminUser = this.adminUsers.find(user => user.id === userId);
-    if (adminUser) {
-      adminUser.isActive = isActive;
-    }
-    
-    const filteredAdminUser = this.filteredAdminUsers.find(user => user.id === userId);
-    if (filteredAdminUser) {
-      filteredAdminUser.isActive = isActive;
-    }
-
-    // Update normal users
-    const normalUser = this.normalUsers.find(user => user.id === userId);
-    if (normalUser) {
-      normalUser.isActive = isActive;
-    }
-    
-    const filteredNormalUser = this.filteredNormalUsers.find(user => user.id === userId);
-    if (filteredNormalUser) {
-      filteredNormalUser.isActive = isActive;
-    }
-  }
-
-  getProtectionText(userRole?: string): string {
-    if (userRole === 'SUPER_ADMIN') {
-      return 'Always Protected';
-    }
-    if (userRole === 'ADMIN') {
-      const currentAdmin = this.authService.getCurrentAdmin();
-      const currentAdminRole = currentAdmin?.userRole;
-      if (currentAdminRole !== 'SUPER_ADMIN') {
-        return 'SUPER_ADMIN Only';
-      }
-    }
-    return 'Protected';
-  }
-
-  getProtectionReason(userRole?: string): string {
-    if (userRole === 'SUPER_ADMIN') {
-      return 'SUPER_ADMIN accounts cannot be disabled for security reasons';
-    }
-    if (userRole === 'ADMIN') {
-      const currentAdmin = this.authService.getCurrentAdmin();
-      const currentAdminRole = currentAdmin?.userRole;
-      if (currentAdminRole !== 'SUPER_ADMIN') {
-        return 'Only SUPER_ADMIN can disable ADMIN accounts';
-      }
-    }
-    return 'This account is protected from being disabled';
-  }
-
-  // Utility methods for template
-  getStatusText(isActive: boolean): string {
-    return isActive ? 'Active' : 'Inactive';
-  }
-
-  getStatusClass(isActive: boolean): string {
-    return isActive ? 'status-active' : 'status-inactive';
-  }
-
-  getRoleDisplayName(role: string): string {
-    switch (role) {
-      case 'SUPER_ADMIN': return 'Super Admin';
-      case 'ADMIN': return 'Admin';
-      case 'MANAGER': return 'Manager';
-      case 'CUSTOMER': return 'Customer';
-      default: return role;
-    }
-  }
-
-  getTypeDisplayName(type: string): string {
-    switch (type) {
-      case 'ADMIN': return 'Admin';
-      case 'CUSTOMER': return 'Customer';
-      default: return type;
-    }
+  getUserRoleDisplayName(userRole?: string): string {
+    return this.getUserRoleText(userRole);
   }
 }

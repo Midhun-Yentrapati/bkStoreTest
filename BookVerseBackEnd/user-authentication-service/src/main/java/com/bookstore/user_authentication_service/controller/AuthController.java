@@ -49,29 +49,7 @@ public class AuthController {
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginRequest.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Customer Login",
-                                            summary = "Customer login example",
-                                            value = """
-                                                    {
-                                                      "usernameOrEmail": "john.doe@example.com",
-                                                      "password": "customerPassword123"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "Admin Login",
-                                            summary = "Admin login example",
-                                            value = """
-                                                    {
-                                                      "usernameOrEmail": "admin@bookstore.com",
-                                                      "password": "adminPassword123"
-                                                    }
-                                                    """
-                                    )
-                            }
+                            schema = @Schema(implementation = LoginRequest.class)
                     )
             )
     )
@@ -81,60 +59,16 @@ public class AuthController {
                     description = "Login successful",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class),
-                            examples = @ExampleObject(
-                                    name = "Successful Login",
-                                    value = """
-                                            {
-                                              "success": true,
-                                              "message": "Authentication successful",
-                                              "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                              "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                              "user": {
-                                                "id": "user-uuid-123",
-                                                "username": "johndoe",
-                                                "email": "john.doe@example.com",
-                                                "userRole": "CUSTOMER",
-                                                "accountStatus": "ACTIVE"
-                                              }
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = AuthResponse.class)
                     )
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Authentication failed - Invalid credentials",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "Invalid Credentials",
-                                    value = """
-                                            {
-                                              "success": false,
-                                              "message": "Invalid username/email or password",
-                                              "errorCode": "INVALID_CREDENTIALS"
-                                            }
-                                            """
-                            )
-                    )
+                    description = "Authentication failed - Invalid credentials"
             ),
             @ApiResponse(
                     responseCode = "423",
-                    description = "Account locked due to multiple failed attempts",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "Account Locked",
-                                    value = """
-                                            {
-                                              "success": false,
-                                              "message": "Account is locked due to multiple failed login attempts",
-                                              "errorCode": "ACCOUNT_LOCKED"
-                                            }
-                                            """
-                            )
-                    )
+                    description = "Account locked due to multiple failed attempts"
             )
     })
     @PostMapping("/login")        // POST /api/auth/login - User login
@@ -162,36 +96,11 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Logout successful",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "Successful Logout",
-                                    value = """
-                                            {
-                                              "success": true,
-                                              "message": "Logout successful"
-                                            }
-                                            """
-                            )
-                    )
+                    description = "Logout successful"
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Unauthorized - Invalid or missing token",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "Unauthorized",
-                                    value = """
-                                            {
-                                              "success": false,
-                                              "message": "Unauthorized access",
-                                              "errorCode": "UNAUTHORIZED"
-                                            }
-                                            """
-                            )
-                    )
+                    description = "Unauthorized - Invalid or missing token"
             )
     })
     @PostMapping("/logout")       // POST /api/auth/logout - User logout
@@ -236,21 +145,7 @@ public class AuthController {
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserRegistrationRequest.class),
-                            examples = @ExampleObject(
-                                    name = "Customer Registration",
-                                    summary = "New customer registration",
-                                    value = """
-                                            {
-                                              "username": "johndoe123",
-                                              "email": "john.doe@example.com",
-                                              "password": "SecurePassword123!",
-                                              "fullName": "John Doe",
-                                              "mobileNumber": "+1234567890",
-                                              "dateOfBirth": "1990-05-15"
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = UserRegistrationRequest.class)
                     )
             )
     )
@@ -260,26 +155,7 @@ public class AuthController {
                     description = "Registration successful",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class),
-                            examples = @ExampleObject(
-                                    name = "Successful Registration",
-                                    value = """
-                                            {
-                                              "success": true,
-                                              "message": "Registration successful",
-                                              "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                              "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                              "user": {
-                                                "id": "user-uuid-456",
-                                                "username": "johndoe123",
-                                                "email": "john.doe@example.com",
-                                                "userRole": "CUSTOMER",
-                                                "accountStatus": "ACTIVE",
-                                                "emailVerified": false
-                                              }
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = AuthResponse.class)
                     )
             ),
             @ApiResponse(
