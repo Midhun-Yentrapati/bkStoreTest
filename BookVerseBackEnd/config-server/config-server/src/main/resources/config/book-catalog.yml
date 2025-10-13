@@ -10,7 +10,7 @@ spring:
     url: jdbc:mysql://localhost:3306/catlog_schema
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: vijay@2003
+    password: Midhun@64
     platform: mysql
   jpa:
     hibernate:

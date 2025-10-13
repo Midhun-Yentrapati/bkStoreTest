@@ -8,8 +8,9 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class AddressService {
-  // Update API URL to point to Spring Boot API Gateway
-  private apiBaseUrl = 'http://localhost:8090/api'; // API Gateway URL
+  // API Gateway URL
+  private apiBaseUrl = 'http://localhost:8090/api';
+  // Base URL for most user address operations
   private apiUrl = `${this.apiBaseUrl}/users/addresses`;
 
   constructor(
@@ -21,24 +22,40 @@ export class AddressService {
    * Get all addresses for current user
    */
   getAddresses(): Observable<Address[]> {
-    // Backend gets userId from JWT token, no need to pass it as parameter
+    // Backend gets userId from JWT token
     return this.http.get<Address[]>(this.apiUrl);
   }
 
   /**
-   * Get a specific address by ID
-   */
+   * Get a specific address by ID for the currently logged-in user
+   
   getAddressById(id: string): Observable<Address> {
     return this.http.get<Address>(`${this.apiUrl}/${id}`);
   }
+    */
+  getAddressById(id: string): Observable<Address> {
+    // CORRECTED URL: The path is /api/users/address/{id} for a single address,
+    // which is handled by the getAddressByIdForAdmin method's URL construction.
+    // We will reuse that logic here for consistency.
+    const singleAddressUrl = `${this.apiBaseUrl}/users/address/${id}`;
+    return this.http.get<Address>(singleAddressUrl);
+  }
 
+  // =================================================================
+  // == THE FIX IS IN THIS METHOD
+  // =================================================================
   /**
-   * Get a specific address by ID for admin users
-   * Uses the admin endpoint that can access any user's address
+   * Get a specific address by ID for admin users.
+   * This points to the correct admin-accessible endpoint.
    */
   getAddressByIdForAdmin(id: string): Observable<Address> {
-    return this.http.get<Address>(`${this.apiBaseUrl}/addresses/${id}`);
+    // CORRECTED URL: The path is /api/users/address/{id}, not /api/addresses/{id}
+    const adminAddressUrl = `${this.apiBaseUrl}/users/address/${id}`;
+    return this.http.get<Address>(adminAddressUrl);
   }
+  // =================================================================
+  // == END OF FIX
+  // =================================================================
 
   /**
    * Add a new address
@@ -49,36 +66,6 @@ export class AddressService {
       return throwError(() => new Error('User not logged in'));
     }
 
-    // Create AddressDTO matching backend expectations
-    const addressDTO = {
-      name: address.name,
-      phone: address.phone,
-      alternatePhone: address.alternatePhone || null,
-      email: address.email || null,
-      pincode: address.pincode,
-      addressLine1: address.addressLine1,
-      addressLine2: address.addressLine2 || null,
-      city: address.city,
-      state: address.state,
-      country: address.country || 'India', // Default to India if not provided
-      landmark: address.landmark || null,
-      addressType: address.addressType,
-      isDefault: address.isDefault || false,
-      isActive: true, // Always set as active for new addresses
-      instructions: address.instructions || null,
-      accessCode: address.accessCode || null,
-      latitude: address.latitude || null,
-      longitude: address.longitude || null
-    };
-
-    return this.http.post<Address>(this.apiUrl, addressDTO);
-  }
-
-  /**
-   * Update an existing address
-   */
-  updateAddress(id: string, address: Address): Observable<Address> {
-    // Create AddressDTO matching backend expectations
     const addressDTO = {
       name: address.name,
       phone: address.phone,
@@ -93,7 +80,35 @@ export class AddressService {
       landmark: address.landmark || null,
       addressType: address.addressType,
       isDefault: address.isDefault || false,
-      isActive: address.isActive !== false, // Keep active unless explicitly set to false
+      isActive: true,
+      instructions: address.instructions || null,
+      accessCode: address.accessCode || null,
+      latitude: address.latitude || null,
+      longitude: address.longitude || null
+    };
+
+    return this.http.post<Address>(this.apiUrl, addressDTO);
+  }
+
+  /**
+   * Update an existing address
+   */
+  updateAddress(id: string, address: Address): Observable<Address> {
+    const addressDTO = {
+      name: address.name,
+      phone: address.phone,
+      alternatePhone: address.alternatePhone || null,
+      email: address.email || null,
+      pincode: address.pincode,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2 || null,
+      city: address.city,
+      state: address.state,
+      country: address.country || 'India',
+      landmark: address.landmark || null,
+      addressType: address.addressType,
+      isDefault: address.isDefault || false,
+      isActive: address.isActive !== false,
       instructions: address.instructions || null,
       accessCode: address.accessCode || null,
       latitude: address.latitude || null,
@@ -111,13 +126,6 @@ export class AddressService {
   }
 
   /**
-   * Permanently delete an address
-   */
-  permanentDeleteAddress(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  /**
    * Set an address as default
    */
   setDefaultAddress(id: string): Observable<Address> {
@@ -131,11 +139,9 @@ export class AddressService {
     return this.http.get<Address>(`${this.apiUrl}/default`);
   }
 
-  /**
-   * Validate pincode
-   */
+  // --- Helper/Simulation Methods (can be removed if not used) ---
+
   validatePincode(pincode: string): Observable<{isValid: boolean, location?: string}> {
-    // Simulate pincode validation - In production, use a real API
     const isValid = /^\d{6}$/.test(pincode);
     return of({
       isValid,
@@ -143,31 +149,20 @@ export class AddressService {
     });
   }
 
-  /**
-   * Get address suggestions based on pincode
-   */
   getAddressSuggestions(pincode: string): Observable<{city: string, state: string}[]> {
-    // Simulate address suggestions based on pincode - In production, use a real API
     const suggestions = [
       { city: 'Sample City', state: 'Sample State' }
     ];
     return of(suggestions);
   }
 
-  /**
-   * Geocode address to get coordinates
-   */
   geocodeAddress(address: string): Observable<{latitude: number, longitude: number} | null> {
-    // Simulate geocoding service - In production, use Google Maps or similar
     return of({
       latitude: 12.9716,
       longitude: 77.5946
     });
   }
 
-  /**
-   * Get addresses by type
-   */
   getAddressesByType(type: Address['addressType']): Observable<Address[]> {
     return new Observable(observer => {
       this.getAddresses().subscribe(addresses => {
@@ -178,12 +173,9 @@ export class AddressService {
     });
   }
 
-  /**
-   * Search addresses
-   */
   searchAddresses(query: string): Observable<Address[]> {
     const userId = this.authService.getCurrentCustomer()?.id;
     const searchParams = `?q=${encodeURIComponent(query)}${userId ? `&userId=${userId}` : ''}`;
     return this.http.get<Address[]>(`${this.apiUrl}/search${searchParams}`);
   }
-} 
+}

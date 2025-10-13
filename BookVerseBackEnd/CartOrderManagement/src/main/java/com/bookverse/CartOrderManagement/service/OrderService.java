@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,6 @@ public class OrderService {
         order.setShippingAddressId(orderDto.getShippingAddressId());
         order.setSubtotal(orderDto.getSubtotal() != null ? orderDto.getSubtotal() : orderDto.getGrandTotal());
         
-        // Handle coupon application
         BigDecimal discountAmount = BigDecimal.ZERO;
         if (orderDto.getCouponCode() != null && !orderDto.getCouponCode().trim().isEmpty()) {
             if (couponService.validateCoupon(orderDto.getCouponCode(), orderDto.getSubtotal(), orderDto.getUserId())) {
@@ -99,17 +99,14 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
         System.out.println("Order created with ID: " + savedOrder.getId() + ", GrandTotal: " + savedOrder.getGrandTotal());
         
-        // Create initial status history
         createStatusHistory(savedOrder, null, Order.OrderStatus.Pending, "Order created", "SYSTEM");
         
-        // Create payment record for the order
         try {
             createPaymentForOrder(savedOrder);
         } catch (Exception e) {
             System.out.println("Error creating payment: " + e.getMessage());
         }
         
-        // Create order items from cart items
         try {
             createOrderItemsFromCart(savedOrder, orderDto.getUserId());
         } catch (Exception e) {
@@ -117,7 +114,6 @@ public class OrderService {
             e.printStackTrace();
         }
         
-        // Clear cart after successful order creation
         try {
             cartService.clearCart(orderDto.getUserId());
             System.out.println("Cart cleared for user: " + orderDto.getUserId());
@@ -129,22 +125,19 @@ public class OrderService {
     }
     
     private void createOrderItemsFromCart(Order order, String userId) {
-        // Get cart items for the user
         List<CartItem> cartItems = cartService.getCartItems(userId);
         System.out.println("Found " + cartItems.size() + " cart items for user: " + userId);
         
-        // Create order items from cart items
         for (CartItem cartItem : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setId(UUID.randomUUID().toString());
-            orderItem.setOrder(order);  // Set the order entity instead of just orderId
+            orderItem.setOrder(order);
             orderItem.setBookId(cartItem.getBookId());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getPriceWhenAdded());
             orderItem.setSubtotal(cartItem.getPriceWhenAdded().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             orderItem.setItemStatus(OrderItem.ItemStatus.Pending);
             
-            // Fetch book details from book service
             var bookDetails = externalDataService.getBookDetails(cartItem.getBookId());
             if (bookDetails != null) {
                 orderItem.setTitle((String) bookDetails.get("title"));
@@ -163,20 +156,15 @@ public class OrderService {
 
     @Transactional
     public OrderDto updateOrderStatus(String orderId, Order.OrderStatus status) {
-        // --- FIX IS HERE ---
-        // Use findByIdWithDetails, which is designed to find a single order by its ID
-        // and returns an Optional<Order>.
         Order order = orderRepository.findByIdWithDetails(orderId)
                 .orElseThrow(() -> new ItemNotFoundException("Order not found with id: " + orderId));
         
         Order.OrderStatus previousStatus = order.getOrderStatus();
         order.setOrderStatus(status);
         
-        // Update timestamp based on status
         LocalDateTime now = LocalDateTime.now();
         switch (status) {
             case Confirmed:
-                // No specific timestamp field for confirmed
                 break;
             case Shipped:
                 order.setShippedAt(now);
@@ -195,7 +183,6 @@ public class OrderService {
         
         Order savedOrder = orderRepository.save(order);
         
-        // Create status history record
         createStatusHistory(orderId, previousStatus, status, "Status updated", "ADMIN");
         
         return convertToDto(savedOrder);
@@ -203,7 +190,6 @@ public class OrderService {
 
     @Transactional
     public OrderDto updatePaymentStatus(String orderId, Order.PaymentStatus status) {
-        // This method is correct as is.
         Order order = orderRepository.findByIdWithDetails(orderId)
                 .orElseThrow(() -> new ItemNotFoundException("Order not found with id: " + orderId));
         order.setPaymentStatus(status);
@@ -218,11 +204,9 @@ public class OrderService {
 
     @Transactional
     public OrderDto cancelOrder(String orderId) {
-        // This method is correct as is.
         Order order = orderRepository.findByIdWithDetails(orderId)
                 .orElseThrow(() -> new ItemNotFoundException("Order not found with id: " + orderId));
         
-        // Check if order can be cancelled
         if (order.getOrderStatus() == Order.OrderStatus.Delivered) {
             throw new IllegalStateException("Cannot cancel a delivered order.");
         }
@@ -235,18 +219,15 @@ public class OrderService {
         
         Order.OrderStatus previousStatus = order.getOrderStatus();
         
-        // Cancel the order
         order.setOrderStatus(Order.OrderStatus.Cancelled);
         order.setCancelledAt(LocalDateTime.now());
         
-        // If payment was made, update payment status to refunded
         if (order.getPaymentStatus() == Order.PaymentStatus.Paid) {
             order.setPaymentStatus(Order.PaymentStatus.Refunded);
         }
         
         Order savedOrder = orderRepository.save(order);
         
-        // Create status history record
         createStatusHistory(orderId, previousStatus, Order.OrderStatus.Cancelled, "Order cancelled by user", "USER");
         
         return convertToDto(savedOrder);
@@ -254,7 +235,6 @@ public class OrderService {
     
     private void createStatusHistory(String orderId, Order.OrderStatus previousStatus, 
                                    Order.OrderStatus newStatus, String reason, String updatedBy) {
-        // Fetch the order entity to set the relationship properly
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ItemNotFoundException("Order not found with id: " + orderId));
         
@@ -265,7 +245,7 @@ public class OrderService {
                                    Order.OrderStatus newStatus, String reason, String updatedBy) {
         OrderStatusHistory statusHistory = new OrderStatusHistory();
         statusHistory.setId(UUID.randomUUID().toString());
-        statusHistory.setOrder(order);  // Set the order entity instead of just orderId
+        statusHistory.setOrder(order);
         statusHistory.setPreviousStatus(previousStatus);
         statusHistory.setNewStatus(newStatus);
         statusHistory.setReason(reason);
@@ -288,21 +268,62 @@ public class OrderService {
         System.out.println("Payment created with ID: " + payment.getId() + " for order: " + order.getId());
     }
     
-    // Entity to DTO conversion methods
+    // =================================================================
+    // == UPDATED METHOD WITH ADDRESS FIX IS HERE
+    // =================================================================
     private OrderDto convertToDto(Order order) {
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());
         dto.setUserId(order.getUserId());
-        
-        // Add customer information from user service
-        dto.setCustomerName(externalDataService.getCustomerName(order.getUserId()));
-        dto.setCustomerEmail(externalDataService.getCustomerEmail(order.getUserId()));
-        
+    
+        if (order.getUserId() != null) {
+            Map<String, String> customerDetails = externalDataService.getCustomerDetails(order.getUserId());
+            dto.setCustomerName(customerDetails.get("name"));
+            dto.setCustomerEmail(customerDetails.get("email"));
+            dto.setCustomerPhone(customerDetails.get("phone"));
+        } else {
+            dto.setCustomerName("Customer Name N/A");
+            dto.setCustomerEmail("Email N/A");
+            dto.setCustomerPhone("Phone N/A");
+        }
+    
+        // Fetch and set Billing Address details
+        if (order.getBillingAddressId() != null) {
+            Map<String, Object> addressDetails = externalDataService.getAddressDetails(order.getBillingAddressId());
+            if (addressDetails != null) {
+                dto.setBillingAddressId(String.format("%s, %s, %s, %s",
+                    addressDetails.getOrDefault("street", ""),
+                    addressDetails.getOrDefault("city", ""),
+                    addressDetails.getOrDefault("state", ""),
+                    addressDetails.getOrDefault("zipCode", "")));
+            } else {
+                dto.setBillingAddressId("Address not found for ID: " + order.getBillingAddressId());
+            }
+        } else {
+            dto.setBillingAddressId("No billing address specified");
+        }
+    
+        // Fetch and set Shipping Address details
+        if (order.getShippingAddressId() != null) {
+            Map<String, Object> addressDetails = externalDataService.getAddressDetails(order.getShippingAddressId());
+            if (addressDetails != null) {
+                dto.setShippingAddressId(String.format("%s, %s, %s, %s",
+                    addressDetails.getOrDefault("street", ""),
+                    addressDetails.getOrDefault("city", ""),
+                    addressDetails.getOrDefault("state", ""),
+                    addressDetails.getOrDefault("zipCode", "")));
+            } else {
+                dto.setShippingAddressId("Address not found for ID: " + order.getShippingAddressId());
+            }
+        } else {
+            dto.setShippingAddressId("No shipping address specified");
+        }
+    
         dto.setBillingAddressId(order.getBillingAddressId());
         dto.setShippingAddressId(order.getShippingAddressId());
         dto.setSubtotal(order.getSubtotal());
         dto.setDiscountAmount(order.getDiscountAmount());
-        dto.setCouponCode(order.getCouponId()); // Map couponId to couponCode for frontend
+        dto.setCouponCode(order.getCouponId());
         dto.setTaxAmount(order.getTaxAmount());
         dto.setShippingAmount(order.getShippingAmount());
         dto.setPlatformFee(order.getPlatformFee());
@@ -313,8 +334,7 @@ public class OrderService {
         dto.setOrderStatus(order.getOrderStatus());
         dto.setTrackingId(order.getTrackingId());
         dto.setNotes(order.getNotes());
-        
-        // Set timestamps
+    
         dto.setCreatedAt(order.getCreatedAt());
         dto.setUpdatedAt(order.getUpdatedAt());
         dto.setPlacedAt(order.getPlacedAt());
@@ -322,27 +342,23 @@ public class OrderService {
         dto.setShippedAt(order.getShippedAt());
         dto.setDeliveredAt(order.getDeliveredAt());
         dto.setCancelledAt(order.getCancelledAt());
-        
-        // Convert order items
+    
         if (order.getOrderItems() != null) {
             List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
                     .map(this::convertOrderItemToDto)
                     .collect(Collectors.toList());
             dto.setOrderItems(orderItemDtos);
         }
-        
-        // Convert status history
+    
         if (order.getStatusHistory() != null) {
             List<OrderStatusHistoryDto> statusHistoryDtos = order.getStatusHistory().stream()
                     .map(this::convertStatusHistoryToDto)
                     .collect(Collectors.toList());
             dto.setStatusHistory(statusHistoryDtos);
         }
-        
+    
         return dto;
     }
-    
-
     
     private OrderItemDto convertOrderItemToDto(OrderItem orderItem) {
         OrderItemDto dto = new OrderItemDto();

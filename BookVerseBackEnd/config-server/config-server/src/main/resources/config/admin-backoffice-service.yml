@@ -10,7 +10,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/AdminService?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
-    password: vijay@2003
+    password: Midhun@64
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

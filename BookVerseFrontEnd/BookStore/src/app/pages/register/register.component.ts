@@ -87,16 +87,23 @@ export class RegisterComponent {
       
       this.authService.register(userData).subscribe({
         next: (user) => {
+          console.log('Registration successful, received user:', user);
+          console.log('Auth service customer state:', this.authService.getCurrentCustomer());
+          console.log('Auth service isLoggedIn:', this.authService.isLoggedIn());
+          
           // Show success message in green
           this.successMessage = `Welcome to BookVerse, ${user.fullName}! Registration successful. You are now logged in.`;
           this.isSubmitting = false;
           
-          console.log('Registration successful, user logged in:', user);
+          // Force refresh auth state to ensure user is properly logged in
+          this.authService.refreshAuthState();
           
-          // Redirect to home after showing success message for 2 seconds
+          // Small delay to ensure state is updated, then redirect
           setTimeout(() => {
+            console.log('After refresh - isLoggedIn:', this.authService.isLoggedIn());
+            console.log('After refresh - customer:', this.authService.getCurrentCustomer());
             this.router.navigate(['/']);
-          }, 2000);
+          }, 100);
         },
         error: (err) => {
           this.errorMessage = err.message || 'Registration failed. Please try again.';

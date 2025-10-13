@@ -1,4 +1,5 @@
 package com.bookstore.user_authentication_service.controller;
+
 import com.bookstore.user_authentication_service.dto.*;
 import com.bookstore.user_authentication_service.entity.*;
 import com.bookstore.user_authentication_service.service.AddressService;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +39,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    
+
     private final UserService userService;
     private final AddressService addressService;
-    
+
     // ==================== USER PROFILE MANAGEMENT ====================
-    
+
     @Operation(
             summary = "Get User Profile",
             description = "Get the authenticated user's profile information",
@@ -58,7 +60,7 @@ public class UserController {
         try {
             String userId = getCurrentUserId();
             log.info("Getting profile for user: {}", userId);
-            
+
             Optional<UserDTO> userDTO = userService.getUserById(userId);
             if (userDTO.isPresent()) {
                 return ResponseEntity.ok(userDTO.get());
@@ -90,10 +92,10 @@ public class UserController {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentUserId = authentication.getName();
-            
+
             boolean isAdmin = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_SUPER_ADMIN"));
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_SUPER_ADMIN"));
 
             // Security Check: Allow access if the user is an admin OR if the user is requesting their own profile
             if (!isAdmin && !currentUserId.equals(userId)) {
@@ -102,7 +104,7 @@ public class UserController {
             }
 
             log.info("Getting profile for user ID: {}", userId);
-            
+
             Optional<UserDTO> userDTO = userService.getUserById(userId);
             if (userDTO.isPresent()) {
                 return ResponseEntity.ok(userDTO.get());
@@ -119,7 +121,7 @@ public class UserController {
         }
     }
     // --- END: ADDED ENDPOINT ---
-    
+
     @Operation(
             summary = "Update User Profile",
             description = "Update the authenticated user's profile information",
@@ -136,7 +138,7 @@ public class UserController {
         try {
             String userId = getCurrentUserId();
             log.info("Updating profile for user: {}", userId);
-            
+
             userDTO.setPassword(null);
             userDTO.setUsername(null);
             userDTO.setEmail(null);
@@ -145,7 +147,7 @@ public class UserController {
             userDTO.setAccountStatus(null);
             userDTO.setFailedLoginAttempts(null);
             userDTO.setAccountLockedUntil(null);
-            
+
             UserDTO updatedUser = userService.updateUserProfile(userId, userDTO);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -158,22 +160,22 @@ public class UserController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     // ==================== ADDRESS MANAGEMENT ====================
-    
+
     @Operation(
             summary = "Get User Addresses",
             description = "Get all addresses for the authenticated user",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    
+
     @Transactional()
     @GetMapping("/addresses")
     public ResponseEntity<?> getUserAddresses() {
         try {
             String userId = getCurrentUserId();
             log.info("Getting addresses for user: {}", userId);
-            
+
             List<AddressDTO> addresses = userService.getUserAddresses(userId);
             return ResponseEntity.ok(addresses);
         } catch (Exception e) {
@@ -182,7 +184,7 @@ public class UserController {
                     .body(Map.of("error", "Failed to retrieve addresses"));
         }
     }
-    
+
     @Operation(
             summary = "Add User Address",
             description = "Add a new address for the authenticated user",
@@ -193,7 +195,7 @@ public class UserController {
         try {
             String userId = getCurrentUserId();
             log.info("Adding address for user: {}", userId);
-            
+
             AddressDTO savedAddress = userService.addUserAddress(userId, addressDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "success", true,
@@ -206,7 +208,7 @@ public class UserController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Update User Address",
             description = "Update an existing address for the authenticated user",
@@ -219,7 +221,7 @@ public class UserController {
         try {
             String userId = getCurrentUserId();
             log.info("Updating address {} for user: {}", addressId, userId);
-            
+
             AddressDTO updatedAddress = userService.updateUserAddress(userId, addressId, addressDTO);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -232,7 +234,7 @@ public class UserController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Delete User Address",
             description = "Delete an address for the authenticated user",
@@ -243,7 +245,7 @@ public class UserController {
         try {
             String userId = getCurrentUserId();
             log.info("Deleting address {} for user: {}", addressId, userId);
-            
+
             userService.deleteUserAddress(userId, addressId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -255,36 +257,29 @@ public class UserController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
+    // =================================================================
+    // == NEW ENDPOINT FOR ADDRESS FIX IS HERE
+    // =================================================================
     @Operation(
-            summary = "Get User Address by ID",
-            description = "Get a specific address by its ID for the authenticated user",
+            summary = "Get Address by ID",
+            description = "Get a specific address by its ID. Can be accessed by the owner or an admin.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Address retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - Address does not belong to user"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Address does not belong to user or user is not an admin"),
             @ApiResponse(responseCode = "404", description = "Address not found")
     })
-    @GetMapping("/addresses/{addressId}")
-    public ResponseEntity<?> getAddressById(@PathVariable String addressId) {
-        try {
-            String userId = getCurrentUserId();
-            log.info("Getting address {} for user: {}", addressId, userId);
-
-            Optional<AddressDTO> addressDTO = addressService.getAddressByIdAndUserId(addressId, userId);
-
-            if (addressDTO.isPresent()) {
-                return ResponseEntity.ok(addressDTO.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            log.error("Error getting address by ID: {}", addressId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred."));
-        }
+    @GetMapping("/address/{addressId}")
+    public ResponseEntity<Optional<AddressDTO>> getAddressById(@PathVariable String addressId) {
+        Optional<AddressDTO> address = addressService.getAddressById(addressId);
+        return ResponseEntity.ok(address);
     }
+    // =================================================================
+    // == END OF NEW ENDPOINT
+    // =================================================================
 
     /**
      * [ADMIN] Get any address by its ID.
@@ -293,7 +288,7 @@ public class UserController {
      * @return The address DTO if found.
      */
     @GetMapping("/admin/addresses/{addressId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "[ADMIN] Get any address by ID", description = "Allows an admin to retrieve any address by its unique ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Address retrieved successfully"),
@@ -313,31 +308,31 @@ public class UserController {
 
     @Operation(
             summary = "Set Default Address",
-        security = @SecurityRequirement(name = "bearerAuth")
-)
-@PutMapping("/addresses/{addressId}/default")
-public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
-    try {
-        String userId = getCurrentUserId();
-        log.info("Setting default address {} for user: {}", addressId, userId);
-        
-        AddressDTO defaultAddress = userService.setDefaultAddress(userId, addressId);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Default address set successfully",
-                "address", defaultAddress
-        ));
-    } catch (IllegalArgumentException | NoSuchElementException e) {
-        log.error("Error setting default address: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
-    } catch (Exception e) {
-        log.error("An unexpected error occurred while setting default address: {}", e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "An unexpected error occurred."));
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PutMapping("/addresses/{addressId}/default")
+    public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
+        try {
+            String userId = getCurrentUserId();
+            log.info("Setting default address {} for user: {}", addressId, userId);
+
+            AddressDTO defaultAddress = userService.setDefaultAddress(userId, addressId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Default address set successfully",
+                    "address", defaultAddress
+            ));
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            log.error("Error setting default address: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("An unexpected error occurred while setting default address: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An unexpected error occurred."));
+        }
     }
-}
-    
+
     @Operation(
             summary = "Get Default Address",
             description = "Get the default address for the authenticated user",
@@ -348,7 +343,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
         try {
             String userId = getCurrentUserId();
             log.info("Getting default address for user: {}", userId);
-            
+
             Optional<AddressDTO> defaultAddress = userService.getDefaultAddress(userId);
             if (defaultAddress.isPresent()) {
                 return ResponseEntity.ok(defaultAddress.get());
@@ -362,9 +357,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve default address"));
         }
     }
-    
+
     // ==================== ADMIN USER MANAGEMENT ====================
-    
+
     @Operation(
             summary = "Get All Users (Admin)",
             description = "Get all users with pagination (Admin only)",
@@ -379,11 +374,11 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             @RequestParam(defaultValue = "desc") String sortDir) {
         try {
             log.info("Admin getting all users - page: {}, size: {}", page, size);
-            
-            Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+
+            Sort sort = sortDir.equalsIgnoreCase("desc") ?
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
-            
+
             Page<UserDTO> users = userService.getAllUsers(pageable);
             return ResponseEntity.ok(users);
         } catch (Exception e) {
@@ -392,7 +387,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve users"));
         }
     }
-    
+
     @Operation(
             summary = "Get All Customers (Admin)",
             description = "Get all customer users with pagination (Admin only)",
@@ -411,13 +406,13 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             log.info("[CONTROLLER DEBUG] Principal: {}", auth != null ? auth.getPrincipal() : "null");
             log.info("[CONTROLLER DEBUG] Authorities: {}", auth != null ? auth.getAuthorities() : "null");
             log.info("[CONTROLLER DEBUG] Is Authenticated: {}", auth != null ? auth.isAuthenticated() : "false");
-            
+
             log.info("Admin getting all customers - page: {}, size: {}", page, size);
-            
-            Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+
+            Sort sort = sortDir.equalsIgnoreCase("desc") ?
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
-            
+
             Page<UserDTO> customers = userService.getAllCustomers(pageable);
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
@@ -426,7 +421,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve customers"));
         }
     }
-    
+
     @Operation(
             summary = "Get All Admins (Admin)",
             description = "Get all admin users with pagination (Admin only)",
@@ -441,11 +436,11 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             @RequestParam(defaultValue = "desc") String sortDir) {
         try {
             log.info("Admin getting all admin users - page: {}, size: {}", page, size);
-            
-            Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+
+            Sort sort = sortDir.equalsIgnoreCase("desc") ?
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
-            
+
             Page<UserDTO> admins = userService.getAllAdmins(pageable);
             return ResponseEntity.ok(admins);
         } catch (Exception e) {
@@ -454,7 +449,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve admin users"));
         }
     }
-    
+
     @Operation(
             summary = "Search Users (Admin)",
             description = "Search users with filters and pagination (Admin only)",
@@ -474,21 +469,21 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         try {
-            log.info("Admin searching users with term: {}, role: {}, status: {}", 
+            log.info("Admin searching users with term: {}, role: {}, status: {}",
                     searchTerm, userRole, accountStatus);
-            
-            Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+
+            Sort sort = sortDir.equalsIgnoreCase("desc") ?
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
-            
+
             Page<UserDTO> users;
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 users = userService.searchUsers(searchTerm, pageable);
             } else {
-                users = userService.getUsersWithFilters(userRole, accountStatus, department, 
+                users = userService.getUsersWithFilters(userRole, accountStatus, department,
                         isEmailVerified, isMobileVerified, pageable);
             }
-            
+
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             log.error("Error searching users: {}", e.getMessage());
@@ -496,7 +491,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to search users"));
         }
     }
-    
+
     @Operation(
             summary = "Get User by ID (Admin)",
             description = "Get a specific user by ID (Admin only)",
@@ -507,7 +502,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> getUserByIdForAdmin(@PathVariable String userId) {
         try {
             log.info("Admin getting user by ID: {}", userId);
-            
+
             Optional<UserDTO> user = userService.getUserById(userId);
             if (user.isPresent()) {
                 return ResponseEntity.ok(user.get());
@@ -521,9 +516,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve user"));
         }
     }
-    
+
     // ==================== ADMIN USER ACCOUNT MANAGEMENT ====================
-    
+
     @Operation(
             summary = "Activate User Account (Admin)",
             description = "Activate a user account (Admin only)",
@@ -534,7 +529,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> activateUser(@PathVariable String userId) {
         try {
             log.info("Admin activating user: {}", userId);
-            
+
             userService.activateAccount(userId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -546,7 +541,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Deactivate User Account (Admin)",
             description = "Deactivate a user account (Admin only)",
@@ -557,7 +552,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> deactivateUser(@PathVariable String userId) {
         try {
             log.info("Admin deactivating user: {}", userId);
-            
+
             userService.deactivateAccount(userId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -569,7 +564,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Lock User Account (Admin)",
             description = "Lock a user account (Admin only)",
@@ -580,7 +575,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> lockUser(@PathVariable String userId) {
         try {
             log.info("Admin locking user: {}", userId);
-            
+
             userService.lockAccount(userId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -592,7 +587,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Unlock User Account (Admin)",
             description = "Unlock a user account (Admin only)",
@@ -603,7 +598,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> unlockUser(@PathVariable String userId) {
         try {
             log.info("Admin unlocking user: {}", userId);
-            
+
             userService.unlockAccount(userId);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -615,7 +610,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Toggle User Account Status (Admin)",
             description = "Enable or disable a user account (Admin only). SUPER_ADMIN can disable ADMIN accounts, but SUPER_ADMIN accounts cannot be disabled.",
@@ -626,42 +621,42 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> toggleUserStatus(@PathVariable String userId) {
         try {
             log.info("Admin toggling user status for user: {}", userId);
-            
+
             Optional<UserDTO> userOpt = userService.getUserById(userId);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
             }
-            
+
             UserDTO user = userOpt.get();
-            
+
             String currentAdminId = getCurrentUserId();
             Optional<UserDTO> currentAdminOpt = userService.getUserById(currentAdminId);
-            
+
             if (currentAdminOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Current admin user not found"));
             }
-            
+
             UserDTO currentAdmin = currentAdminOpt.get();
-            
+
             if (user.getUserRole() == UserRole.SUPER_ADMIN) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Cannot disable SUPER_ADMIN accounts"));
             }
-            
+
             if (user.getUserRole() == UserRole.ADMIN && currentAdmin.getUserRole() != UserRole.SUPER_ADMIN) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Only SUPER_ADMIN can disable ADMIN accounts"));
             }
-            
+
             boolean currentlyActive = user.getAccountStatus() == AccountStatus.ACTIVE;
             if (currentlyActive) {
                 userService.deactivateAccount(userId);
             } else {
                 userService.activateAccount(userId);
             }
-            
+
             String newStatus = currentlyActive ? "deactivated" : "activated";
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -674,9 +669,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to toggle user status: " + e.getMessage()));
         }
     }
-    
+
     // ==================== USER DELETION ENDPOINTS ====================
-    
+
     @Operation(
             summary = "Delete User Account (Admin)",
             description = "Permanently delete a user account (Admin only). This action cannot be undone.",
@@ -687,15 +682,15 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         try {
             log.info("Admin permanently deleting user: {}", userId);
-            
+
             Optional<UserDTO> user = userService.getUserById(userId);
             if (user.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
             }
-            
+
             userService.deleteUser(userId);
-            
+
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "User account deleted permanently"
@@ -706,7 +701,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
         }
     }
-    
+
     @Operation(
             summary = "Soft Delete User Account (Admin)",
             description = "Soft delete a user account (Admin only). User data is preserved but account is marked as deleted.",
@@ -717,15 +712,15 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> softDeleteUser(@PathVariable String userId) {
         try {
             log.info("Admin soft deleting user: {}", userId);
-            
+
             Optional<UserDTO> user = userService.getUserById(userId);
             if (user.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
             }
-            
+
             userService.softDeleteUser(userId);
-            
+
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "User account soft deleted successfully"
@@ -736,9 +731,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to soft delete user: " + e.getMessage()));
         }
     }
-    
+
     // ==================== USER STATISTICS ====================
-    
+
     @Operation(
             summary = "Get User Statistics (Admin)",
             description = "Get user count statistics (Admin only)",
@@ -749,7 +744,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
     public ResponseEntity<?> getUserStatistics() {
         try {
             log.info("Admin getting user statistics");
-            
+
             Map<String, Object> stats = new HashMap<>();
             stats.put("totalUsers", userService.getTotalUserCount());
             stats.put("customerCount", userService.getCustomerCount());
@@ -757,7 +752,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             stats.put("roleDistribution", userService.getUserRoleDistribution());
             stats.put("statusDistribution", userService.getUserStatusDistribution());
             stats.put("departmentDistribution", userService.getUserCountByDepartment());
-            
+
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             log.error("Error getting user statistics: {}", e.getMessage());
@@ -765,7 +760,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve user statistics"));
         }
     }
-    
+
     @Operation(
             summary = "Get Inactive Users (Admin)",
             description = "Get list of inactive users (Admin only)",
@@ -778,11 +773,11 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             @RequestParam(defaultValue = "20") int size) {
         try {
             log.info("Admin getting inactive users");
-            
+
             Pageable pageable = PageRequest.of(page, size);
             Page<UserDTO> inactiveUsers = userService.getUsersWithFilters(
                     null, AccountStatus.INACTIVE, null, null, null, pageable);
-            
+
             return ResponseEntity.ok(inactiveUsers);
         } catch (Exception e) {
             log.error("Error getting inactive users: {}", e.getMessage());
@@ -790,9 +785,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to retrieve inactive users"));
         }
     }
-    
+
     // ==================== PASSWORD MANAGEMENT ====================
-    
+
     @Operation(
             summary = "Change Password",
             description = "Change the authenticated user's password",
@@ -804,14 +799,14 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
             String userId = getCurrentUserId();
             String currentPassword = passwordData.get("currentPassword");
             String newPassword = passwordData.get("newPassword");
-            
+
             if (currentPassword == null || newPassword == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("error", "Current password and new password are required"));
             }
-            
+
             log.info("Changing password for user: {}", userId);
-            
+
             userService.changePassword(userId, currentPassword, newPassword);
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -823,9 +818,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    
+
     // ==================== VALIDATION ENDPOINTS ====================
-    
+
     @Operation(
             summary = "Check Username Availability",
             description = "Check if a username is available for registration"
@@ -844,7 +839,7 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to check username availability"));
         }
     }
-    
+
     @Operation(
             summary = "Check Email Availability",
             description = "Check if an email is available for registration"
@@ -863,9 +858,9 @@ public ResponseEntity<?> setDefaultAddress(@PathVariable String addressId) {
                     .body(Map.of("error", "Failed to check email availability"));
         }
     }
-    
+
     // ==================== UTILITY METHODS ====================
-    
+
     private String getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof String) {

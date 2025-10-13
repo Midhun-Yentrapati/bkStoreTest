@@ -17,6 +17,8 @@ public class OrderDto {
     private String customerName;
     @Schema(description = "Customer email", example = "john@example.com")
     private String customerEmail;
+    @Schema(description = "Customer phone", example = "+1234567890")
+    private String customerPhone;
     @Schema(description = "Billing address ID", example = "ADDR-789")
     private String billingAddressId;
     @Schema(description = "Shipping address ID", example = "ADDR-790")
@@ -74,6 +76,9 @@ public class OrderDto {
 
     public String getCustomerEmail() { return customerEmail; }
     public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
+
+    public String getCustomerPhone() { return customerPhone; }
+    public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
 
     public String getBillingAddressId() { return billingAddressId; }
     public void setBillingAddressId(String billingAddressId) { this.billingAddressId = billingAddressId; }
