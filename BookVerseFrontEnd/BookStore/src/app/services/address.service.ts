@@ -41,9 +41,6 @@ export class AddressService {
     return this.http.get<Address>(singleAddressUrl);
   }
 
-  // =================================================================
-  // == THE FIX IS IN THIS METHOD
-  // =================================================================
   /**
    * Get a specific address by ID for admin users.
    * This points to the correct admin-accessible endpoint.
@@ -53,9 +50,7 @@ export class AddressService {
     const adminAddressUrl = `${this.apiBaseUrl}/users/address/${id}`;
     return this.http.get<Address>(adminAddressUrl);
   }
-  // =================================================================
-  // == END OF FIX
-  // =================================================================
+
 
   /**
    * Add a new address
